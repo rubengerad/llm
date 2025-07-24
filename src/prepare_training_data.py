@@ -62,7 +62,7 @@ def initialize_ollama_model(model_name: str):
     except requests.RequestException as e:
         raise Exception(f"Error connecting to Ollama: {str(e)}")
 
-def summarize_with_ollama(model_name: str, content: str) -> str:
+def summarize_with_ollama(model_name: str, title: str, content: str) -> str:
     """
     Generate a summary of n8n workflow JSON using Ollama.
     
@@ -78,7 +78,7 @@ def summarize_with_ollama(model_name: str, content: str) -> str:
     """
     try:
           # Create the prompt for summarization
-        prompt = f"Create task definition with purpose for the following n8n workflow JSON in 50 words or less. Focus on what the workflow does and its key components:\n\n{content}. Return no additional text and do not exceed 50 words in response."
+        prompt = f"Read and summarise JSON Worflow: '\n\n{content}'. Create task definition from summary for the n8n JSON Workflow at the end in 30 words or less. Focus on what the workflow does and its key components. Return no additional text other than concise response in single line. Do not prepend acknowlegement of task like 'ok here is the summary'. Do not include verbatim JSON Workflow or descriptions."
 
         # Call Ollama API directly
         response = requests.post(
@@ -94,7 +94,7 @@ def summarize_with_ollama(model_name: str, content: str) -> str:
             return f"Error: Ollama returned status code {response.status_code}"
             
         result = response.json()
-        return result.get("response", "").strip()
+        return title + ":" + result.get("response", "").strip()
     except Exception as e:
         logger.error(f"Error generating summary with Ollama: {str(e)}")
         return f"Error summarizing workflow: {str(e)}"
@@ -154,17 +154,16 @@ def prepare_n8n_training_data(folder_path: str, model_name: str, output_path: st
                 continue
             
             # Remove all digits from filename
-            instructions = clean_filename(filename)
+            title = clean_filename(filename)
         
-        
-            # Generate summary using Ollama    
-            summary = summarize_with_ollama(llm_model, file_content)
-            logger.info(f"{instructions}: {summary}")
+
+            # Generate summary using Ollama
+            instructions = summarize_with_ollama(llm_model, title, json.dumps(json.loads(file_content), ensure_ascii=False))
+            logger.info(f"{instructions}")
 
             # Add to output data
             output_data.append({
                 "instruction": instructions,
-                "input": summary,
                 "output": json.dumps(json.loads(file_content), ensure_ascii=False)
             })
         except Exception as e:
@@ -196,7 +195,7 @@ def main() -> None:
     parser.add_argument("--type", required=True, help="Type of training data (e.g., n8n)")
     parser.add_argument("--folder", required=True, help="Folder containing n8n workflow JSON files")
     parser.add_argument("--model", required=True, help="Ollama model name (e.g., llama3)")
-    parser.add_argument("--output", default="training/n8n-training-data.json", 
+    parser.add_argument("--output", default="training/alpaca/n8n-training-data.json", 
                        help="Output file path for training data")
     args = parser.parse_args()
 
