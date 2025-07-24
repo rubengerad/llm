@@ -1,0 +1,288 @@
+"mcp","TITLE: Use Prisma MCP Servers with OpenAI Agents SDK (Python)
+DESCRIPTION: An example Python script showcasing the integration of Prisma MCP servers with the OpenAI Agents SDK. It demonstrates launching MCP servers concurrently, listing their tools, and setting up an assistant that utilizes these servers for database tasks.
+SOURCE: https://github.com/prisma/mcp/blob/main/README.md#_snippet_8
+
+LANGUAGE: python
+CODE:
+```
+from openai import AsyncOpenAI
+from openai.types.beta import Assistant
+from openai.beta import AsyncAssistantExecutor
+from openai.experimental.mcp import MCPServerStdio
+from openai.types.beta.threads import Message, Thread
+from openai.types.beta.tools import ToolCall
+
+import asyncio
+
+async def main():
+    # Launch both MCP servers concurrently
+    async with MCPServerStdio(
+        params={
+            ""command"": ""npx"",
+            ""args"": [""-y"", ""prisma"", ""mcp""]
+        }
+    ) as local_server, MCPServerStdio(
+        params={
+            ""command"": ""npx"",
+            ""args"": [""-y"", ""mcp-remote"", ""https://mcp.prisma.io/mcp""]
+        }
+    ) as remote_server:
+        
+        # Optional: list tools from both servers
+        local_tools = await local_server.list_tools()
+        remote_tools = await remote_server.list_tools()
+        print(""Local server tools:"", [tool.name for tool in local_tools])
+        print(""Remote server tools:"", [tool.name for tool in remote_tools])
+
+        # Set up the assistant with both MCP servers
+        agent = Assistant(
+            name=""Prisma Assistant"",
+            instructions=""Use the Prisma tools to help the user with database tasks."",
+            mcp_servers=[local_server, remote_server],
+        )
+
+        executor = AsyncAssistantExecutor(agent=agent)
+
+        # Create a thread and send a message
+        thread = Thread(messages=[Message(role=""user"", content=""Create a new user in the database"")])
+        response = await executor.run(thread=thread)
+
+        print(""Agent response:"")
+        for message in response.thread.messages:
+            print(f""{message.role}: {message.content}"")
+
+# Run the async main function
+asyncio.run(main())
+```
+
+----------------------------------------
+
+TITLE: Prisma MCP Server Configuration
+DESCRIPTION: This JSON configuration defines how to set up Prisma MCP servers within AI tools. It includes examples for a local server using 'npx prisma mcp' and a remote server pointing to 'https://mcp.prisma.io/mcp'. This configuration is typically placed in tool-specific settings files.
+SOURCE: https://github.com/prisma/mcp/blob/main/README.md#_snippet_5
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  ""mcpServers"": {
+    ""Prisma-Local"": {
+      ""command"": ""npx"",
+      ""args"": [""-y"", ""prisma"", ""mcp""]
+    },
+    ""Prisma-Remote"": {
+      ""command"": ""npx"",
+      ""args"": [""-y"", ""mcp-remote"", ""https://mcp.prisma.io/mcp""]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Start Local MCP Server
+DESCRIPTION: Command to start the local Model-Context-Protocol (MCP) server, typically used for local development and database workflows.
+SOURCE: https://github.com/prisma/mcp/blob/main/README.md#_snippet_2
+
+LANGUAGE: terminal
+CODE:
+```
+npx -y prisma mcp
+```
+
+----------------------------------------
+
+TITLE: Start Remote MCP Server
+DESCRIPTION: Command to start the remote Model-Context-Protocol (MCP) server, which allows LLMs to access external systems via a defined URL.
+SOURCE: https://github.com/prisma/mcp/blob/main/README.md#_snippet_0
+
+LANGUAGE: terminal
+CODE:
+```
+npx -y mcp-remote https://mcp.prisma.io/mcp
+```
+
+----------------------------------------
+
+TITLE: Local MCP Server Tools
+DESCRIPTION: Lists the capabilities (tools) exposed by the local MCP server for managing Prisma database migrations, schema, and authentication.
+SOURCE: https://github.com/prisma/mcp/blob/main/README.md#_snippet_4
+
+LANGUAGE: APIDOC
+CODE:
+```
+Local MCP Server Tools:
+
+migrate-status:
+  Description: Checks your migration status via the `prisma migrate status` command.
+
+migrate-dev:
+  Description: Creates and executes a migration via the `prisma migrate dev --name <name>` command. The LLM will provide the `<name>` option.
+
+migrate-reset:
+  Description: Resets your database via the `prisma migrate reset --force` command.
+
+Prisma-Postgres-account-status:
+  Description: Checks your authentication status with Prisma Console via the `platform auth show --early-access` command.
+
+Create-Prisma-Postgres-Database:
+  Description: Creates a new Prisma Postgres database via the `'init --db --name' <name> '--region' <region> '--non-interactive'` command. The LLM will provide the `<name>` and `<region>` options.
+
+Prisma-Login:
+  Description: Authenticates with Prisma Console via the `platform auth login --early-access` command.
+
+Prisma-Studio:
+  Description: Open Prisma Studio via the `prisma studio` command.
+```
+
+----------------------------------------
+
+TITLE: Remote MCP Server Tools
+DESCRIPTION: Lists the capabilities (tools) exposed by the remote MCP server for managing Prisma Postgres databases and related resources.
+SOURCE: https://github.com/prisma/mcp/blob/main/README.md#_snippet_3
+
+LANGUAGE: APIDOC
+CODE:
+```
+Remote MCP Server Tools:
+
+CreateBackupTool:
+  Description: Create a new managed Prisma Postgres Backup.
+
+CreateConnectionStringTool:
+  Description: Create a new Connection String for a Prisma Postgres database with the given id.
+
+CreateRecoveryTool:
+  Description: Restore a Prisma Postgres Database to a new database with the given Backup id.
+
+DeleteConnectionStringTool:
+  Description: Delete a Connection String with the given connection string id.
+
+DeleteDatabaseTool:
+  Description: Delete a Prisma Postgres database with the given id.
+
+ListBackupsTool:
+  Description: Fetch a list of available Prisma Postgres Backups for the given database id and environment id.
+
+ListConnectionStringsTool:
+  Description: Fetch a list of available Prisma Postgres Database Connection Strings for the given database id and environment id.
+
+ListDatabasesTool:
+  Description: Fetch a list of available Prisma Postgres Databases for user's workspace.
+
+ExecuteSqlQueryTool:
+  Description: Execute a SQL query on a Prisma Postgres database with the given id.
+
+IntrospectSchemaTool:
+  Description: Introspect the schema of a Prisma Postgres database with the given id.
+```
+
+----------------------------------------
+
+TITLE: GitHub Actions Release Workflow Trigger
+DESCRIPTION: Instructions for manually triggering the GitHub Actions workflow to build and publish the DXT extension. This process allows for version bumping (patch, minor, major), adding release notes, and marking releases as pre-release.
+SOURCE: https://github.com/prisma/mcp/blob/main/dxt/README.md#_snippet_1
+
+LANGUAGE: yaml
+CODE:
+```
+# This is a conceptual representation of the workflow trigger inputs.
+# The actual workflow file would define the steps.
+# Inputs for manual workflow run:
+# - Version bump: patch | minor | major
+# - Release notes: string (optional)
+# - Mark as pre-release: boolean
+```
+
+----------------------------------------
+
+TITLE: Configure Prisma MCP Servers in JSON
+DESCRIPTION: Provides JSON configurations for adding Prisma MCP servers to various tools. This includes global settings for Codeium, Warp, and Claude Desktop, specifying server names, commands, and arguments for establishing connections.
+SOURCE: https://github.com/prisma/mcp/blob/main/README.md#_snippet_6
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""mcpServers"": {
+    ""Prisma-Local"": {
+      ""command"": ""npx"",
+      ""args"": [""-y"", ""prisma"", ""mcp""]
+    },
+    ""Prisma-Remote"": {
+      ""command"": ""npx"",
+      ""args"": [""-y"", ""mcp-remote"", ""https://mcp.prisma.io/mcp""]
+    }
+    // other MCP servers
+  }
+}
+```
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""Prisma"": {
+    ""command"": ""npx"",
+    ""args"": [
+      ""-y"",
+      ""prisma"",
+      ""mcp""
+    ],
+    ""env"": {},
+    ""working_directory"": null,
+    ""start_on_launch"": true
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Local Development: Install Dependencies and Pack Extension
+DESCRIPTION: Commands to install Node.js dependencies and pack the Prisma Desktop Extension for local development and distribution. This involves navigating to the server directory, installing packages with npm, and then using the dxt CLI to pack the extension.
+SOURCE: https://github.com/prisma/mcp/blob/main/dxt/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+cd server
+npm install
+npx @anthropic-ai/dxt pack
+```
+
+----------------------------------------
+
+TITLE: Add Prisma MCP Servers via Claude Code CLI
+DESCRIPTION: Demonstrates how to register local and remote Prisma MCP servers using the `claude mcp add` command. This allows Claude Code to utilize the specified MCP servers for database operations.
+SOURCE: https://github.com/prisma/mcp/blob/main/README.md#_snippet_7
+
+LANGUAGE: terminal
+CODE:
+```
+claude mcp add prisma-local npx prisma mcp
+```
+
+LANGUAGE: terminal
+CODE:
+```
+claude mcp add prisma-remote npx mcp-remote https://mcp.prisma.io/mcp
+```
+
+----------------------------------------
+
+TITLE: Remote MCP Server Configuration
+DESCRIPTION: JSON configuration object specifying the command and arguments to launch the remote MCP server.
+SOURCE: https://github.com/prisma/mcp/blob/main/README.md#_snippet_1
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""mcpServers"": {
+    ""Prisma-Remote"": {
+      ""command"": ""npx"",
+      ""args"": [""-y"", ""mcp-remote"", ""https://mcp.prisma.io/mcp""]
+    }
+  }
+}
+```","mcp",""

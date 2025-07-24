@@ -1,0 +1,408 @@
+"gitmcp","TITLE: Configure VSCode for GitMCP
+DESCRIPTION: Instructions to connect VSCode by updating its configuration file at `.vscode/mcp.json` with a 'gitmcp' server entry, specifying the type as 'sse' and the URL.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/README.md#_snippet_3
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""servers"": {
+    ""gitmcp"": {
+      ""type"": ""sse"",
+      ""url"": ""https://gitmcp.io/{owner}/{repo}""
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Cursor IDE to Use GitMCP Server
+DESCRIPTION: This configuration snippet demonstrates how to update the Cursor IDE's `mcp.json` file to integrate with a GitMCP server. It defines a new MCP server named 'gitmcp' with its URL, allowing Cursor to access up-to-date documentation and code from specified GitHub repositories. Users should replace `{owner}` and `{repo}` with the actual GitHub username/organization and repository name.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/README.md#_snippet_0
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""mcpServers"": {
+    ""gitmcp"": {
+      ""url"": ""https://gitmcp.io/{owner}/{repo}""
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Fetch Repository Documentation Tool
+DESCRIPTION: This tool retrieves primary documentation from a specified GitHub repository, such as `llms.txt`, providing AI models with a general overview of the project. It is useful for general inquiries about a project's purpose or features.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/README.md#_snippet_7
+
+LANGUAGE: APIDOC
+CODE:
+```
+`fetch_<repo-name>_documentation`
+  Description: Gets the primary documentation from a GitHub repository (e.g., `llms.txt`).
+  Use Case: General questions about project purpose, features, or getting started.
+```
+
+----------------------------------------
+
+TITLE: Search Repository Code Tool
+DESCRIPTION: This tool facilitates searching through a repository's actual code using GitHub's code search functionality. It helps AI find specific code examples or implementation details not covered in documentation.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/README.md#_snippet_10
+
+LANGUAGE: APIDOC
+CODE:
+```
+`search_<repo-name>_code`
+  Description: Searches through the actual code in the repository using GitHub's code search.
+  Use Case: Finding examples of how something is implemented or needing technical details not covered in documentation.
+```
+
+----------------------------------------
+
+TITLE: Configure Claude Desktop for GitMCP
+DESCRIPTION: Instructions to connect Claude Desktop by updating its developer configuration file with a 'gitmcp' server entry, specifying the command and arguments for 'mcp-remote'.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/README.md#_snippet_1
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""mcpServers"": {
+    ""gitmcp"": {
+      ""command"": ""npx"",
+      ""args"": [
+        ""mcp-remote"",
+        ""https://gitmcp.io/{owner}/{repo}""
+      ]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Search Repository Documentation Tool
+DESCRIPTION: This tool enables AI to search specific parts of a repository's documentation using a provided query, avoiding the need to load the entire document. It is ideal for specific questions about features, functions, or concepts.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/README.md#_snippet_8
+
+LANGUAGE: APIDOC
+CODE:
+```
+`search_<repo-name>_documentation`
+  Description: Searches through a repository's documentation by providing a specific search query.
+  Use Case: Specific questions about particular features, functions, or concepts within a project.
+```
+
+----------------------------------------
+
+TITLE: Configure Windsurf for GitMCP
+DESCRIPTION: Instructions to connect Windsurf by updating its configuration file at `~/.codeium/windsurf/mcp_config.json` with a 'gitmcp' server entry, specifying the server URL.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/README.md#_snippet_2
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""mcpServers"": {
+    ""gitmcp"": {
+      ""serverUrl"": ""https://gitmcp.io/{owner}/{repo}""
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Fetch URL Content Tool
+DESCRIPTION: This tool allows the AI to retrieve and process content from external links referenced within documentation, converting it into a readable format. It is useful when external information is crucial for answering a question.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/README.md#_snippet_9
+
+LANGUAGE: APIDOC
+CODE:
+```
+`fetch_url_content`
+  Description: Gets information from links mentioned in the documentation, retrieving and converting content to an AI-readable format.
+  Use Case: When documentation references external information that would help answer your question.
+```
+
+----------------------------------------
+
+TITLE: Configure Cline for GitMCP
+DESCRIPTION: Instructions to connect Cline by updating its configuration file at `~/Library/Application Support/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json` with a 'gitmcp' server entry, including URL, disabled status, and autoApprove settings.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/README.md#_snippet_4
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""mcpServers"": {
+    ""gitmcp"": {
+      ""url"": ""https://gitmcp.io/{owner}/{repo}"",
+      ""disabled"": false,
+      ""autoApprove"": []
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Highlight AI Custom Plugin for GitMCP
+DESCRIPTION: Steps to add a custom plugin in Highlight AI using a custom SSE URL, specifying the plugin name and the SSE URL parameters.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/README.md#_snippet_5
+
+LANGUAGE: APIDOC
+CODE:
+```
+Plugin name: `gitmcp`
+SSE URL: `https://gitmcp.io/{owner}/{repo}`
+```
+
+----------------------------------------
+
+TITLE: Configure Claude Desktop for Remote MCP Server (JSON)
+DESCRIPTION: JSON configuration snippet for Claude Desktop to connect to a deployed remote MCP server via its workers.dev URL using the mcp-remote proxy.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/static/README.md#_snippet_5
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""mcpServers"": {
+    ""math"": {
+      ""command"": ""npx"",
+      ""args"": [""mcp-remote"", ""https://worker-name.account-name.workers.dev/sse""]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Augment Code for GitMCP
+DESCRIPTION: Instructions to connect Augment Code by adding a new MCP server, providing both a bash command and a JSON configuration option for the server details.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/README.md#_snippet_6
+
+LANGUAGE: bash
+CODE:
+```
+npx mcp-remote https://gitmcp.io/{owner}/{repo}
+```
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""mcpServers"": {
+    ""git-mcp Docs"": {
+      ""command"": ""npx"",
+      ""args"": [
+        ""mcp-remote"",
+        ""https://gitmcp.io/{owner}/{repo}""
+      ]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Deploy Remote MCP Server to Cloudflare (Bash)
+DESCRIPTION: Command to build and deploy the remote MCP server application to Cloudflare Workers using npm scripts.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/static/README.md#_snippet_3
+
+LANGUAGE: bash
+CODE:
+```
+npm run deploy
+```
+
+----------------------------------------
+
+TITLE: Start MCP Inspector (Bash)
+DESCRIPTION: Command to start the MCP Inspector tool, which can be used to connect to and interact with an MCP server.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/static/README.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+npx @modelcontextprotocol/inspector@latest
+```
+
+----------------------------------------
+
+TITLE: Install MCP Inspector CLI Tool
+DESCRIPTION: Install the Model Context Protocol (MCP) Inspector command-line interface tool using npx. This tool is essential for testing and interacting with MCP-compatible services such as GitMCP.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/README.md#_snippet_17
+
+LANGUAGE: bash
+CODE:
+```
+npx @modelcontextprotocol/inspector
+```
+
+----------------------------------------
+
+TITLE: Configure Claude Desktop for Local MCP Server (JSON)
+DESCRIPTION: JSON configuration snippet for Claude Desktop to connect to a local MCP server running on http://localhost:8787/sse via the mcp-remote proxy.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/static/README.md#_snippet_1
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""mcpServers"": {
+    ""math"": {
+      ""command"": ""npx"",
+      ""args"": [""mcp-remote"", ""http://localhost:8787/sse""]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Clone GitMCP Repository for Local Development
+DESCRIPTION: This command-line instruction guides users on how to clone the GitMCP repository from GitHub to their local machine. It's the first step in setting up the project for local development.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/README.md#_snippet_14
+
+LANGUAGE: bash
+CODE:
+```
+git clone https://github.com/idosal/git-mcp.git
+cd git-mcp
+```
+
+----------------------------------------
+
+TITLE: Develop Remote MCP Server Locally (Bash)
+DESCRIPTION: Commands to clone the repository, install dependencies, and run the remote MCP server locally using npm and nx.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/static/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+# clone the repository
+git clone git@github.com:cloudflare/ai.git
+
+# install dependencies
+cd ai
+npm install
+
+# run locally
+npx nx dev remote-mcp-server
+```
+
+----------------------------------------
+
+TITLE: Install GitMCP Project Dependencies
+DESCRIPTION: This command installs all necessary project dependencies for GitMCP using `pnpm`. This step ensures that all required packages are available before running the application locally.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/README.md#_snippet_15
+
+LANGUAGE: bash
+CODE:
+```
+pnpm install
+```
+
+----------------------------------------
+
+TITLE: Run GitMCP Locally for Development
+DESCRIPTION: These commands demonstrate how to start the GitMCP application in development mode using either `npm` or `pnpm`. Running locally allows developers to test changes and contribute to the project.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/README.md#_snippet_16
+
+LANGUAGE: bash
+CODE:
+```
+npm run dev
+# or
+pnpm dev
+```
+
+----------------------------------------
+
+TITLE: Add GitMCP Badge to README.md
+DESCRIPTION: This Markdown snippet provides the code to embed a GitMCP badge into a repository's `README.md` file. The badge allows users to quickly access documentation via IDE or browser and displays documentation access counts.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/README.md#_snippet_12
+
+LANGUAGE: markdown
+CODE:
+```
+[![GitMCP](https://img.shields.io/endpoint?url=https://gitmcp.io/badge/OWNER/REPO)](https://gitmcp.io/OWNER/REPO)
+```
+
+----------------------------------------
+
+TITLE: Debug Connect to Local MCP Server (Bash)
+DESCRIPTION: Command to connect directly to the local MCP server's SSE endpoint using the mcp-remote tool for debugging purposes.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/static/README.md#_snippet_6
+
+LANGUAGE: bash
+CODE:
+```
+npx mcp-remote http://localhost:8787/sse
+```
+
+----------------------------------------
+
+TITLE: Create Cloudflare KV Namespace for OAuth (Bash)
+DESCRIPTION: Command to create a Cloudflare Workers KV namespace required for the OAuth functionality of the remote MCP server deployment.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/static/README.md#_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+npx wrangler@latest kv namespace create remote-mcp-server-oauth-kv
+```
+
+----------------------------------------
+
+TITLE: Clear MCP Authentication Files (Bash)
+DESCRIPTION: Command to remove the local authentication files stored by MCP tools, which can help resolve authentication issues during debugging.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/static/README.md#_snippet_7
+
+LANGUAGE: bash
+CODE:
+```
+rm -rf ~/.mcp-auth
+```
+
+----------------------------------------
+
+TITLE: Dynamic Endpoint Tool Naming Convention
+DESCRIPTION: When using the dynamic GitMCP endpoint (`gitmcp.io/docs`), the tools are named differently (`fetch_generic_documentation`, `search_generic_code`, `search_generic_documentation`) and require additional repository information.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/README.md#_snippet_11
+
+LANGUAGE: APIDOC
+CODE:
+```
+Dynamic Endpoint Tool Names:
+  - `fetch_generic_documentation`
+  - `search_generic_code`
+  - `search_generic_documentation`
+  Note: These tools need additional information about which repository to access.
+```
+
+----------------------------------------
+
+TITLE: Customize GitMCP Badge Appearance
+DESCRIPTION: This section describes the parameters available for customizing the appearance of the GitMCP badge. Parameters include `color` for the badge value and `label` for the badge text, allowing for visual integration with repository branding.
+SOURCE: https://github.com/idosal/git-mcp/blob/main/README.md#_snippet_13
+
+LANGUAGE: APIDOC
+CODE:
+```
+Badge Customization Parameters:
+  - `color`:
+    Description: Color for the badge value
+    Default: `aquamarine`
+    Example: `?color=green`
+  - `label`:
+    Description: Badge label
+    Default: `GitMCP`
+    Example: `Documentation`
+```","gitmcp",""

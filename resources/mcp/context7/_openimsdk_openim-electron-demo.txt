@@ -1,0 +1,189 @@
+"mcp electron","TITLE: Installing Project Dependencies Node.js/NPM Bash
+DESCRIPTION: Installs all necessary project dependencies listed in the `package.json` file using npm. This command downloads required packages, modules, and libraries into the `node_modules` directory. Requires Node.js and npm to be installed.
+SOURCE: https://github.com/openimsdk/openim-electron-demo/blob/main/README.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+npm install
+```
+
+----------------------------------------
+
+TITLE: Installing Dependencies for OpenIM Electron Demo
+DESCRIPTION: This command installs the necessary dependencies for the OpenIM Electron demo application using npm. It ensures that all required packages are available for the project to run correctly.
+SOURCE: https://github.com/openimsdk/openim-electron-demo/blob/main/README.zh-CN.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+npm install
+```
+
+----------------------------------------
+
+TITLE: Running Development Server Node.js/NPM Bash
+DESCRIPTION: Starts the local development server for the OpenIM Electron demo application. This command typically initiates a live development environment, potentially including hot-reloading and starting the Electron application simultaneously for testing purposes. Requires Node.js, npm, and dependencies installed.
+SOURCE: https://github.com/openimsdk/openim-electron-demo/blob/main/README.md#_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+npm run dev
+```
+
+----------------------------------------
+
+TITLE: Running the OpenIM Electron Demo in Development Mode
+DESCRIPTION: This command starts the development server for the OpenIM Electron demo application. It allows you to view and test the application in a development environment.
+SOURCE: https://github.com/openimsdk/openim-electron-demo/blob/main/README.zh-CN.md#_snippet_3
+
+LANGUAGE: bash
+CODE:
+```
+npm run dev
+```
+
+----------------------------------------
+
+TITLE: Configuring Environment Variables for OpenIM Electron Demo
+DESCRIPTION: These environment variables configure the OpenIM Electron demo to connect to your OpenIM server.  The VITE_BASE_HOST variable should be set to your server's IP address. The other variables define the websocket, API, and chat URLs.
+SOURCE: https://github.com/openimsdk/openim-electron-demo/blob/main/README.zh-CN.md#_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+VITE_BASE_HOST=your-server-ip
+
+VITE_WS_URL=ws://$VITE_BASE_HOST:10001
+VITE_API_URL=http://$VITE_BASE_HOST:10002
+VITE_CHAT_URL=http://$VITE_BASE_HOST:10008
+
+# VITE_BASE_DOMAIN=your-server-domain
+
+# VITE_WS_URL=wss://$VITE_BASE_DOMAIN/msg_gateway
+# VITE_API_URL=https://$VITE_BASE_DOMAIN/api
+# VITE_CHAT_URL=https://$VITE_BASE_DOMAIN/chat
+```
+
+----------------------------------------
+
+TITLE: Building Web Application Node.js/NPM Bash
+DESCRIPTION: Builds the OpenIM Electron demo application specifically as a web application for production deployment. This command compiles and bundles the source code into static assets suitable for hosting on a web server, typically outputting files into a `dist` directory. Requires Node.js, npm, and dependencies installed.
+SOURCE: https://github.com/openimsdk/openim-electron-demo/blob/main/README.md#_snippet_3
+
+LANGUAGE: bash
+CODE:
+```
+npm run build
+```
+
+----------------------------------------
+
+TITLE: Building the OpenIM Electron Demo Web Application
+DESCRIPTION: This command builds the OpenIM Electron demo as a web application. The output will be located in the dist directory.
+SOURCE: https://github.com/openimsdk/openim-electron-demo/blob/main/README.zh-CN.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+npm run build
+```
+
+----------------------------------------
+
+TITLE: Cloning OpenIM Electron Demo Repository Bash
+DESCRIPTION: Clones the openim-electron-demo GitHub repository from its remote URL and navigates into the newly created project directory. This is the initial step to obtain the project source code locally. Requires Git to be installed on the system.
+SOURCE: https://github.com/openimsdk/openim-electron-demo/blob/main/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+git clone https://github.com/openimsdk/openim-electron-demo.git
+cd openim-electron-demo
+```
+
+----------------------------------------
+
+TITLE: Cloning the OpenIM Electron Demo Repository
+DESCRIPTION: This command clones the OpenIM Electron demo repository from GitHub to your local machine. It's the first step in setting up the development environment.
+SOURCE: https://github.com/openimsdk/openim-electron-demo/blob/main/README.zh-CN.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+git clone https://github.com/openimsdk/openim-electron-demo.git
+cd openim-electron-demo
+```
+
+----------------------------------------
+
+TITLE: Building Electron Application macOS Node.js/NPM Bash
+DESCRIPTION: Builds and packages the Electron application for the macOS operating system. This command generates distribution files (like `.dmg` or `.pkg`) that can be used to install the application on macOS devices. It typically requires running on a macOS machine or using macOS for cross-compilation.
+SOURCE: https://github.com/openimsdk/openim-electron-demo/blob/main/README.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+npm run build:mac
+```
+
+----------------------------------------
+
+TITLE: Building the OpenIM Electron Demo for macOS
+DESCRIPTION: This command builds the OpenIM Electron demo application for macOS. It creates a distributable package for macOS.
+SOURCE: https://github.com/openimsdk/openim-electron-demo/blob/main/README.zh-CN.md#_snippet_5
+
+LANGUAGE: bash
+CODE:
+```
+npm run build:mac
+```
+
+----------------------------------------
+
+TITLE: Building Electron Application Windows Node.js/NPM Bash
+DESCRIPTION: Builds and packages the Electron application for the Windows operating system. This command generates distribution files (like `.exe` or `.msi`) that can be used to install the application on Windows devices. It typically requires running on a Windows machine or using macOS for cross-compilation.
+SOURCE: https://github.com/openimsdk/openim-electron-demo/blob/main/README.md#_snippet_5
+
+LANGUAGE: bash
+CODE:
+```
+npm run build:win
+```
+
+----------------------------------------
+
+TITLE: Building the OpenIM Electron Demo for Windows
+DESCRIPTION: This command builds the OpenIM Electron demo application for Windows. It creates a distributable package for Windows.
+SOURCE: https://github.com/openimsdk/openim-electron-demo/blob/main/README.zh-CN.md#_snippet_6
+
+LANGUAGE: bash
+CODE:
+```
+npm run build:win
+```
+
+----------------------------------------
+
+TITLE: Building Electron Application Linux Node.js/NPM Bash
+DESCRIPTION: Builds and packages the Electron application for the Linux operating system. This command generates distribution files (like `.deb` or `.rpm`) that can be used to install the application on Linux devices. It typically requires running on a Linux machine or using macOS for cross-compilation.
+SOURCE: https://github.com/openimsdk/openim-electron-demo/blob/main/README.md#_snippet_6
+
+LANGUAGE: bash
+CODE:
+```
+npm run build:linux
+```
+
+----------------------------------------
+
+TITLE: Building the OpenIM Electron Demo for Linux
+DESCRIPTION: This command builds the OpenIM Electron demo application for Linux. It creates a distributable package for Linux.
+SOURCE: https://github.com/openimsdk/openim-electron-demo/blob/main/README.zh-CN.md#_snippet_7
+
+LANGUAGE: bash
+CODE:
+```
+npm run build:linux
+```","mcp electron",""

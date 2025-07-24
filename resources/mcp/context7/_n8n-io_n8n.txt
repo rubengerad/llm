@@ -1,0 +1,4512 @@
+"n8n","TITLE: Node Configuration Example: Active Campaign getAll Operation
+DESCRIPTION: Describes the addition of a 'Simple' parameter in the Active Campaign Node to standardize the behavior of the `getAll` operation across various resources.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_41
+
+LANGUAGE: javascript
+CODE:
+```
+// In the Active Campaign Node:
+// The 'getAll' operation now includes a 'Simple' parameter for consistency.
+// Adjust your node configurations to utilize this new parameter if needed.
+```
+
+----------------------------------------
+
+TITLE: Start Basic n8n Instance
+DESCRIPTION: Starts a basic n8n instance using the default SQLite database. This is the simplest way to get an n8n container stack running for development.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/testing/containers/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+pnpm stack
+```
+
+----------------------------------------
+
+TITLE: n8n Node Development Guide
+DESCRIPTION: Information on how to build custom nodes for n8n, enabling extension of functionality. Custom nodes can be shared via npm.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_39
+
+LANGUAGE: APIDOC
+CODE:
+```
+Custom Node Development
+  Documentation Link: https://docs.n8n.io/integrations/creating-nodes/
+  Description: Provides resources and instructions for creating custom nodes to extend n8n's capabilities. Custom nodes can be published and distributed via npm.
+```
+
+----------------------------------------
+
+TITLE: Basic Dependency Injection Usage with @n8n/di
+DESCRIPTION: This TypeScript example demonstrates how to define injectable services using the `@Service()` decorator and retrieve them from the `Container`. It shows how `ExampleInjectedService` is automatically injected into `ExampleService`'s constructor, illustrating the core dependency injection pattern.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/di/README.md#_snippet_0
+
+LANGUAGE: TypeScript
+CODE:
+```
+import { Container, Service } from 'typedi';
+
+@Service()
+class ExampleInjectedService {
+  printMessage() {
+    console.log('I am alive!');
+  }
+}
+
+@Service()
+class ExampleService {
+  constructor(
+    // because we annotated ExampleInjectedService with the @Service()
+    // decorator TypeDI will automatically inject an instance of
+    // ExampleInjectedService here when the ExampleService class is requested
+    // from TypeDI.
+    public injectedService: ExampleInjectedService
+  ) {}
+}
+
+const serviceInstance = Container.get(ExampleService);
+// we request an instance of ExampleService from TypeDI
+
+serviceInstance.injectedService.printMessage();
+// logs ""I am alive!"" to the console
+```
+
+----------------------------------------
+
+TITLE: Example: Creating a Custom n8n Vector Store Node with createVectorStoreNode
+DESCRIPTION: This TypeScript example demonstrates how to use the `createVectorStoreNode` factory function to define a new n8n vector store node. It illustrates the configuration of node metadata, specification of supported operation modes, definition of shared and operation-specific fields, and implementation of core functionalities such as `getVectorStoreClient` for client instantiation and `populateVectorStore` for document insertion.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/nodes-langchain/nodes/vector_store/shared/createVectorStoreNode/README.md#_snippet_0
+
+LANGUAGE: typescript
+CODE:
+```
+import { createVectorStoreNode } from './createVectorStoreNode';
+
+export class MyVectorStoreNode {
+  static description = createVectorStoreNode({
+    meta: {
+      displayName: 'My Vector Store',
+      name: 'myVectorStore',
+      description: 'Operations for My Vector Store',
+      docsUrl: 'https://docs.example.com/my-vector-store',
+      icon: 'file:myIcon.svg',
+      // Optional: specify which operations this vector store supports
+      operationModes: ['load', 'insert', 'update','retrieve', 'retrieve-as-tool'],
+    },
+    sharedFields: [
+      // Fields shown in all operation modes
+    ],
+    loadFields: [
+      // Fields specific to 'load' operation
+    ],
+    insertFields: [
+      // Fields specific to 'insert' operation
+    ],
+    retrieveFields: [
+      // Fields specific to 'retrieve' operation
+    ],
+    // Functions to implement
+    getVectorStoreClient: async (context, filter, embeddings, itemIndex) => {
+      // Create and return vector store instance
+    },
+    populateVectorStore: async (context, embeddings, documents, itemIndex) => {
+      // Insert documents into vector store
+    },
+    // Optional: cleanup function - called in finally blocks after operations
+    releaseVectorStoreClient: (vectorStore) => {
+      // Release resources such as database connections or external clients
+      // For example, in PGVector: vectorStore.client?.release();
+    },
+  });
+}
+```
+
+----------------------------------------
+
+TITLE: Node Configuration Example: Harvest Node Account ID
+DESCRIPTION: Illustrates how the 'Account ID' parameter was moved from credentials to the node parameters in the Harvest Node, allowing multi-account support without new credentials.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_36
+
+LANGUAGE: javascript
+CODE:
+```
+// In the Harvest Node, set the 'Account ID' parameter directly.
+// Example: Assuming 'Account ID' is a parameter field in the node's UI or configuration.
+```
+
+----------------------------------------
+
+TITLE: n8n REST Controller Definition
+DESCRIPTION: Demonstrates the definition of a REST controller in n8n. It shows how to use the `@RestController()` decorator to define the base path and how to define individual routes using HTTP method decorators like `@Get()`. It also illustrates constructor injection for services and parameter decorators like `@Query()`.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/scripts/backend-module/backend-module.guide.md#_snippet_6
+
+LANGUAGE: ts
+CODE:
+```
+@RestController('/my-feature')
+export class MyFeatureController {
+  constructor(private readonly myFeatureService: MyFeatureService) {}
+
+  @Get('/summary')
+  async getSummary(_req: AuthenticatedRequest, _res: Response) {
+    return await this.myFeatureService.getSummary();
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Initialize Service in Module
+DESCRIPTION: Demonstrates how to initialize a service within a module's entrypoint using dependency injection. It imports the service and calls its start method during module initialization.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/scripts/backend-module/backend-module.guide.md#_snippet_7
+
+LANGUAGE: typescript
+CODE:
+```
+import { Container, ModuleInterface } from '@n8n/backend-core';
+
+@BackendModule({ name: 'my-feature' })
+export class MyFeatureModule implements ModuleInterface {
+  async init() {
+    const { MyFeatureService } = await import('./my-feature.service');
+    Container.get(MyFeatureService).start();
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Programmatic n8n Stack Creation (TypeScript)
+DESCRIPTION: Demonstrates how to programmatically create and manage n8n container stacks using the `createN8NStack` function in TypeScript. It covers basic setup, PostgreSQL configuration, and queue mode with scaling.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/testing/containers/README.md#_snippet_8
+
+LANGUAGE: typescript
+CODE:
+```
+import { createN8NStack } from './containers/n8n-test-containers';
+
+// Simple SQLite instance
+const stack = await createN8NStack();
+
+// PostgreSQL with custom environment
+const stack = await createN8NStack({
+  postgres: true,
+  env: { N8N_LOG_LEVEL: 'debug' }
+});
+
+// Queue mode with scaling
+const stack = await createN8NStack({
+  queueMode: { mains: 2, workers: 3 }
+});
+
+// Use the stack
+console.log(`n8n available at: ${stack.baseUrl}`);
+
+// Clean up when done
+await stack.stop();
+```
+
+----------------------------------------
+
+TITLE: Node Configuration Example: Typeform Recall Information
+DESCRIPTION: Details how Typeform Trigger node now handles 'Recall information' feature text, changing the display format from `{{field:id}}` to `[field:id]` to prevent expression editor conflicts.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_40
+
+LANGUAGE: javascript
+CODE:
+```
+// Typeform Trigger Node with Recall Information:
+// Previously: ""You have chosen {{field:23234242}} as your answer.""
+// Now: ""You have chosen [field:23234242] as your answer.""
+// Nodes referencing these key names may need updates.
+```
+
+----------------------------------------
+
+TITLE: Start n8n in Queue Mode
+DESCRIPTION: Starts an n8n instance in queue mode, which requires Redis and PostgreSQL. This setup is for testing n8n's distributed execution capabilities.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/testing/containers/README.md#_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+pnpm stack --queue
+```
+
+----------------------------------------
+
+TITLE: Refactor Webhook responseData for iframe sandboxing
+DESCRIPTION: In version 1.103.0, the `responseData` within the Webhook node is now sandboxed in an iframe. This change may break workflows relying on browser APIs like `localStorage` and `fetch` from within custom code. Users need to refactor their JavaScript code in the `responseData` section if it utilizes these APIs.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+/**
+ * In version 1.103.0, responseData in Webhook node is sandboxed.
+ * Refactor custom JS to avoid browser APIs like localStorage and fetch if used.
+ */
+// Example of refactoring fetch calls if needed:
+// async function fetchData() {
+//   const response = await fetch('https://api.example.com/data');
+//   const data = await response.json();
+//   return data;
+// }
+```
+
+----------------------------------------
+
+TITLE: Start n8n with PostgreSQL
+DESCRIPTION: Starts an n8n instance configured to use a PostgreSQL database instead of the default SQLite. This is useful for testing with a more robust database backend.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/testing/containers/README.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+pnpm stack --postgres
+```
+
+----------------------------------------
+
+TITLE: Service Class with Dependency Injection
+DESCRIPTION: Defines a service class using the `@Service()` decorator, enabling dependency injection for its constructor parameters like repositories, loggers, and configurations. Includes a `start` method for scheduled tasks.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/scripts/backend-module/backend-module.guide.md#_snippet_8
+
+LANGUAGE: typescript
+CODE:
+```
+import { Service, Logger, Inject } from '@n8n/backend-core';
+import { MyFeatureRepository } from './my-feature.repository';
+import { MyFeatureConfig } from './my-feature.config';
+
+@Service()
+export class MyFeatureService {
+  private intervalId?: NodeJS.Timeout;
+
+  constructor(
+    private readonly myFeatureRepository: MyFeatureRepository,
+    private readonly logger: Logger,
+    private readonly config: MyFeatureConfig,
+  ) {
+    this.logger = this.logger.scoped('my-feature');
+  }
+
+  start() {
+    this.logger.debug('Starting feature work...');
+
+    this.intervalId = setInterval(
+      () => {
+        this.logger.debug('Running scheduled task...');
+      },
+      this.config.taskInterval * 60 * 1000,
+    );
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: n8n Credential Translation File Example
+DESCRIPTION: Provides an example of a JSON structure for a credential translation file, demonstrating how `displayName`, `description`, and `placeholder` keys are used for specific credential parameters.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_8
+
+LANGUAGE: JSON
+CODE:
+```
+{
+	""server.displayName"": ""🇩🇪 Github Server"",
+	""server.description"": ""🇩🇪 The server to connect to. Only has to be set if Github Enterprise is used."",
+	""user.placeholder"": ""🇩🇪 Hans"",
+	""accessToken.placeholder"": ""🇩🇪 123""
+}
+```
+
+----------------------------------------
+
+TITLE: Node Configuration Example: Segment Node Properties
+DESCRIPTION: Demonstrates the change in how 'traits' and 'properties' are defined in the Segment Node, allowing key/value pairs for custom traits/properties, particularly for Identify, Track, and Group operations.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_37
+
+LANGUAGE: javascript
+CODE:
+```
+// For Segment Node's Identify (Create), Track (Event/Page), Group (Add) operations:
+// 'traits' and 'properties' parameters now accept key/value pairs.
+// Example structure for traits:
+// {
+//   ""userId"": ""user123"",
+//   ""plan"": ""premium""
+// }
+```
+
+----------------------------------------
+
+TITLE: Node Configuration Example: Pipedrive Incoming Authentication
+DESCRIPTION: Shows the renaming of the 'Authentication' field to 'Incoming Authentication' in the Pipedrive Trigger node, requiring users to update their settings if 'Basic Auth' was previously used.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_38
+
+LANGUAGE: javascript
+CODE:
+```
+// In the Pipedrive Trigger Node:
+// The field 'Authentication' has been renamed to 'Incoming Authentication'.
+// If previously set to 'Basic Auth', update the 'Incoming Authentication' field to 'Basic Auth'.
+```
+
+----------------------------------------
+
+TITLE: n8n Node Header Translation File Example
+DESCRIPTION: Shows a JSON example for the `header` section of a node translation file, mapping `displayName` and `description` to their translated values.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_10
+
+LANGUAGE: JSON
+CODE:
+```
+{
+	""header"": {
+		""displayName"": ""🇩🇪 GitHub"",
+		""description"": ""🇩🇪 Consume GitHub API""
+	}
+}
+```
+
+----------------------------------------
+
+TITLE: Example n8n Regular Node in TypeScript
+DESCRIPTION: This TypeScript code defines a basic n8n regular node named 'My Node'. It demonstrates how to set up node properties within the `INodeTypeDescription` and implement the `execute` method to process input items, adding a custom string property to their JSON data.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/node-dev/README.md#_snippet_2
+
+LANGUAGE: TypeScript
+CODE:
+```
+import {
+	IExecuteFunctions,
+	INodeExecutionData,
+	INodeType,
+	INodeTypeDescription,
+} from 'n8n-workflow';
+
+
+export class MyNode implements INodeType {
+	description: INodeTypeDescription = {
+		displayName: 'My Node',
+		name: 'myNode',
+		group: ['transform'],
+		version: 1,
+		description: 'Adds ""myString"" on all items to defined value.',
+		defaults: {
+			name: 'My Node',
+			color: '#772244',
+		},
+		inputs: ['main'],
+		outputs: ['main'],
+		properties: [
+			// Node properties which the user gets displayed and
+			// can change on the node.
+			{
+				displayName: 'My String',
+				name: 'myString',
+				type: 'string',
+				'default': '',
+				placeholder: 'Placeholder value',
+				description: 'The description text',
+			}
+		]
+	};
+
+
+	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+
+		const items = this.getInputData();
+
+		let item: INodeExecutionData;
+		let myString: string;
+
+		// Itterates over all input items and add the key ""myString"" with the
+		// value the parameter ""myString"" resolves to.
+		// (This could be a different value for each item in case it contains an expression)
+		for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
+			myString = this.getNodeParameter('myString', itemIndex, '') as string;
+			item = items[itemIndex];
+
+			item.json['myString'] = myString;
+		}
+
+		return [items];
+
+	}
+}
+```
+
+----------------------------------------
+
+TITLE: Node Configuration Example: Slack Node Ephemeral Messages
+DESCRIPTION: Explains the removal of the 'Ephemeral' property in the Slack node and the consolidation of 'As User' and 'User Name' into 'Send as User'. Ephemeral messages are now handled by selecting the 'Post (Ephemeral)' operation.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_39
+
+LANGUAGE: javascript
+CODE:
+```
+// In the Slack Node:
+// The 'Ephemeral' property is removed.
+// To send an ephemeral message, select the 'Post (Ephemeral)' operation.
+// The 'As User' and 'User Name' fields are combined into 'Send as User'.
+```
+
+----------------------------------------
+
+TITLE: n8n Node Operational Parameter Translation Example
+DESCRIPTION: Provides a JSON example for translating a node's operational parameter, specifically `resource`, within the `nodeView` section of the translation file.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_12
+
+LANGUAGE: JSON
+CODE:
+```
+{
+	""nodeView.resource.displayName"": ""🇩🇪 Resource""
+}
+```
+
+----------------------------------------
+
+TITLE: Enable Container Reuse
+DESCRIPTION: Enables container reuse for faster development cycles by reusing existing containers instead of recreating them on each start. This applies to different configurations.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/testing/containers/README.md#_snippet_3
+
+LANGUAGE: bash
+CODE:
+```
+pnpm run stack              # SQLite
+pnpm run stack:postgres     # PostgreSQL
+pnpm run stack:queue        # Queue mode
+pnpm run stack:multi-main   # Multiple main instances
+```
+
+----------------------------------------
+
+TITLE: Start Storybook development server
+DESCRIPTION: Compiles and hot-reloads the Storybook application for development purposes, allowing real-time preview and interaction with components.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/design-system/README.md#_snippet_1
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm storybook
+```
+
+----------------------------------------
+
+TITLE: CLI Start Command Path
+DESCRIPTION: The command to start n8n directly via its JavaScript file has changed due to updates in the underlying CLI library. The path to the executable has been adjusted to reflect the new structure.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_45
+
+LANGUAGE: bash
+CODE:
+```
+/usr/local/bin/node ./dist/index.js start
+```
+
+LANGUAGE: bash
+CODE:
+```
+/usr/local/bin/node bin/n8n start
+```
+
+----------------------------------------
+
+TITLE: Custom Selective Development: Start Backend Server
+DESCRIPTION: Starts the n8n backend server without any watching or development-specific features. This is useful for pure backend testing or when frontend development is handled separately.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_23
+
+LANGUAGE: shell
+CODE:
+```
+pnpm start
+```
+
+----------------------------------------
+
+TITLE: Slack Node Output Adjustment
+DESCRIPTION: In version 0.68.0, the Slack Node's output structure for 'Channel -> Create' operations was simplified. When the Slack API returns only '{""ok"": true}', the node now directly exposes the data under the 'channel' property at the main level, instead of nesting it. This requires adjusting expressions that reference data previously found under 'channel.id' or similar.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_42
+
+LANGUAGE: javascript
+CODE:
+```
+Before (0.68.0):
+{{ $node[""Slack""].data[""channel""][""id""] }}
+
+After (0.68.0):
+{{ $node[""Slack""].data[""id""] }}
+```
+
+----------------------------------------
+
+TITLE: Run Multiple Stacks in Parallel
+DESCRIPTION: Starts multiple n8n stacks concurrently, each with a unique name to avoid conflicts. This is essential for parallel testing scenarios.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/testing/containers/README.md#_snippet_6
+
+LANGUAGE: bash
+CODE:
+```
+pnpm run stack --name test-1 --postgres
+pnpm run stack --name test-2 --queue
+```
+
+----------------------------------------
+
+TITLE: n8n Node String/Number/Boolean Parameter Translation Example
+DESCRIPTION: Shows a JSON example for translating `displayName`, `placeholder`, and `description` for a string, number, or boolean parameter within the `nodeView` section of a node translation file.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_14
+
+LANGUAGE: JSON
+CODE:
+```
+{
+	""nodeView.owner.displayName"": ""🇩🇪 Repository Owner"",
+	""nodeView.owner.placeholder"": ""🇩🇪 n8n-io"",
+	""nodeView.owner.description"": ""🇩🇪 Owner of the repository""
+}
+```
+
+----------------------------------------
+
+TITLE: Start n8n
+DESCRIPTION: Executes the n8n application after it has been built. This command starts the n8n server.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_13
+
+LANGUAGE: shell
+CODE:
+```
+pnpm start
+```
+
+----------------------------------------
+
+TITLE: Start Local HTTPS Server for Chat Bundle
+DESCRIPTION: Initiates the `http-server` to serve the compiled n8n chat bundle over HTTPS. It uses the previously generated SSL certificate and key, listens on port 8443, and enables Cross-Origin Resource Sharing (CORS) for development flexibility.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/nodes-langchain/nodes/trigger/ChatTrigger/README.md#_snippet_3
+
+LANGUAGE: bash
+CODE:
+```
+http-server packages/frontend/@n8n/chat/dist -g -S -C cert.pem -K key.pem --port 8443 --cors
+```
+
+----------------------------------------
+
+TITLE: Set Custom Environment Variables
+DESCRIPTION: Starts an n8n instance with custom environment variables passed via the command line. This is useful for configuring specific n8n behaviors during testing.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/testing/containers/README.md#_snippet_5
+
+LANGUAGE: bash
+CODE:
+```
+pnpm run stack --postgres --env N8N_LOG_LEVEL=info --env N8N_ENABLED_MODULES=insights
+```
+
+----------------------------------------
+
+TITLE: Start n8n Application
+DESCRIPTION: Command to start the n8n application, often used in conjunction with other commands like E2E test execution.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_34
+
+LANGUAGE: shell
+CODE:
+```
+pnpm start
+```
+
+----------------------------------------
+
+TITLE: Start n8n in Development Mode
+DESCRIPTION: Starts n8n in development mode, which typically includes features like automatic code rebuilding and frontend refreshes on file changes.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_15
+
+LANGUAGE: shell
+CODE:
+```
+pnpm dev
+```
+
+----------------------------------------
+
+TITLE: Define Playwright Test Tags for n8n E2E Tests
+DESCRIPTION: This example illustrates the convention for applying tags within Playwright `test()` definitions to control test execution behavior. Tags allow specifying test modes (e.g., `@mode:postgres`), database requirements (`@db:reset`), or isolation needs (`@chaostest`), influencing how tests are run across workers and environments.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/testing/playwright/README.md#_snippet_2
+
+LANGUAGE: typescript
+CODE:
+```
+test('basic test', ...)                              // All modes, fully parallel
+test('postgres only @mode:postgres', ...)            // Mode-specific
+test('needs clean db @db:reset', ...)                // Sequential per worker
+test('chaos test @mode:multi-main @chaostest', ...) // Isolated per worker
+```
+
+----------------------------------------
+
+TITLE: Database Schema and Execution Data Changes
+DESCRIPTION: This release introduces irreversible changes: workflow and credential identifiers will use strings instead of numbers, and execution data is moved to a separate table. A full database backup is recommended before migration to ensure compatibility with older n8n versions.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_23
+
+LANGUAGE: APIDOC
+CODE:
+```
+Database Changes:
+  Identifier Type:
+    Previous: Numeric
+    New: String (for workflows and credentials)
+
+  Execution Data Storage:
+    Previous: Integrated with main tables
+    New: Split into a separate database table
+
+  Compatibility:
+    Warning: n8n@0.234.0 database is not readable by older versions.
+    Action: Perform a full database backup before migrating.
+```
+
+----------------------------------------
+
+TITLE: Define and Reuse Dynamic Text for Node Parameters in i18n JSON
+DESCRIPTION: This example demonstrates the use of the `_reusableDynamicText` key to define translations for common node parameters, such as OAuth client ID and client secret. These translations can then be reused across various node credential parameters, ensuring consistent terminology throughout the application.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/ADDENDUM.md#_snippet_3
+
+LANGUAGE: json
+CODE:
+```
+{
+	""_reusableDynamicText.oauth2.clientId"": ""🇩🇪 Client ID"",
+	""_reusableDynamicText.oauth2.clientSecret"": ""🇩🇪 Client Secret""
+}
+```
+
+----------------------------------------
+
+TITLE: Start n8n in Development Mode
+DESCRIPTION: Command to start the n8n application in development mode, enabling hot-reloading and other developer-friendly features.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_33
+
+LANGUAGE: shell
+CODE:
+```
+pnpm dev
+```
+
+----------------------------------------
+
+TITLE: Update Async Credential Handling in Custom Nodes
+DESCRIPTION: Demonstrates the change in how credentials are fetched in custom n8n nodes. The `getCredentials` method is now asynchronous and requires the `await` keyword.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_25
+
+LANGUAGE: TypeScript
+CODE:
+```
+// Before 0.135.0:
+const credentials = this.getCredentials(credentialTypeName);
+
+// From 0.135.0:
+const credentials = await this.getCredentials(myNodeCredentials);
+```
+
+----------------------------------------
+
+TITLE: Taiga Node: Credential Unification and Operation Updates
+DESCRIPTION: The Taiga nodes have unified server and cloud credentials into a single type and removed the 'version' parameter. The 'issue:create' operation now automatically loads tags as 'multiOptions'. Users may need to reconnect credentials and reselect tags in their workflows.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_27
+
+LANGUAGE: APIDOC
+CODE:
+```
+TaigaNode:
+  Credentials:
+    - Unified Server and Cloud credentials into a single type.
+    - Removed 'version' parameter.
+  Operations:
+    issue:create:
+      - Tags are now automatically loaded as 'multiOptions'.
+  Action Required:
+    - Reconnect Taiga node credentials.
+    - Reselect tags if used in 'issue:create' operation.
+```
+
+----------------------------------------
+
+TITLE: Frontend-only Development Mode
+DESCRIPTION: Starts n8n in a development mode focused on the frontend. It runs the backend server and the editor-ui development server simultaneously.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_19
+
+LANGUAGE: shell
+CODE:
+```
+pnpm dev:fe
+```
+
+----------------------------------------
+
+TITLE: Start n8n with Tunnel
+DESCRIPTION: Starts the n8n application with an active tunnel enabled. This is useful for making your local n8n instance accessible from external networks.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_14
+
+LANGUAGE: shell
+CODE:
+```
+./packages/cli/bin/n8n start --tunnel
+```
+
+----------------------------------------
+
+TITLE: Await this.helpers.getBinaryStream() in Nodes
+DESCRIPTION: The `this.helpers.getBinaryStream()` method within n8n nodes is now asynchronous. Developers using this method must prepend `await` to the function call to correctly retrieve binary streams.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_18
+
+LANGUAGE: typescript
+CODE:
+```
+// Until n8n v1.9.0:
+// const binaryStream = this.helpers.getBinaryStream(id);
+
+// Since n8n v1.9.0:
+const binaryStream = await this.helpers.getBinaryStream(id);
+```
+
+----------------------------------------
+
+TITLE: Run n8n editor UI in development mode
+DESCRIPTION: Compiles the n8n editor UI and starts a hot-reloading development server. This allows developers to see changes in real-time without manual refreshes, facilitating rapid development and testing.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/editor-ui/README.md#_snippet_2
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm serve
+```
+
+----------------------------------------
+
+TITLE: Custom Selective Development: Run Frontend Dev Server
+DESCRIPTION: Starts the development server for the n8n editor-ui. This command is typically run in a separate terminal from the backend server.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_24
+
+LANGUAGE: shell
+CODE:
+```
+cd packages/editor-ui
+pnpm dev
+```
+
+----------------------------------------
+
+TITLE: Translate n8n Node Custom API Call Option
+DESCRIPTION: Demonstrates the specific JSON translation key for the `__CUSTOM_API_CALL__` option, which is dynamically injected into `Resource` and `Operation` parameters for certain n8n nodes. This ensures that the 'Custom API Call' option is properly localized in the user interface when credentials allow for custom HTTP requests.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_17
+
+LANGUAGE: json
+CODE:
+```
+{
+	""nodeView.resource.options.file.name"": ""🇩🇪 File"",
+	""nodeView.resource.options.issue.name"": ""🇩🇪 Issue"",
+	""nodeView.resource.options.__CUSTOM_API_CALL__.name"": ""🇩🇪 Custom API Call""
+}
+```
+
+----------------------------------------
+
+TITLE: Import Workflows and Credentials (n8n CLI)
+DESCRIPTION: Commands to import previously exported n8n credentials and workflows. This is used after changing the database or upgrading n8n to restore your setup.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_35
+
+LANGUAGE: shell
+CODE:
+```
+n8n import:workflow --separate --input=backups/latest/
+n8n import:credentials --separate --input=backups/latest/
+```
+
+----------------------------------------
+
+TITLE: n8n Documentation Repository
+DESCRIPTION: Link to the GitHub repository where the n8n documentation is managed. Contributions to the documentation can be made by forking and submitting PRs to this repository.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_40
+
+LANGUAGE: APIDOC
+CODE:
+```
+Documentation Repository
+  Link: https://github.com/n8n-io/n8n-docs
+  Description: The official repository for n8n's documentation hosted on docs.n8n.io. Contributions and updates to the documentation are managed here.
+```
+
+----------------------------------------
+
+TITLE: Update Node.js Version Requirement
+DESCRIPTION: n8n now requires a minimum Node.js version of v18. Users running n8n via npm, PM2, or contributing to the project must ensure their Node.js environment is updated.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_22
+
+LANGUAGE: APIDOC
+CODE:
+```
+System Requirement:
+  Node.js Version:
+    Minimum Required: v18
+    Action: Update Node.js to v18 or higher.
+```
+
+----------------------------------------
+
+TITLE: Postgres, CrateDB, QuestDB, TimescaleDB: Execute Query Output
+DESCRIPTION: Nodes utilizing the Postgres Wire Protocol (Postgres, QuestDB, CrateDB, TimescaleDB) now return results from all executed queries instead of just one. This change ensures consistency across n8n, potentially providing more output. Users should review logic dependent on the number of results returned.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_29
+
+LANGUAGE: APIDOC
+CODE:
+```
+PostgresWireProtocolNodes:
+  Nodes: [Postgres, CrateDB, QuestDB, TimescaleDB]
+  Operation: Execute Query
+  Behavior Change:
+    - Returns results from all executed queries, not just one.
+  Implication:
+    - Node output may contain more information than before.
+  Action Recommended:
+    - Revisit workflow logic if dependent on the specific number of results returned.
+```
+
+----------------------------------------
+
+TITLE: Backend-only Development Mode
+DESCRIPTION: Starts n8n in a development mode that excludes frontend packages like editor-ui and design-system. This can improve performance and reduce resource usage during backend-focused development.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_18
+
+LANGUAGE: shell
+CODE:
+```
+pnpm dev:be
+```
+
+----------------------------------------
+
+TITLE: Export Workflows and Credentials (n8n CLI)
+DESCRIPTION: Commands to export all n8n credentials and workflows for backup purposes. These commands are essential before major upgrades or database migrations.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_34
+
+LANGUAGE: shell
+CODE:
+```
+n8n export:workflow --backup --output=backups/latest/
+n8n export:credentials --backup --output=backups/latest/
+```
+
+----------------------------------------
+
+TITLE: Use getBinaryDataBuffer for Binary Data Access in Custom Nodes
+DESCRIPTION: Illustrates the updated method for accessing binary data buffers within custom n8n nodes. Direct buffer creation is replaced by the asynchronous `getBinaryDataBuffer` helper method.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_26
+
+LANGUAGE: TypeScript
+CODE:
+```
+const items = this.getInputData();
+
+for (const i = 0; i < items.length; i++) {
+	const item = items[i].binary as IBinaryKeyData;
+	const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i);
+	const binaryData = item[binaryPropertyName] as IBinaryData;
+	// Before 0.135.0:
+	const binaryDataBuffer = Buffer.from(binaryData.data, BINARY_ENCODING);
+	// From 0.135.0:
+	const binaryDataBuffer = await this.helpers.getBinaryDataBuffer(i, binaryPropertyName);
+}
+```
+
+----------------------------------------
+
+TITLE: n8n-node-dev CLI Commands Reference
+DESCRIPTION: This section describes the available commands for the `n8n-node-dev` command-line interface, including `build` for compiling and deploying nodes/credentials, and `new` for generating boilerplate code for new nodes or credentials.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/node-dev/README.md#_snippet_1
+
+LANGUAGE: APIDOC
+CODE:
+```
+n8n-node-dev <COMMAND>
+
+build
+  - Builds credentials and nodes in the current folder.
+  - Copies them into the n8n custom extension folder (~/.n8n/custom/) unless --destination <FOLDER_PATH> is specified.
+  - When ""--watch"" is set, it starts in watch mode, automatically building and copying files on changes. Stop with ""ctrl + c"".
+
+new
+  - Creates new basic credentials or a node of the selected type.
+  - Provides a first starting point for development.
+```
+
+----------------------------------------
+
+TITLE: Unsupported Crypto Algorithms
+DESCRIPTION: Due to Node.js/OpenSSL upgrades, several crypto algorithms are no longer supported. These include RSA-MD4, RSA-MDC2, md4, md4WithRSAEncryption, mdc2, and mdc2WithRSAEncryption. Users relying on these should migrate to supported alternatives.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_24
+
+LANGUAGE: APIDOC
+CODE:
+```
+Crypto Algorithms:
+  Status: Not Supported (due to Node.js/OpenSSL upgrade)
+  Algorithms:
+    - RSA-MD4
+    - RSA-MDC2
+    - md4
+    - md4WithRSAEncryption
+    - mdc2
+    - mdc2WithRSAEncryption
+  Action: Migrate away from these algorithms.
+```
+
+----------------------------------------
+
+TITLE: AI/LangChain Nodes Development Mode
+DESCRIPTION: Starts n8n in a development mode that runs only essential packages required for AI and LangChain node development. This optimizes resource usage for specific tasks.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_20
+
+LANGUAGE: shell
+CODE:
+```
+pnpm dev:ai
+```
+
+----------------------------------------
+
+TITLE: Quick Start n8n with npx
+DESCRIPTION: This command uses npx to quickly run n8n, requiring Node.js to be installed. It's ideal for instantly trying out n8n without a full installation, providing a temporary instance accessible via localhost.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/README.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+npx n8n
+```
+
+----------------------------------------
+
+TITLE: n8n Node Execution Methods
+DESCRIPTION: This section details the primary execution methods available for n8n nodes, defining how their logic is invoked within a workflow. It covers `execute` for regular nodes, `trigger` for trigger nodes, and `webhook` for webhook nodes, explaining their respective use cases and invocation patterns.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/node-dev/README.md#_snippet_3
+
+LANGUAGE: APIDOC
+CODE:
+```
+Regular node:
+  execute:
+    - Executed once no matter how many items.
+    - By default, `execute` should always be used, especially when creating a third-party integration.
+    - Provides much more flexibility and allows, for example, returning a different number of items than it received as input.
+
+Trigger node:
+  trigger:
+    - Method is called once when the workflow gets activated.
+    - It can then trigger workflow runs and provide the necessary data by itself.
+
+Webhook node:
+  webhook:
+    - Method is called when webhook gets called.
+```
+
+----------------------------------------
+
+TITLE: Start n8n Application with Specific Locale
+DESCRIPTION: This command sequence sets the `N8N_DEFAULT_LOCALE` environment variable to 'de' (German) and then starts the n8n application. This terminal should be kept running while performing translation work.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_23
+
+LANGUAGE: sh
+CODE:
+```
+export N8N_DEFAULT_LOCALE=de
+pnpm start
+```
+
+----------------------------------------
+
+TITLE: Running n8n Benchmarks with Docker Image
+DESCRIPTION: Provides commands to pull the n8n benchmark Docker image, inspect its available options, and execute benchmark scenarios against an n8n instance. It demonstrates setting n8n base URL, user credentials, virtual users, duration, and filtering scenarios.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/benchmark/README.md#_snippet_0
+
+LANGUAGE: sh
+CODE:
+```
+docker pull ghcr.io/n8n-io/n8n-benchmark:latest
+# Print the help to list all available flags
+docker run ghcr.io/n8n-io/n8n-benchmark:latest run --help
+```
+
+LANGUAGE: sh
+CODE:
+```
+docker run ghcr.io/n8n-io/n8n-benchmark:latest run \
+	--n8nBaseUrl=https://instance.url \
+	--n8nUserEmail=InstanceOwner@email.com \
+	--n8nUserPassword=InstanceOwnerPassword \
+	--vus=5 \
+	--duration=1m \
+	--scenarioFilter=single-webhook
+```
+
+----------------------------------------
+
+TITLE: Building and Running n8n-benchmark CLI Locally with Docker
+DESCRIPTION: Provides instructions for building a Docker image for the `n8n-benchmark` CLI and subsequently running it locally. It covers platform considerations during build and setting necessary environment variables for n8n connectivity.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/benchmark/README.md#_snippet_3
+
+LANGUAGE: sh
+CODE:
+```
+# Must be run in the repository root
+# k6 doesn't have an arm64 build available for linux, we need to build against amd64
+docker build --platform linux/amd64 -t n8n-benchmark -f packages/@n8n/benchmark/Dockerfile .
+```
+
+LANGUAGE: sh
+CODE:
+```
+docker run \
+  -e N8N_USER_EMAIL=user@n8n.io \
+  -e N8N_USER_PASSWORD=password \
+  # For macos, n8n running outside docker
+  -e N8N_BASE_URL=http://host.docker.internal:5678 \
+  n8n-benchmark
+```
+
+----------------------------------------
+
+TITLE: Running the Entire n8n Benchmark Suite
+DESCRIPTION: Provides commands to execute the full n8n benchmark suite, either locally or in a cloud environment, using `pnpm` for orchestration.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/benchmark/README.md#_snippet_2
+
+LANGUAGE: sh
+CODE:
+```
+pnpm benchmark-locally
+```
+
+LANGUAGE: sh
+CODE:
+```
+pnpm benchmark-in-cloud
+```
+
+----------------------------------------
+
+TITLE: Custom Selective Development: Watch Specific Node Package
+DESCRIPTION: Starts a watch process for a specific custom node package. This command recompiles the package automatically upon detecting changes.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_25
+
+LANGUAGE: shell
+CODE:
+```
+cd packages/nodes-base  # or your custom node package
+pnpm watch
+```
+
+----------------------------------------
+
+TITLE: Clean All n8n Containers
+DESCRIPTION: Removes all n8n containers, networks, and associated resources created by the test container system. This is a comprehensive cleanup command.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/testing/containers/README.md#_snippet_10
+
+LANGUAGE: bash
+CODE:
+```
+pnpm run stack:clean:all
+```
+
+----------------------------------------
+
+TITLE: Publish Release Workflow
+DESCRIPTION: Link to the GitHub Actions workflow that publishes a release after the release PR is merged. This workflow builds, tags, and creates GitHub releases.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_38
+
+LANGUAGE: APIDOC
+CODE:
+```
+GitHub Actions Workflow: Release Publishing
+  URL: https://github.com/n8n-io/n8n/actions/workflows/release-publish.yml
+  Description: Publishes packages and creates Git tags/releases after a release PR is merged.
+  Steps:
+    1. Build and publish updated packages.
+    2. Create a Git tag and GitHub release.
+    3. Merge the release commit back into the 'master' branch.
+```
+
+----------------------------------------
+
+TITLE: Update .hash() Expression Helper
+DESCRIPTION: The `.hash()` expression helper has dropped support for the `ripemd160` algorithm. Additionally, the `sha3` algorithm now correctly returns a `sha3-512` hash. Users must switch from `ripemd160` to other supported algorithms.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_16
+
+LANGUAGE: javascript
+CODE:
+```
+// Previous usage (ripemd160):
+// ""ripemd160:your_string""
+
+// Action: Switch to a supported algorithm like 'sha3' or 'md5'.
+// Example for sha3 (now sha3-512):
+// ""sha3:your_string""
+
+// Note: The .hash() helper is used within n8n expressions.
+```
+
+----------------------------------------
+
+TITLE: Enable Hot Reload for Nodes
+DESCRIPTION: Starts n8n in development mode with hot reloading enabled for custom nodes and credentials. This allows changes to be detected and applied without a full server restart.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_17
+
+LANGUAGE: bash
+CODE:
+```
+N8N_DEV_RELOAD=true pnpm dev
+```
+
+----------------------------------------
+
+TITLE: Custom Selective Development: Watch Nodes Package
+DESCRIPTION: Starts a watch process for the 'nodes-base' package (or a custom node package). This command recompiles the package automatically upon detecting changes.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_21
+
+LANGUAGE: shell
+CODE:
+```
+cd packages/nodes-base
+pnpm watch
+```
+
+----------------------------------------
+
+TITLE: Enable Stdout for Code Node console.log
+DESCRIPTION: By default, `console.log` in the Code node no longer outputs to stdout. To enable this behavior for non-manual executions, set the `CODE_ENABLE_STDOUT` environment variable to `true`.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_20
+
+LANGUAGE: APIDOC
+CODE:
+```
+Configuration:
+  CODE_ENABLE_STDOUT
+    Description: Enables Code node console.log output to process stdout.
+    Default: false
+    Action: Set to 'true' to direct Code node logs to stdout.
+```
+
+----------------------------------------
+
+TITLE: n8n Node Type Properties Reference
+DESCRIPTION: This reference outlines the key properties that define an n8n node's behavior and configuration. It includes essential properties like `description`, `execute`, `hooks`, `methods`, `trigger`, and `webhook`, detailing their purpose and optionality.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/node-dev/README.md#_snippet_4
+
+LANGUAGE: APIDOC
+CODE:
+```
+description [required]:
+  - Describes the node like its name, properties, hooks, etc. See `Node Type Description` for more details.
+
+execute [optional]:
+  - Method is called when the workflow gets executed (once).
+
+hooks [optional]:
+  - The hook methods.
+
+methods [optional]:
+  - Additional methods.
+  - Currently only ""loadOptions"" exists, which allows loading options for parameters from external services.
+
+trigger [optional]:
+  - Method is called once when the workflow gets activated.
+
+webhook [optional]:
+  - Method is called when webhook gets called.
+
+webhookMethods [optional]:
+  - Methods to set up webhooks on external services.
+```
+
+----------------------------------------
+
+TITLE: Set Docker Image
+DESCRIPTION: Overrides the default Docker image used for n8n test containers. This is useful for testing specific versions or custom-built images.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/testing/containers/README.md#_snippet_9
+
+LANGUAGE: bash
+CODE:
+```
+export N8N_DOCKER_IMAGE=n8nio/n8n:dev
+pnpm run stack
+```
+
+----------------------------------------
+
+TITLE: Run Playwright E2E Tests for n8n
+DESCRIPTION: This section provides the primary commands for quickly initiating Playwright end-to-end tests for n8n. It includes options to run all tests with fresh Docker containers or to execute them against a locally running n8n instance.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/testing/playwright/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+pnpm test                 # Run all tests (fresh containers)
+pnpm run test:local       # Run against http://localhost:5678
+```
+
+----------------------------------------
+
+TITLE: Implement String Interpolation in i18n JSON
+DESCRIPTION: This example illustrates the use of named interpolation within i18n strings, where variables enclosed in curly braces (`{variableName}`) are dynamically replaced. It also highlights the crucial rule that these interpolated variables must remain untranslated when localizing the string.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/ADDENDUM.md#_snippet_1
+
+LANGUAGE: json
+CODE:
+```
+{
+	""stopExecution.message"": ""The execution with the ID {activeExecutionId} got stopped!"",
+	""stopExecution.title"": ""Execution stopped""
+}
+```
+
+LANGUAGE: json
+CODE:
+```
+{
+	""stopExecution.message"": ""Die Ausführung mit der ID {activeExecutionId} wurde gestoppt"",
+	""stopExecution.title"": ""Execution stopped""
+}
+```
+
+----------------------------------------
+
+TITLE: Postgres, QuestDB, CrateDB, TimescaleDB: Query Execution Modes and Insert Output
+DESCRIPTION: These nodes now offer configurable query execution modes: 'Multiple queries' (default), 'Independently', or 'Transaction'. The 'Continue on Fail' option is more critical with these modes. 'Insert' operations now rely on the 'Return fields' parameter for output, defaulting to returning all fields ('*').
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_30
+
+LANGUAGE: APIDOC
+CODE:
+```
+PostgresWireProtocolNodes:
+  Nodes: [Postgres, QuestDB, CrateDB, TimescaleDB]
+  Query Execution:
+    Modes:
+      - Multiple queries (default, previous behavior)
+      - Independently
+      - Transaction
+    Parameter:
+      - Continue on Fail: Plays a major role in new modes.
+  Insert Operations:
+    Output:
+      - Relies on the 'Return fields' parameter.
+      - Default: 'Return fields: *' (returns all information inserted).
+      - Previously returned all received information regardless of database outcome.
+  Action Recommended:
+    - Review workflows relying on 'insert' operation output.
+```
+
+----------------------------------------
+
+TITLE: Trigger Release Workflow
+DESCRIPTION: Link to the GitHub Actions workflow used to initiate a release process. This workflow handles version bumping, changelog updates, and creating release branches/PRs.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_37
+
+LANGUAGE: APIDOC
+CODE:
+```
+GitHub Actions Workflow: Release Creation
+  URL: https://github.com/n8n-io/n8n/actions/workflows/release-create-pr.yml
+  Description: Triggers the release process by creating a PR. Requires specifying a SemVer release type and the branch to release from.
+  Steps:
+    1. Bump package versions.
+    2. Update Changelog.
+    3. Create 'release/VERSION' branch.
+    4. Create a pull request for the release branch.
+```
+
+----------------------------------------
+
+TITLE: Queue Mode with Custom Scaling
+DESCRIPTION: Configures the n8n queue mode with specific numbers of main instances and worker instances. This allows testing n8n's scaling behavior.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/testing/containers/README.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+# Custom scaling: 3 main instances, 5 workers
+pnpm stack --queue --mains 3 --workers 5
+
+# Single main, 2 workers
+pnpm stack --queue --workers 2
+```
+
+----------------------------------------
+
+TITLE: Custom Selective Development: Run CLI with Hot Reload
+DESCRIPTION: Starts the n8n CLI in development mode with hot reload enabled, typically used in conjunction with watching a specific package.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_22
+
+LANGUAGE: shell
+CODE:
+```
+cd packages/cli
+N8N_DEV_RELOAD=true pnpm dev
+```
+
+----------------------------------------
+
+TITLE: Run E2E Tests (Headless)
+DESCRIPTION: Starts n8n and runs all E2E tests in headless mode. This command is typically used for CI/CD pipelines or automated testing without a graphical interface.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_32
+
+LANGUAGE: shell
+CODE:
+```
+pnpm test:e2e:all
+```
+
+----------------------------------------
+
+TITLE: TypeScript Configuration for Decorator Support
+DESCRIPTION: This JSON snippet illustrates the necessary `compilerOptions` in `tsconfig.json` to enable experimental decorators and emit decorator metadata. These settings are crucial for `@n8n/di`'s dependency injection functionality, which relies heavily on TypeScript decorators.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/di/README.md#_snippet_1
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  ""compilerOptions"": {
+    ""experimentalDecorators"": true,
+    ""emitDecoratorMetadata"": true
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Pass n8n Environment Variables via JSON
+DESCRIPTION: Passes n8n environment variables to the containers using a JSON string for complex configurations. This allows setting multiple variables at once.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/testing/containers/README.md#_snippet_7
+
+LANGUAGE: bash
+CODE:
+```
+N8N_TEST_ENV='{""N8N_METRICS"":""true""}' npm run stack:standard
+N8N_TEST_ENV='{""N8N_LOG_LEVEL"":""debug"",""N8N_METRICS"":""true"",""N8N_ENABLED_MODULES"":""insights""}' npm run stack:postgres
+```
+
+----------------------------------------
+
+TITLE: Webhook Node: Response Mode Parameter
+DESCRIPTION: A typo in the Webhook Node's parameter `reponseMode` has been corrected to `responseMode`. Users who previously set 'Response Mode' to 'Last Node' will need to re-apply this setting manually after upgrading.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_47
+
+LANGUAGE: javascript
+CODE:
+```
+// Parameter renamed from 'reponseMode' to 'responseMode'
+```
+
+----------------------------------------
+
+TITLE: Monday.com Node Column Value Changes
+DESCRIPTION: Updates to the Monday.com node affecting how `column_values` are referenced. Specific properties like 'owner' and 'title' have been renamed or changed in structure, requiring users to update their expressions or configurations.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_15
+
+LANGUAGE: APIDOC
+CODE:
+```
+Monday.com Node Changes:
+  Resource: Board
+    Operation: Get, Get All
+    Property Change:
+      Previous: owner
+      New: owners
+
+  Resource: Board Item
+    Operation: Get, Get All, Get By Column Value
+    Property Change:
+      Previous: title
+      New: column.title
+
+  Resource: Board Item
+    Operation: Get, Get All, Get By Column Value
+    Property Change:
+      Previous: additional_info
+      New: column.settings_str
+    Note: column.settings_str is not a complete equivalent to additional_info.
+```
+
+----------------------------------------
+
+TITLE: Remove N8N_CACHE_ENABLED Flag
+DESCRIPTION: This change requires the removal of the N8N_CACHE_ENABLED flag from user settings. The exact reason for its removal or deprecation is not detailed, but it's a direct instruction for users.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_14
+
+LANGUAGE: APIDOC
+CODE:
+```
+Configuration:
+  N8N_CACHE_ENABLED
+    Description: Flag to enable or disable caching.
+    Action: Remove this flag from your settings.
+```
+
+----------------------------------------
+
+TITLE: Dropbox Node: App Access Type and Root Directory Behavior
+DESCRIPTION: The Dropbox node now includes an 'APP Access Type' parameter for both Access Token and OAuth2 credential types. Additionally, all operations are now performed relative to the user's root directory, particularly affecting OAuth2 authentication and 'folder:list' operations with Team Spaces.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_32
+
+LANGUAGE: APIDOC
+CODE:
+```
+DropboxNode:
+  Credentials:
+    - Added 'APP Access Type' parameter for Access Token and OAuth2 types.
+  Operations:
+    - All operations now relative to the user's root directory.
+  Implications:
+    - OAuth2 authentication users may need to reconnect credentials.
+    - 'folder:list' operation with empty 'Folder Path' and Team Space may require logic adjustment.
+  Action Required:
+    - For OAuth2 users: Reconnect credentials.
+    - Adjust 'folder:list' logic if using Team Folders and root path.
+```
+
+----------------------------------------
+
+TITLE: Example n8n Base Text JSON Structure
+DESCRIPTION: This JSON snippet illustrates the structure of a base text translation file in n8n. Keys represent UI elements (e.g., Vue component paths or category names), and values are the translated strings. These files are typically located at `/packages/frontend/@n8n/i18n/src/locales/{localeIdentifier}.json`.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_1
+
+LANGUAGE: JSON
+CODE:
+```
+{
+	""nodeCreator.categoryNames.analytics"": ""🇩🇪 Analytics"",
+	""nodeCreator.categoryNames.communication"": ""🇩🇪 Communication"",
+	""nodeCreator.categoryNames.coreNodes"": ""🇩🇪 Core Nodes""
+}
+```
+
+----------------------------------------
+
+TITLE: Run E2E Tests (Interactive UI)
+DESCRIPTION: Starts n8n and runs E2E tests interactively using the built UI. This command opens the Cypress test runner and does not automatically react to code changes.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_30
+
+LANGUAGE: shell
+CODE:
+```
+pnpm test:e2e:ui
+```
+
+----------------------------------------
+
+TITLE: Running n8n Benchmarks with Custom Scenarios via Docker
+DESCRIPTION: Illustrates how to execute n8n benchmarks using custom scenario files by mounting a local directory into the Docker container. It specifies the n8n instance details and the path to the custom scenarios.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/benchmark/README.md#_snippet_1
+
+LANGUAGE: sh
+CODE:
+```
+# Assuming your scenarios are located in ./scenarios, mount them into /scenarios in the container
+docker run -v ./scenarios:/scenarios ghcr.io/n8n-io/n8n-benchmark:latest run \
+	--n8nBaseUrl=https://instance.url \
+	--n8nUserEmail=InstanceOwner@email.com \
+	--n8nUserPassword=InstanceOwnerPassword \
+	--vus=5 \
+	--duration=1m \
+	--testScenariosPath=/scenarios
+```
+
+----------------------------------------
+
+TITLE: Prometheus metrics include n8n_ prefix
+DESCRIPTION: In version 1.52.0, Prometheus metrics enabled via `N8N_METRICS_INCLUDE_DEFAULT_METRICS` and `N8N_METRICS_INCLUDE_API_ENDPOINTS` were fixed to correctly include the `n8n_` prefix. This ensures consistency in metric naming.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_10
+
+LANGUAGE: prometheus
+CODE:
+```
+# Metrics now consistently prefixed with n8n_:
+# e.g., n8n_workflow_runs_total instead of workflow_runs_total
+```
+
+----------------------------------------
+
+TITLE: Translate Activation Message for Cron Node in i18n JSON
+DESCRIPTION: This example demonstrates how to translate dynamic node properties such as `activationMessage` for a Cron node. The translation key is defined at the root level of the `nodeView` property in the node's dedicated translation file.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/ADDENDUM.md#_snippet_5
+
+LANGUAGE: json
+CODE:
+```
+{
+	""nodeView.activationMessage"": ""🇩🇪 'Your cron trigger will now trigger executions on the schedule you have defined.""
+}
+```
+
+----------------------------------------
+
+TITLE: Run E2E Tests (Interactive Dev Mode)
+DESCRIPTION: Starts n8n in development mode and runs E2E tests interactively. This command is useful for debugging as it reacts to code changes and opens the Cypress test runner.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_31
+
+LANGUAGE: shell
+CODE:
+```
+pnpm test:e2e:dev
+```
+
+----------------------------------------
+
+TITLE: Hubspot Trigger Node: Multiple Events and App ID Location
+DESCRIPTION: The Hubspot Trigger node now supports providing multiple events. The 'App ID' field has been moved from the node configuration to the credentials section. Users of the Hubspot Trigger node should be aware of this change.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_33
+
+LANGUAGE: APIDOC
+CODE:
+```
+HubspotTriggerNode:
+  Features:
+    - Supports multiple events.
+  Parameter Change:
+    - 'App ID' field moved from node configuration to credentials.
+  Action Required:
+    - Review Hubspot Trigger node configurations and credentials.
+```
+
+----------------------------------------
+
+TITLE: Repository Class with TypeORM
+DESCRIPTION: Illustrates a repository class that extends TypeORM's `Repository` to handle database access. It's registered with the dependency injection container and includes a method for fetching data.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/scripts/backend-module/backend-module.guide.md#_snippet_9
+
+LANGUAGE: typescript
+CODE:
+```
+import { Service, Repository } from '@n8n/backend-core';
+import { DataSource } from 'typeorm';
+import { MyFeatureEntity } from './my-feature.entity';
+
+@Service()
+export class MyFeatureRepository extends Repository<MyFeatureEntity> {
+  constructor(dataSource: DataSource) {
+    super(MyFeatureEntity, dataSource.manager);
+  }
+
+  async getSummary() {
+    return await /* typeorm query on entities */; 
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Start n8n with Tunnel for Local Development
+DESCRIPTION: This setup is designed for local development and testing, enabling n8n to receive webhooks from external services via a tunnel service. It's crucial to note that this configuration is not suitable for production environments due to security implications. The tunnel redirects requests from n8n's servers to your local instance.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/docker/images/n8n/README.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+docker volume create n8n_data
+
+docker run -it --rm \
+ --name n8n \
+ -p 5678:5678 \
+ -v n8n_data:/home/node/.n8n \
+ docker.n8n.io/n8nio/n8n \
+ start --tunnel
+```
+
+----------------------------------------
+
+TITLE: n8n Node Property Type-Specific Options
+DESCRIPTION: Details additional, type-specific options that can be applied to individual node properties, allowing for fine-grained control over UI behavior like input field size, value constraints, and multiple value support. These options enhance the user experience for specific data types.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/node-dev/README.md#_snippet_7
+
+LANGUAGE: APIDOC
+CODE:
+```
+Node Property Type-Specific Options:
+
+alwaysOpenEditWindow [type: json]: If set then the ""Editor Window"" will always open when the user tries to edit the field. Helpful if long text is typically used in the property
+loadOptionsMethod [type: options]: Method to use to load options from an external service
+maxValue [type: number]: Maximum value of the number
+minValue [type: number]: Minimum value of the number
+multipleValues [type: all]: If set the property gets turned into an Array and the user can add multiple values
+multipleValueButtonText [type: all]: Custom text for add button in case ""multipleValues"" were set
+numberPrecision [type: number]: The precision of the number. By default, it is ""0"" and will only allow integers
+password [type: string]: If a password field should be displayed (normally only used by credentials because all node data is not encrypted and gets saved in clear-text)
+rows [type: string]: Number of rows the input field should have. By default it is ""1""
+```
+
+----------------------------------------
+
+TITLE: n8n CLI Command Flag Removal
+DESCRIPTION: The `--file` flag for the `execute` CLI command has been removed. Users should update scripts to import workflows first and then execute them using the `--id` flag.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_12
+
+LANGUAGE: bash
+CODE:
+```
+# Old command (removed)
+# n8n execute --file /path/to/workflow.js
+
+# New recommended approach
+n8n import --workflow ""/path/to/workflow.js""
+n8n execute --id <workflow-id>
+```
+
+----------------------------------------
+
+TITLE: Start n8n in Docker
+DESCRIPTION: This command sequence initializes a Docker volume for persistent data storage and then runs the n8n container, mapping port 5678 for access. The volume ensures workflow data, webhook URLs, and encryption keys are preserved across container restarts, preventing data loss and credential decryption issues.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/docker/images/n8n/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+docker volume create n8n_data
+
+docker run -it --rm \
+ --name n8n \
+ -p 5678:5678 \
+ -v n8n_data:/home/node/.n8n \
+ docker.n8n.io/n8nio/n8n
+```
+
+----------------------------------------
+
+TITLE: Remove QUEUE_RECOVERY_INTERVAL environment variable
+DESCRIPTION: Version 1.65.0 removed the queue polling functionality controlled by the `QUEUE_RECOVERY_INTERVAL` environment variable. If this variable was set, it no longer has any effect and can be safely removed from the n8n configuration.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_6
+
+LANGUAGE: environment
+CODE:
+```
+# Remove this environment variable if set:
+# QUEUE_RECOVERY_INTERVAL
+```
+
+----------------------------------------
+
+TITLE: Remove N8N_SKIP_WEBHOOK_DEREGISTRATION_SHUTDOWN Flag
+DESCRIPTION: The flag `N8N_SKIP_WEBHOOK_DEREGISTRATION_SHUTDOWN` is removed as n8n no longer deregisters webhooks at startup/shutdown. This change simplifies webhook management by relying on third-party retries. Users should remove this flag from their settings.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_17
+
+LANGUAGE: APIDOC
+CODE:
+```
+Configuration:
+  N8N_SKIP_WEBHOOK_DEREGISTRATION_SHUTDOWN
+    Description: Flag to skip webhook deregistration during shutdown.
+    Status: Removed.
+    Action: Remove this flag from your settings.
+```
+
+----------------------------------------
+
+TITLE: Activation Trigger Node Replacement
+DESCRIPTION: The 'Activation Trigger' node has been removed and replaced by two new nodes: 'n8n Trigger' and 'Workflow Trigger'. These new nodes offer refactored functionality that is more intuitive for users. Workflows using the 'Activation Trigger' must be updated to use the new nodes.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_31
+
+LANGUAGE: APIDOC
+CODE:
+```
+TriggerNodes:
+  RemovedNode: Activation Trigger
+  ReplacementNodes:
+    - n8n Trigger
+    - Workflow Trigger
+  Reason:
+    - Refactored for better UX and compliance.
+  Action Required:
+    - Replace 'Activation Trigger' nodes with 'n8n Trigger' or 'Workflow Trigger'.
+```
+
+----------------------------------------
+
+TITLE: Process Documents for Vector Store Operations (TypeScript)
+DESCRIPTION: Demonstrates the usage of the `processDocument` utility function, which standardizes the handling of input documents. It returns both processed and serialized versions of the documents, preparing them for vector store insertion or other operations.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/nodes-langchain/nodes/vector_store/shared/createVectorStoreNode/README.md#_snippet_3
+
+LANGUAGE: typescript
+CODE:
+```
+const { processedDocuments, serializedDocuments } = await processDocument(
+  documentInput,
+  itemData,
+  itemIndex
+);
+```
+
+----------------------------------------
+
+TITLE: HTTP Request Node: Response Format String
+DESCRIPTION: When the 'Response Format' in the 'HTTP Request' node was set to 'String', data was previously saved by default in the 'response' property. This behavior is now configurable, and the default value has been changed from 'response' to 'data' to align with similar nodes.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_46
+
+LANGUAGE: javascript
+CODE:
+```
+// Old behavior: Default save to 'response'
+// New behavior: Default save to 'data', configurable via 'Binary Property'
+```
+
+----------------------------------------
+
+TITLE: n8n Module Entrypoint Definition
+DESCRIPTION: Defines the structure of an n8n backend module's entrypoint file (`.module.ts`). It demonstrates how to use the `@BackendModule()` decorator and implement methods for initialization, shutdown, database entity registration, and settings provision. It also highlights the use of dynamic imports for lazy loading.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/scripts/backend-module/backend-module.guide.md#_snippet_3
+
+LANGUAGE: ts
+CODE:
+```
+@BackendModule({ name: 'my-feature' })
+export class MyFeatureModule implements ModuleInterface {
+  async init() {
+    await import('./my-feature.controller');
+
+    const { MyFeatureService } = await import('./my-feature.service');
+
+    Container.get(MyFeatureService).start();
+  }
+
+  @OnShutdown()
+  async shutdown() {
+    const { MyFeatureService } = await import('./my-feature.service');
+
+    await Container.get(MyFeatureService).shutdown();
+  }
+
+  async entities() {
+    const { MyEntity } = await import('./my-feature.entity.ts');
+    return [MyEntity]
+  }
+
+  async settings() {
+    const { MyFeatureService } = await import('./my-feature.service');
+
+    return Container.get(MyFeatureService).settings();
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Merge verbose log level into debug
+DESCRIPTION: In version 1.57.0, the `verbose` log level was merged into the `debug` log level. If users were previously setting `N8N_LOG_LEVEL=verbose`, they should now update it to `N8N_LOG_LEVEL=debug` for equivalent logging output.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_8
+
+LANGUAGE: environment
+CODE:
+```
+# Update log level from verbose to debug:
+N8N_LOG_LEVEL=debug
+```
+
+----------------------------------------
+
+TITLE: Linear Node Priority Adjustment
+DESCRIPTION: The default priority for 'Low' in the Linear node has been corrected from `3` to `4`. Users who previously set 'Low' might have unintentionally used a 'Normal' priority. It's recommended to verify intended priority settings.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_21
+
+LANGUAGE: APIDOC
+CODE:
+```
+Linear Node:
+  Issue Creation Priority:
+    Value: Low
+    Previous Priority: 3 (interpreted as Normal)
+    New Priority: 4 (correct Low)
+    Action: Review and confirm priority settings if using 'Low'.
+```
+
+----------------------------------------
+
+TITLE: Create Dynamic Tool for Vector Store Retrieval (TypeScript)
+DESCRIPTION: Illustrates how a `DynamicTool` is instantiated for the `retrieve-as-tool` mode, allowing vector store functionality to be exposed as a callable tool. The tool's `func` property encapsulates the logic for searching the vector store based on input.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/nodes-langchain/nodes/vector_store/shared/createVectorStoreNode/README.md#_snippet_5
+
+LANGUAGE: typescript
+CODE:
+```
+const vectorStoreTool = new DynamicTool({
+  name: toolName,
+  description: toolDescription,
+  func: async (input) => {
+    // Search vector store with input
+    // ...
+  },
+});
+```
+
+----------------------------------------
+
+TITLE: Typical Backend Module File Structure
+DESCRIPTION: Illustrates the standard directory and file layout for a new n8n backend module. This structure promotes organization and maintainability, with specific files for tests, database models, repositories, configurations, constants, controllers, services, and the module entrypoint.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/scripts/backend-module/backend-module.guide.md#_snippet_1
+
+LANGUAGE: tree
+CODE:
+```
+.\\
+├── __tests__
+│   ├── my-feature.controller.test.ts
+│   └── my-feature.service.test.ts
+├── my-feature.entity.ts            # DB model
+├── my-feature.repository.ts        # DB access
+├── my-feature.config.ts            # env vars
+├── my-feature.constants.ts         # constants
+├── my-feature.controller.ts        # HTTP REST routes
+├── my-feature.service.ts           # business logic
+└── my-feature.module.ts            # entrypoint
+```
+
+----------------------------------------
+
+TITLE: Remove Deprecated Binary Data TTL Flags
+DESCRIPTION: Environment variables `N8N_BINARY_DATA_TTL` and `EXECUTIONS_DATA_PRUNE_TIMEOUT` are no longer effective. Binary data cleanup is now integrated with execution pruning. The legacy flag `N8N_PERSISTED_BINARY_DATA_TTL` is also removed as ephemeral executions are unsupported.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_19
+
+LANGUAGE: APIDOC
+CODE:
+```
+Configuration:
+  N8N_BINARY_DATA_TTL
+    Description: Time-to-live for binary data.
+    Status: No longer has effect.
+    Action: Remove from settings.
+
+  EXECUTIONS_DATA_PRUNE_TIMEOUT
+    Description: Timeout for pruning execution data.
+    Status: No longer has effect.
+    Action: Remove from settings.
+
+  N8N_PERSISTED_BINARY_DATA_TTL
+    Description: Legacy TTL for persisted binary data.
+    Status: No longer has effect, removed.
+    Action: Remove from settings.
+```
+
+----------------------------------------
+
+TITLE: Install Build Tools (Windows)
+DESCRIPTION: Installs necessary build tools for Windows development using npm.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_2
+
+LANGUAGE: powershell
+CODE:
+```
+npm add -g windows-build-tools
+```
+
+----------------------------------------
+
+TITLE: Zoho Node: Lead Create and Delete Operation Changes
+DESCRIPTION: The Zoho node's 'lead:create' operation now mandates a 'Company' parameter, moves 'Address' to 'Additional Options', and removes 'Title' and 'Is Duplicate Record'. The 'lead:delete' operation has been updated to return only the 'id' of the deleted lead. Users should review workflows using these operations.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_28
+
+LANGUAGE: APIDOC
+CODE:
+```
+ZohoNode:
+  Operations:
+    lead:create:
+      - Requires 'Company' parameter.
+      - 'Address' parameter moved to 'Additional Options'.
+      - Removed 'Title' parameter.
+      - Removed 'Is Duplicate Record' parameter.
+    lead:delete:
+      - Returns only the 'id' of the deleted lead.
+  Action Required:
+    - For 'lead:create': Reset 'Company' and 'Address' parameters if used.
+    - For 'lead:delete': Reselect the 'id' key if relying on the response.
+```
+
+----------------------------------------
+
+TITLE: Upgrade Expression Syntax
+DESCRIPTION: In newer versions of n8n, the syntax for evaluating expressions has been updated from `evaluateExpression(...)` to `$evaluateExpression(...)`. This change ensures consistency across nodes and allows for easier integration of values from other workflow parts or manual construction of source dates.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_44
+
+LANGUAGE: javascript
+CODE:
+```
+evaluateExpression(...)
+```
+
+LANGUAGE: javascript
+CODE:
+```
+$evaluateExpression(...)
+```
+
+----------------------------------------
+
+TITLE: n8n Environment Variable Changes
+DESCRIPTION: Details changes to several n8n environment variables, including default values, required settings for workers, and removal of flags. Users may need to explicitly set variables or remove deprecated ones.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_13
+
+LANGUAGE: bash
+CODE:
+```
+# DB_POSTGRESDB_USER: Default changed from 'root' to 'postgres'. Explicitly set to 'root' if needed.
+# N8N_SECURE_COOKIE: Set to 'false' to disable the Secure flag if running n8n without HTTPS on non-localhost domains.
+# EXECUTIONS_PROCESS: 'own' mode removed. Remove or set to 'main'. Configuration field will be removed.
+# N8N_ENCRYPTION_KEY: Must match config file on main instance. Required on workers.
+# N8N_CACHE_ENABLED: Removed, cache is now always enabled.
+```
+
+----------------------------------------
+
+TITLE: Update HTML Script and Link Import Paths
+DESCRIPTION: Modifies the import paths within HTML `script` and `link` tags to point to the locally served chat bundle and its associated stylesheet. This ensures that the browser loads the development versions from the local HTTPS server instead of remote sources.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/nodes-langchain/nodes/trigger/ChatTrigger/README.md#_snippet_4
+
+LANGUAGE: html
+CODE:
+```
+<script type=""module"">
+    import { createChat } from 'https://127.0.0.1:8443/chat.bundle.es.js';
+</script>
+<link href=""https://127.0.0.1:8443/style.css"" rel=""stylesheet"" />
+```
+
+----------------------------------------
+
+TITLE: Update Node.js to v20 for n8n
+DESCRIPTION: As of version 1.98.0, the minimum required Node.js version for running n8n has been updated to v20. Users running n8n via npm, PM2, or contributing to n8n must ensure their Node.js environment is updated to v20 or higher.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+# Check current Node.js version:
+node -v
+
+# Update Node.js (example using nvm):
+nvm install 20
+nvm use 20
+
+# Or update globally via package manager if not using nvm.
+```
+
+----------------------------------------
+
+TITLE: n8n Chat createChat Function Options
+DESCRIPTION: Details the configuration options available for the `createChat` function, which controls the behavior and appearance of the n8n Chat widget. This includes webhook settings, rendering mode, and UI customization.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/chat/README.md#_snippet_4
+
+LANGUAGE: APIDOC
+CODE:
+```
+createChat(options: {
+  webhookUrl: string;
+  webhookConfig?: {
+    method: 'POST' | 'GET' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS' | 'HEAD' | 'CONNECT' | 'TRACE';
+    headers: Record<string, string>;
+  };
+  target?: string;
+  mode?: 'window' | 'fullscreen';
+  chatInputKey?: string;
+  chatSessionKey?: string;
+  loadPreviousSession?: boolean;
+  metadata?: Record<string, any>;
+  showWelcomeScreen?: boolean;
+  defaultLanguage?: string;
+  initialMessages?: string[];
+  i18n?: {
+    [lang: string]: {
+      title?: string;
+      subtitle?: string;
+      footer?: string;
+      getStarted?: string;
+      inputPlaceholder?: string;
+    };
+  };
+  enableStreaming?: boolean;
+}): void;
+
+// Parameters:
+// webhookUrl (string, required): The URL of the n8n Webhook endpoint. Should be the production URL.
+//   Examples:
+//     - ""https://yourname.app.n8n.cloud/webhook/513107b3-6f3a-4a1e-af21-659f0ed14183""
+//     - ""http://localhost:5678/webhook/513107b3-6f3a-4a1e-af21-659f0ed14183""
+// webhookConfig (object, optional): Configuration for the Webhook request.
+//   - method (string, default: 'POST'): HTTP method for the request.
+//   - headers (Record<string, string>, default: {}): Custom headers for the request.
+// target (string, default: '#n8n-chat'): CSS selector for the element where the chat window embeds.
+// mode (string, default: 'window'): Render mode ('window' or 'fullscreen').
+//   - 'window': Embeds as a toggle button and fixed-size window.
+//   - 'fullscreen': Takes up the entire width and height of its target container.
+// chatInputKey (string, default: 'chatInput'): Key for sending chat input to the AI Agent node.
+// chatSessionKey (string, default: 'sessionId'): Key for managing chat session identifiers.
+// loadPreviousSession (boolean, default: true): Whether to load the previous chat session when the chatbot reopens.
+// metadata (object, default: {}): Custom metadata to send with requests.
+// showWelcomeScreen (boolean, default: false): Whether to display a welcome screen upon opening the chat.
+// defaultLanguage (string, default: 'en'): The default language for the chat interface.
+// initialMessages (string[], default: ['Hi there! 👋', 'My name is Nathan. How can I assist you today?']): Array of messages to display on initial load.
+// i18n (object, optional): Internationalization settings for different languages.
+//   - en (object, optional): English language translations for UI elements.
+//     - title (string): Welcome screen title.
+//     - subtitle (string): Welcome screen subtitle.
+//     - footer (string): Text for the footer.
+//     - getStarted (string): Button text for starting a new conversation.
+//     - inputPlaceholder (string): Placeholder text for the input field.
+// enableStreaming (boolean, default: false): Enables streaming responses from the AI model.
+```
+
+----------------------------------------
+
+TITLE: Execute n8n Playwright Tests by Mode or Pattern
+DESCRIPTION: This snippet details various `pnpm` commands to run Playwright tests tailored to specific n8n operational modes, such as standard, PostgreSQL, queue, or multi-main (HA) setups. It also demonstrates how to filter tests by a specific pattern for focused development and debugging.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/testing/playwright/README.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+# By Mode
+pnpm run test:standard    # Basic n8n
+pnpm run test:postgres    # PostgreSQL
+pnpm run test:queue       # Queue mode
+pnpm run test:multi-main  # HA setup
+
+# Development
+pnpm test --grep ""workflow""           # Pattern match
+```
+
+----------------------------------------
+
+TITLE: Enforce stricter parameters for Form node HTML tags
+DESCRIPTION: Version 1.98.0 introduced stricter parameter validation for `iframe`, `video`, and `source` tags within the n8n Form node. Users employing attributes beyond a predefined list or using schemes other than `http` or `https` will need to update their node configurations or workflows.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_3
+
+LANGUAGE: javascript
+CODE:
+```
+// Example of allowed attributes for iframe tag (check source for full list):
+// <iframe src=""https://example.com"" width=""500"" height=""300""></iframe>
+// 
+// If using non-http/https schemes or disallowed attributes, update the workflow.
+```
+
+----------------------------------------
+
+TITLE: Replace N8N_RUNNERS_ALLOW_PROTOTYPE_MUTATION with N8N_RUNNERS_INSECURE_MODE
+DESCRIPTION: Version 1.102.0 replaces the `N8N_RUNNERS_ALLOW_PROTOTYPE_MUTATION` flag with `N8N_RUNNERS_INSECURE_MODE`. The new flag disables all task runner security measures and is intended as an escape hatch for compatibility with libraries like `puppeteer`, at the cost of security. Users previously using the old flag or experiencing compatibility issues should consider setting `N8N_RUNNERS_INSECURE_MODE=true`.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_1
+
+LANGUAGE: environment
+CODE:
+```
+N8N_RUNNERS_INSECURE_MODE=true
+```
+
+----------------------------------------
+
+TITLE: Running n8n-benchmark CLI Locally Without Docker
+DESCRIPTION: Outlines the steps to run the `n8n-benchmark` CLI directly on the local machine without Docker. It involves building the project with `pnpm` and then executing the benchmark with environment variables for n8n credentials.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/benchmark/README.md#_snippet_4
+
+LANGUAGE: sh
+CODE:
+```
+pnpm build
+
+# Run tests against http://localhost:5678 with specified email and password
+N8N_USER_EMAIL=user@n8n.io N8N_USER_PASSWORD=password ./bin/n8n-benchmark run
+```
+
+----------------------------------------
+
+TITLE: Function Rename: evaluateExpression
+DESCRIPTION: In version 0.62.0, the function 'evaluateExpression(...)' used within n8n's Function and FunctionItem nodes was renamed to '$evaluateExpression()' for simplification and normalization. Users referencing this function directly in their workflows must update their expressions to use the new name.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_43
+
+LANGUAGE: javascript
+CODE:
+```
+Before:
+evaluateExpression(...)
+
+After:
+$evaluateExpression(...)
+```
+
+----------------------------------------
+
+TITLE: Configure n8n Default Locale via Environment Variable
+DESCRIPTION: This snippet demonstrates how to set the default locale for n8n using the `N8N_DEFAULT_LOCALE` environment variable before starting the application. The output shows n8n initializing with the specified locale, confirming the successful application of the German locale ('de').
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+export N8N_DEFAULT_LOCALE=de
+pnpm start
+```
+
+LANGUAGE: Text
+CODE:
+```
+Initializing n8n process
+n8n ready on 0.0.0.0, port 5678
+Version: 0.156.0
+Locale: de
+
+Editor is now accessible via:
+http://localhost:5678/
+
+Press ""o"" to open in Browser.
+```
+
+----------------------------------------
+
+TITLE: Build n8n Translations with Terminal Commands
+DESCRIPTION: Provides a sequence of shell commands to set the default locale for n8n and then start the frontend development server. These commands are essential for developers to build and test localized versions of the n8n client, triggering a rebuild upon changes to base text files.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_22
+
+LANGUAGE: shell
+CODE:
+```
+export N8N_DEFAULT_LOCALE=de
+pnpm start
+```
+
+LANGUAGE: shell
+CODE:
+```
+export N8N_DEFAULT_LOCALE=de
+cd packages/frontend/editor-ui
+pnpm dev
+```
+
+----------------------------------------
+
+TITLE: Update Prometheus metrics for last_activity format
+DESCRIPTION: In version 1.98.0, the `last_activity` metric format changed from a timestamp label approach to outputting Unix time in seconds. This was done to reduce high cardinality in Prometheus. Users ingesting route metrics from versions 1.81.0 and newer should analyze the impact on their Prometheus instance and potentially clean up old data.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_2
+
+LANGUAGE: prometheus
+CODE:
+```
+# Example of how last_activity metric might have changed:
+# Old format (timestamp label):
+# n8n_route_metrics_last_activity{method=""POST"",path=""/api/v1/workflow/execute"",status=""200""} 1
+# New format (Unix time in seconds):
+# n8n_route_metrics_last_activity{method=""POST"",path=""/api/v1/workflow/execute"",status=""200""} 1678886400
+```
+
+----------------------------------------
+
+TITLE: Build n8n Chat Bundle
+DESCRIPTION: Navigates to the frontend chat package directory within the n8n project and executes its build script using pnpm. This step compiles and prepares the chat bundle for local serving, ensuring the latest changes are included.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/nodes-langchain/nodes/trigger/ChatTrigger/README.md#_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+cd packages/frontend/@n8n/chat && pnpm run build
+```
+
+----------------------------------------
+
+TITLE: Theme Configuration and State Management Utilities
+DESCRIPTION: Includes methods for managing the application's theme state. `dataProxy` provides a dynamic way to retrieve color values based on a string key, while `setGlobal` initializes global theme settings from a `window.userThemeConfig` object, ensuring theme persistence or initial setup. `copyCssVariables` retrieves and stores the currently applied inline CSS variables.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/design-system/theme/preview/index.html#_snippet_2
+
+LANGUAGE: JavaScript
+CODE:
+```
+dataProxy(value) { return this[`color_${value.toLowerCase()}`]; },
+setGlobal() { if (window.userThemeConfig) { this.global = window.userThemeConfig.global; } },
+copyCssVariables() {
+  const cssVariables = document.querySelector('html').getAttribute('style');
+  this.cssVariables = cssVariables ? cssVariables : '没有进行颜色修改，请先修改颜色！';
+  this.visible = true;
+}
+```
+
+----------------------------------------
+
+TITLE: Build n8n editor UI for production
+DESCRIPTION: Compiles and minifies the n8n editor UI for production deployment. This process optimizes assets for performance and size, preparing the application for a live environment.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/editor-ui/README.md#_snippet_3
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm build
+```
+
+----------------------------------------
+
+TITLE: Build static Storybook pages
+DESCRIPTION: Generates static HTML, CSS, and JavaScript files for the Storybook application, suitable for deployment as a static site.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/design-system/README.md#_snippet_2
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm build:storybook
+```
+
+----------------------------------------
+
+TITLE: N8N_BLOCK_FILE_ACCESS_TO_N8N_FILES blocks static cache directory
+DESCRIPTION: Version 1.55.0 updated the `N8N_BLOCK_FILE_ACCESS_TO_N8N_FILES` environment variable to also block access to n8n's static cache directory located at `~/.cache/n8n/public`. If workflows were reading from or writing to this directory via nodes like 'Read/Write Files from Disk', they must be updated to use a different path.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_9
+
+LANGUAGE: environment
+CODE:
+```
+# N8N_BLOCK_FILE_ACCESS_TO_N8N_FILES now also blocks ~/.cache/n8n/public
+# If accessing this path, update workflow to use a different directory.
+```
+
+----------------------------------------
+
+TITLE: Manually Update n8n Docker Container
+DESCRIPTION: This sequence of Docker commands facilitates a manual update of an n8n container. It involves identifying the running container, stopping it, removing the old container (without affecting persistent data), and then starting a new container using the updated n8n image. This process ensures a clean transition to the new version.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/docker/images/n8n/README.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+docker ps -a
+```
+
+LANGUAGE: bash
+CODE:
+```
+docker stop [container_id]
+```
+
+LANGUAGE: bash
+CODE:
+```
+docker rm [container_id]
+```
+
+LANGUAGE: bash
+CODE:
+```
+docker run --name=[container_name] [options] -d docker.n8n.io/n8nio/n8n
+```
+
+----------------------------------------
+
+TITLE: Update n8n with Docker Compose
+DESCRIPTION: This set of commands streamlines the update process for n8n deployments managed by Docker Compose. It first pulls the latest n8n image, then stops and removes the existing containers defined in the compose file, and finally starts new containers with the updated image in detached mode. This method is recommended for Docker Compose setups.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/docker/images/n8n/README.md#_snippet_5
+
+LANGUAGE: bash
+CODE:
+```
+# Pull latest version
+docker compose pull
+
+# Stop and remove older version
+docker compose down
+
+# Start the container
+docker compose up -d
+```
+
+----------------------------------------
+
+TITLE: Controller Method with License Gate
+DESCRIPTION: Shows how to protect a specific controller method using the `@Licensed()` decorator, which gates access based on a license flag. This is used for features that are partially licensed.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/scripts/backend-module/backend-module.guide.md#_snippet_5
+
+LANGUAGE: ts
+CODE:
+```
+class InsightsController {
+  constructor(private readonly insightsService: InsightsService) {}
+
+  @Get('/by-workflow')
+  @Licensed('feat:insights:viewDashboard')
+  async getInsightsByWorkflow(
+    _req: AuthenticatedRequest,
+    _res: Response,
+    @Query payload: ListInsightsWorkflowQueryDto,
+  ) {
+    const dateRangeAndMaxAgeInDays = this.getMaxAgeInDaysAndGranularity({
+      dateRange: payload.dateRange ?? 'week',
+    });
+    return await this.insightsService.getInsightsByWorkflow({
+      maxAgeInDays: dateRangeAndMaxAgeInDays.maxAgeInDays,
+      skip: payload.skip,
+      take: payload.take,
+      sortBy: payload.sortBy,
+    });
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Run n8n Docker Container with Timezone Settings
+DESCRIPTION: This command starts an n8n Docker container, explicitly setting both the n8n application's generic timezone (`GENERIC_TIMEZONE`) and the system's timezone (`TZ`) to ensure consistent time handling. This is crucial for features like the Schedule node and for accurate logging and command output within the container.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/docker/images/n8n/README.md#_snippet_6
+
+LANGUAGE: bash
+CODE:
+```
+docker run -it --rm \
+ --name n8n \
+ -p 5678:5678 \
+ -e GENERIC_TIMEZONE=""Europe/Berlin"" \
+ -e TZ=""Europe/Berlin"" \
+ docker.n8n.io/n8nio/n8n
+```
+
+----------------------------------------
+
+TITLE: Install and Embed n8n Chat with npm
+DESCRIPTION: Installs the n8n Chat package using npm and demonstrates how to import and initialize it in a TypeScript project. This approach is suitable for projects managed with Node.js package manager.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/chat/README.md#_snippet_1
+
+LANGUAGE: shell
+CODE:
+```
+npm install @n8n/chat
+```
+
+LANGUAGE: typescript
+CODE:
+```
+import '@n8n/chat/style.css';
+import { createChat } from '@n8n/chat';
+
+createChat({
+	webhookUrl: 'YOUR_PRODUCTION_WEBHOOK_URL'
+});
+```
+
+----------------------------------------
+
+TITLE: n8n Expression Syntax Update for Outputs
+DESCRIPTION: Updates to how $(...).last(), $(...).first(), and $(...).all() expressions handle multiple outputs. If these expressions are used without arguments and nodes have multiple outputs, they now default to the first output. To maintain previous behavior or specify an output, use $(...).last(0), $(...).first(0), or $(...).all(0).
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_11
+
+LANGUAGE: javascript
+CODE:
+```
+/* Old behavior (defaults to first output if multiple exist) */
+$(...).last()
+$(...).first()
+$(...).all()
+
+/* New behavior (explicitly target first output) */
+$(...).last(0)
+$(...).first(0)
+$(...).all(0)
+```
+
+----------------------------------------
+
+TITLE: Install project dependencies with pnpm
+DESCRIPTION: Installs all required project dependencies for the n8n editor UI using pnpm, a fast, disk-space efficient package manager. This command should be run after cloning the repository.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/editor-ui/README.md#_snippet_1
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm install
+```
+
+----------------------------------------
+
+TITLE: Worker server binding and health check changes
+DESCRIPTION: Version 1.63.0 introduced changes to the worker server: it now binds to IPv4 by default instead of IPv6. Additionally, the `/healthz` endpoint's health status reporting was modified; it now reports healthy regardless of database/Redis status, with database and Redis checks moved to `/healthz/readiness`. Users experiencing port conflicts should set `QUEUE_HEALTH_CHECK_PORT`, and those relying on DB/Redis checks for health should switch to `/healthz/readiness`.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_7
+
+LANGUAGE: environment
+CODE:
+```
+# To change worker server port if IPv4 default causes conflict:
+QUEUE_HEALTH_CHECK_PORT=8081
+
+# To check readiness including DB/Redis status:
+# curl http://localhost:8080/healthz/readiness
+```
+
+----------------------------------------
+
+TITLE: Run unit tests
+DESCRIPTION: Executes the unit tests for the n8n editor UI. These tests verify individual components and functions in isolation, ensuring that each part of the codebase works as expected.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/editor-ui/README.md#_snippet_7
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm test:unit
+```
+
+----------------------------------------
+
+TITLE: Prevent 'input' field types in Form node custom HTML
+DESCRIPTION: Across versions 1.83.0, 1.82.1, and 1.81.3, the n8n Form node was updated to disallow `input` field types within custom HTML. This change was implemented to prevent the injection of malicious JavaScript. Users who previously used `input` fields in custom HTML for Form nodes must refactor their configurations.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/cli/BREAKING-CHANGES.md#_snippet_5
+
+LANGUAGE: javascript
+CODE:
+```
+// In versions 1.83.0, 1.82.1, 1.81.3, the following is no longer allowed:
+// <form>
+//   <input type=""text"" name=""myInput"">
+// </form>
+// 
+// Users must remove or replace 'input' field types in custom HTML for Form nodes.
+```
+
+----------------------------------------
+
+TITLE: Install Node.js HTTP Server Globally
+DESCRIPTION: Installs the `http-server` package globally using npm. This server is essential for serving static files over HTTPS, which is a prerequisite for local development of the n8n chat bundle due to browser security policies.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/nodes-langchain/nodes/trigger/ChatTrigger/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+npm install -g http-server
+```
+
+----------------------------------------
+
+TITLE: Install n8n globally
+DESCRIPTION: Installs the n8n workflow automation platform globally on the system, making the `n8n` command available from any directory for general use.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/editor-ui/README.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+npm install n8n -g
+```
+
+----------------------------------------
+
+TITLE: PostHog Analytics Initialization
+DESCRIPTION: Initializes the PostHog analytics service for n8n.io. It configures tracking, user properties, and event capture. Requires JavaScript to be enabled for the n8n Editor-UI.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/editor-ui/index.html#_snippet_0
+
+LANGUAGE: JavaScript
+CODE:
+```
+!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(""."");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement(""script"")).type=""text/javascript"",p.async=!0,p.src=s.api_host+""/static/array.js"",(r=t.getElementsByTagName(""script"")[0]).parentNode.insertBefore(p,r);var u=e;void 0!==a?u=e[a]=[]:a=""posthog"",u.people=u.people||[],u.toString=function(t){var e=""posthog"";return""posthog""!==a&&(e+="".""+a),t||(e+="" (stub)""),e},u.people.toString=function(){return u.toString(1)+"".people (stub)""},o=""capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled getFeatureFlag onFeatureFlags reloadFeatureFlags"".split("" ""),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[])
+```
+
+----------------------------------------
+
+TITLE: Entity Class Definition
+DESCRIPTION: Defines a database entity using TypeORM decorators. The `@Entity()` decorator marks the class as a database table, and `@Column()` defines properties that map to table columns.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/scripts/backend-module/backend-module.guide.md#_snippet_10
+
+LANGUAGE: typescript
+CODE:
+```
+import { Entity, Column, BaseEntity } from 'typeorm';
+
+@Entity()
+export class MyFeatureEntity extends BaseEntity {
+  @Column()
+  name: string;
+
+  @Column()
+  count: number;
+}
+```
+
+----------------------------------------
+
+TITLE: Define Vector Store Node Constructor Arguments Interface (TypeScript)
+DESCRIPTION: Defines the essential configuration and callback functions required for implementing a custom vector store node within n8n. It specifies metadata, UI fields for different operation modes, and core functions like `populateVectorStore` and `getVectorStoreClient`. Note that `populateVectorStore` supports batch processing from v1.1+.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/nodes-langchain/nodes/vector_store/shared/createVectorStoreNode/README.md#_snippet_1
+
+LANGUAGE: typescript
+CODE:
+```
+interface VectorStoreNodeConstructorArgs<T extends VectorStore> {
+  meta: NodeMeta;                    // Node metadata (name, description, etc.)
+  methods?: { ... };                 // Optional methods for list searches
+  sharedFields: INodeProperties[];   // Fields shown in all modes
+  insertFields?: INodeProperties[];  // Fields specific to insert mode
+  loadFields?: INodeProperties[];    // Fields specific to load mode
+  retrieveFields?: INodeProperties[]; // Fields specific to retrieve mode
+  updateFields?: INodeProperties[];  // Fields specific to update mode
+  
+  // Core implementation functions
+  populateVectorStore: Function;     // Store documents in vector store (accepts batches in v1.1+)
+  getVectorStoreClient: Function;    // Get vector store instance
+  releaseVectorStoreClient?: Function; // Clean up resources
+}
+```
+
+----------------------------------------
+
+TITLE: JavaScript File Object Definition and Management
+DESCRIPTION: Defines the `File` constructor and its associated static and prototype methods for managing file instances. This includes initialization, searching for files by URL or object reference, comparing file instances, and saving/updating files within a global list.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/cypress/fixtures/Dummy_javascript.txt#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+var File = function(url, object){
+	File.list = Array.isArray(File.list)? File.list : [];
+	File.progress = File.progress || 0;
+	this.progress = 0;
+	this.object = object;
+	this.url = url;
+};
+
+File.indexOf = function(term){
+	for(var index in File.list){
+		var file = File.list[index];
+		if (file.equals(term) || file.url === term || file.object === term) {
+			return index;
+		}
+	}
+	return -1;
+};
+
+File.find = function(term){
+	var index = File.indexOf(term);
+	return ~index && File.list[index];
+};
+
+File.prototype.equals = function(file){
+	var isFileType = file instanceof File;
+	return isFileType && this.url === file.url && this.object === file.object;
+};
+
+File.prototype.save = function(update){
+	update = typeof update === 'undefined'? true : update;
+	if(Array.isArray(File.list)){
+		var index = File.indexOf(this);
+		if(~index && update) {
+			File.list[index] = this;
+			console.warn('File `%s` has been loaded before and updated now for: %O.', this.url, this);
+		}else File.list.push(this);
+		console.log(File.list)
+	}else{
+		File.list = [this];
+	}
+	return this;
+};
+```
+
+----------------------------------------
+
+TITLE: Run end-to-end tests
+DESCRIPTION: Executes the end-to-end tests for the n8n editor UI. These tests simulate user interactions to verify the overall system functionality and integration across different components.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/editor-ui/README.md#_snippet_6
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm test:e2e
+```
+
+----------------------------------------
+
+TITLE: Setup New Backend Module
+DESCRIPTION: Command to generate a new backend module within the n8n monorepo. This command initializes the necessary files and directory structure for a new feature module.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/scripts/backend-module/backend-module.guide.md#_snippet_0
+
+LANGUAGE: shell
+CODE:
+```
+pnpm setup-backend-module
+```
+
+----------------------------------------
+
+TITLE: Register Entities in Module
+DESCRIPTION: Shows how to register entity classes with TypeORM within a module's entrypoint. This ensures that the entities are recognized and managed by the ORM for database operations.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/scripts/backend-module/backend-module.guide.md#_snippet_11
+
+LANGUAGE: typescript
+CODE:
+```
+import { ModuleInterface } from '@n8n/backend-core';
+
+class MyFeatureModule implements ModuleInterface {
+  async entities() {
+    const { MyFeatureEntity } = await import('./my-feature.entity');
+    
+    return [MyFeatureEntity];
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Scrape Stripe Webhook Event Types to JS Array
+DESCRIPTION: This JavaScript snippet is designed to be executed in a browser's developer console. It scrapes Stripe webhook event types from a specific HTML structure (requiring a manual step to add an ID to the target `<ul>` element). It extracts the event name and description, formats the name for display, and copies the resulting array of objects to the clipboard for easy pasting into a JavaScript file.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/nodes-base/nodes/Stripe/README.md#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+types = [];
+$$('ul#event-types li').forEach((el) => {
+	const value = el.querySelector('.method-list-item-label-name').innerText;
+
+	types.push({
+		name: value
+			.replace(/(\.|_)/g, ' ')
+			.split(' ')
+			.map((s) => s.charAt(0).toUpperCase() + s.substring(1))
+			.join(' '),
+		value,
+		description: el.querySelector('.method-list-item-description').innerText,
+	});
+});
+copy(types);
+```
+
+----------------------------------------
+
+TITLE: n8n Node Type Description Properties
+DESCRIPTION: Defines the top-level properties used to describe an n8n node, including its display name, internal name, group, input/output types, and default settings for the editor UI. These properties are essential for how the node behaves and is presented within the n8n editor.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/node-dev/README.md#_snippet_5
+
+LANGUAGE: APIDOC
+CODE:
+```
+Node Type Description Properties:
+
+credentials [optional]: Credentials the node requests access to
+defaults [required]: Default ""name"" and ""color"" to set on node when it gets created
+displayName [required]: Name to display users in Editor UI
+description [required]: Description to display users in Editor UI
+group [required]: Node group for example ""transform"" or ""trigger""
+hooks [optional]: Methods to execute at different points in time like when the workflow gets activated or deactivated
+icon [optional]: Icon to display (can be an icon or a font awesome icon)
+inputs [required]: Types of inputs the node has (currently only ""main"" exists) and the amount
+outputs [required]: Types of outputs the node has (currently only ""main"" exists) and the amount
+outputNames [optional]: In case a node has multiple outputs, names can be set that users know what data to expect
+maxNodes [optional]: If an unlimited number of nodes of that type cannot exist in a workflow, the max-amount can be specified
+name [required]: Name of the node (for n8n to use internally, in camelCase)
+properties [required]: Properties which get displayed in the Editor UI and can be set by the user
+subtitle [optional]: Text which should be displayed underneath the name of the node in the Editor UI (can be an expression)
+version [required]: Version of the node. Currently always ""1"" (integer). For future usage, does not get used yet
+webhooks [optional]: Webhooks the node should listen to
+```
+
+----------------------------------------
+
+TITLE: Lint and fix project files
+DESCRIPTION: Analyzes source code for programmatic and stylistic errors, and automatically fixes them where possible. This command helps ensure code quality, consistency, and adherence to project coding standards.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/editor-ui/README.md#_snippet_5
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm lint
+```
+
+----------------------------------------
+
+TITLE: Install project dependencies using pnpm
+DESCRIPTION: Installs all necessary project dependencies as defined in the project's configuration files using the pnpm package manager.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/design-system/README.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm install
+```
+
+----------------------------------------
+
+TITLE: Define and Reuse Base Text in i18n JSON
+DESCRIPTION: This snippet shows how to define reusable base text strings using the special `_reusableBaseText` key in a JSON translation file. Other translation keys can then reference these shared strings using the `@:_reusableBaseText.key` syntax, promoting consistency and reducing duplication, similar to linked locale messages in Vue i18n.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/ADDENDUM.md#_snippet_2
+
+LANGUAGE: json
+CODE:
+```
+{
+	""_reusableBaseText.save"": ""🇩🇪 Save"",
+	""duplicateWorkflowDialog.enterWorkflowName"": ""🇩🇪 Enter workflow name"",
+	""duplicateWorkflowDialog.save"": ""@:_reusableBaseText.save"",
+	""saveButton.save"": ""@:_reusableBaseText.save"",
+	""saveButton.saving"": ""🇩🇪 Saving"",
+	""saveButton.saved"": ""🇩🇪 Saved""
+}
+```
+
+----------------------------------------
+
+TITLE: Build n8n Code
+DESCRIPTION: Compiles and builds all the n8n code, including TypeScript compilation and other necessary build steps, preparing it for execution.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_12
+
+LANGUAGE: shell
+CODE:
+```
+pnpm build
+```
+
+----------------------------------------
+
+TITLE: Run all project tests
+DESCRIPTION: Executes all configured tests for the n8n editor UI project. This typically includes both unit tests and end-to-end tests, providing comprehensive coverage of the application's functionality.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/editor-ui/README.md#_snippet_4
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm test
+```
+
+----------------------------------------
+
+TITLE: Install Dependencies
+DESCRIPTION: Installs all project dependencies using the pnpm package manager and links them together. Requires Node.js and pnpm to be installed.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_11
+
+LANGUAGE: shell
+CODE:
+```
+pnpm install
+```
+
+----------------------------------------
+
+TITLE: pnpm debug:flaky:e2e Command Line Tool
+DESCRIPTION: Provides a command-line interface to debug flaky end-to-end tests by repeatedly running filtered test suites. It allows specifying a filter for test names or tags and the number of times to execute the tests to expose flakiness.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/cypress/README.md#_snippet_0
+
+LANGUAGE: APIDOC
+CODE:
+```
+pnpm run debug:flaky:e2e [-- <grep_filter>] [<burn_count>]
+  - Description: Debugs flaky end-to-end tests by repeatedly executing them based on specified filters and repetition count.
+  - Parameters:
+    - <grep_filter>: (Optional) A string to filter tests. Can be an 'it()' or 'describe()' block title, or a tag (if using @cypress/grep). If omitted, all tests will be run.
+    - <burn_count>: (Optional) The number of times to run the filtered tests. Defaults to 5 if not provided.
+  - Examples:
+    - Run all tests tagged with CAT-726 ten times:
+      pnpm run debug:flaky:e2e CAT-726 10
+    - Run all tests containing ""login"" five times (default burn count):
+      pnpm run debug:flaky:e2e login
+    - Run all tests five times (default grep and burn count):
+      pnpm run debug:flaky:e2e
+```
+
+----------------------------------------
+
+TITLE: Define Vector Store Operation Handler Signatures (TypeScript)
+DESCRIPTION: Illustrates the standardized asynchronous function signatures for different vector store operation handlers (e.g., `loadOperation`, `insertOperation`). These handlers receive context, constructor arguments, embeddings, and item index, returning processed node execution data.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/nodes-langchain/nodes/vector_store/shared/createVectorStoreNode/README.md#_snippet_2
+
+LANGUAGE: typescript
+CODE:
+```
+// Example: loadOperation.ts
+export async function handleLoadOperation<T extends VectorStore>(
+  context: IExecuteFunctions,
+  args: VectorStoreNodeConstructorArgs<T>,
+  embeddings: Embeddings,
+  itemIndex: number
+): Promise<INodeExecutionData[]>
+
+// Example: insertOperation.ts (v1.1+)
+export async function handleInsertOperation<T extends VectorStore>(
+  context: IExecuteFunctions,
+  args: VectorStoreNodeConstructorArgs<T>,
+  embeddings: Embeddings
+): Promise<INodeExecutionData[]>
+```
+
+----------------------------------------
+
+TITLE: Install @n8n/json-schema-to-zod with npm
+DESCRIPTION: Installs the `@n8n/json-schema-to-zod` package, which converts JSON schema objects into Zod schemas, using the npm package manager. This command adds the package to your project's dependencies.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/json-schema-to-zod/README.md#_snippet_0
+
+LANGUAGE: sh
+CODE:
+```
+npm install @n8n/json-schema-to-zod
+```
+
+----------------------------------------
+
+TITLE: Build n8n Docker Image from Source
+DESCRIPTION: These commands outline the process for building an n8n Docker image from its source code. The recommended method uses `pnpm build:docker` for a combined compilation and Docker image creation. Alternatively, `pnpm run build:deploy` can be used to pre-compile the application, which is useful for custom build systems requiring a separate build context.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/docker/images/n8n/README.md#_snippet_7
+
+LANGUAGE: bash
+CODE:
+```
+pnpm build:docker
+```
+
+LANGUAGE: bash
+CODE:
+```
+pnpm run build:deploy
+```
+
+----------------------------------------
+
+TITLE: Enable Corepack (Windows Administrator)
+DESCRIPTION: Enables the Node.js corepack utility on Windows, requiring administrator privileges.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_6
+
+LANGUAGE: powershell
+CODE:
+```
+corepack enable
+```
+
+----------------------------------------
+
+TITLE: Build CSS theme files
+DESCRIPTION: Compiles and processes CSS files related to the project's theme, preparing them for use in the application.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/design-system/README.md#_snippet_5
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm build:theme
+```
+
+----------------------------------------
+
+TITLE: Embed n8n Chat in React
+DESCRIPTION: Demonstrates integrating the n8n Chat widget into a React application. The chat is initialized using the `createChat` function within a `useEffect` hook to ensure it runs after the component mounts.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/chat/README.md#_snippet_3
+
+LANGUAGE: tsx
+CODE:
+```
+import { useEffect } from 'react';
+import '@n8n/chat/style.css';
+import { createChat } from '@n8n/chat';
+
+export const App = () => {
+	useEffect(() => {
+		createChat({
+			webhookUrl: 'YOUR_PRODUCTION_WEBHOOK_URL'
+		});
+	}, []);
+
+	return (<div></div>);
+};
+```
+
+----------------------------------------
+
+TITLE: Configuration Class with Environment Variables
+DESCRIPTION: Defines a configuration class using `@Config` and `@Env` decorators. `@Env` links class properties to environment variables, providing default values and enabling dynamic configuration.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/scripts/backend-module/backend-module.guide.md#_snippet_12
+
+LANGUAGE: typescript
+CODE:
+```
+import { Config, Env } from '@n8n/backend-core';
+
+@Config
+export class MyFeatureConfig {
+  /**
+   * How often in minutes to run some task.
+   * @default 30
+   */
+  @Env('N8N_MY_FEATURE_TASK_INTERVAL')
+  taskInterval: number = 30;
+}
+```
+
+----------------------------------------
+
+TITLE: Install Build Tools (Debian/Ubuntu)
+DESCRIPTION: Installs essential build tools required for development on Debian-based Linux distributions.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+apt-get install -y build-essential python
+```
+
+----------------------------------------
+
+TITLE: Clone n8n Repository
+DESCRIPTION: Clones the n8n repository from GitHub to your local machine. Ensure you have Git installed and have forked the repository first.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_8
+
+LANGUAGE: shell
+CODE:
+```
+git clone https://github.com/<your_github_username>/n8n.git
+```
+
+----------------------------------------
+
+TITLE: Enable Corepack
+DESCRIPTION: Enables the Node.js corepack utility, which is used for managing package managers like pnpm.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_3
+
+LANGUAGE: bash
+CODE:
+```
+corepack enable
+```
+
+----------------------------------------
+
+TITLE: Parsing Mixed n8n Plaintext and Resolvable Expressions
+DESCRIPTION: Demonstrates the parsing of input strings that combine both plaintext and resolvable expressions in various sequences, showing how the 'Program' object correctly identifies and orders 'Plaintext' and 'Resolvable' components.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/codemirror-lang/test/expressions/cases.txt#_snippet_2
+
+LANGUAGE: n8n Expression
+CODE:
+```
+text {{ 1 + 1 }}
+
+==>
+
+Program(Plaintext, Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ 1 + 1 }} Plaintext
+
+==>
+
+Program(Resolvable, Plaintext)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+text {{ 1 + 1 }} text
+
+==>
+
+Program(Plaintext, Resolvable, Plaintext)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ 1 + 1 }} text {{ 1 + 1 }}
+
+==>
+
+Program(Resolvable,Plaintext,Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+text {{ 1 + 1 }} text {{ 1 + 1 }}
+
+==>
+
+Program(Plaintext, Resolvable, Plaintext, Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ 1 + 1 }} text {{ 1 + 1 }} text
+
+==>
+
+Program(Resolvable,Plaintext,Resolvable,Plaintext)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+a {{ 'áßи' }} a
+
+==>
+
+Program(Plaintext, Resolvable, Plaintext)
+```
+
+----------------------------------------
+
+TITLE: Implement Resource Release with Finally Block (TypeScript)
+DESCRIPTION: Shows a common pattern for ensuring resource cleanup in asynchronous operations, specifically releasing the vector store client. The `releaseVectorStoreClient` function is called within a `finally` block, guaranteeing execution even if errors occur during the main operation logic, preventing resource leaks.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/nodes-langchain/nodes/vector_store/shared/createVectorStoreNode/README.md#_snippet_4
+
+LANGUAGE: typescript
+CODE:
+```
+try {
+  // Operation logic
+} finally {
+  // Release resources even if an error occurs
+  args.releaseVectorStoreClient?.(vectorStore);
+}
+```
+
+----------------------------------------
+
+TITLE: Run unit tests
+DESCRIPTION: Executes the defined unit tests for the project to ensure code quality and functionality, providing feedback on code correctness.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/design-system/README.md#_snippet_3
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm test:unit
+```
+
+----------------------------------------
+
+TITLE: Install Build Tools (CentOS)
+DESCRIPTION: Installs essential build tools required for development on CentOS-based Linux distributions.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+yum install gcc gcc-c++ make
+```
+
+----------------------------------------
+
+TITLE: Install n8n-workflow Package
+DESCRIPTION: This command installs the `n8n-workflow` package using npm, providing the foundational code required for developing and running workflows within the n8n automation platform. It's a prerequisite for local development or extending n8n functionalities.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/workflow/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+npm install n8n-workflow
+```
+
+----------------------------------------
+
+TITLE: Generate Self-Signed SSL Certificate for HTTPS
+DESCRIPTION: Generates a self-signed X.509 SSL certificate and a private key using OpenSSL. These files (`cert.pem` and `key.pem`) are required to enable HTTPS for the local development server, ensuring secure communication for the chat bundle.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/nodes-langchain/nodes/trigger/ChatTrigger/README.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
+```
+
+----------------------------------------
+
+TITLE: Module Entrypoint with License Flag
+DESCRIPTION: Illustrates how to define a module that is conditionally activated based on a license flag. The `@BackendModule()` decorator includes a `licenseFlag` property to enforce this behavior.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/scripts/backend-module/backend-module.guide.md#_snippet_4
+
+LANGUAGE: ts
+CODE:
+```
+@BackendModule({
+  name: 'external-secrets',
+  licenseFlag: 'feat:externalSecrets'
+})
+export class ExternalSecretsModule implements ModuleInterface {
+  // This module will be activated only if the license flag is true.
+}
+```
+
+----------------------------------------
+
+TITLE: Parsing Basic n8n Resolvable Expressions
+DESCRIPTION: Illustrates how simple resolvable expressions, including empty and whitespace-only expressions, are parsed into a 'Program' containing a 'Resolvable' component.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/codemirror-lang/test/expressions/cases.txt#_snippet_0
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ 1 + 1 }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{}}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ }}
+
+==>
+
+Program(Resolvable)
+```
+
+----------------------------------------
+
+TITLE: Define Credential Name for Translation File Mapping
+DESCRIPTION: This TypeScript snippet shows how the `name` property within an n8n credential class (`GithubApi`) is used. This `name` property directly corresponds to the filename of its associated credential translation file (e.g., `githubApi.json`), ensuring proper mapping between the credential definition and its localized text.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_4
+
+LANGUAGE: TypeScript
+CODE:
+```
+export class GithubApi implements ICredentialType {
+	name = 'githubApi'; // to use for credential translation file
+	displayName = 'Github API';
+	documentationUrl = 'github';
+	properties: INodeProperties[] = [
+```
+
+----------------------------------------
+
+TITLE: Deploy n8n with Docker
+DESCRIPTION: These commands create a Docker volume for persistent data and then run n8n in a Docker container, mapping port 5678 for access. This method provides a containerized and isolated environment for n8n, ensuring data persistence across container restarts.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/README.md#_snippet_1
+
+LANGUAGE: Docker
+CODE:
+```
+docker volume create n8n_data
+docker run -it --rm --name n8n -p 5678:5678 -v n8n_data:/home/node/.n8n docker.n8n.io/n8nio/n8n
+```
+
+----------------------------------------
+
+TITLE: Install Corepack via Homebrew
+DESCRIPTION: Installs the corepack utility using the Homebrew package manager on macOS.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_5
+
+LANGUAGE: bash
+CODE:
+```
+brew install corepack
+```
+
+----------------------------------------
+
+TITLE: Core Color Manipulation and CSS Variable Application Utilities
+DESCRIPTION: Provides essential functions for color manipulation and dynamic CSS variable management. `tintColor` adjusts the lightness of a hexadecimal color, `hexToHSL` converts hexadecimal colors to HSL format, and `setCssVariable` applies these HSL values to custom CSS properties on the document's root, enabling dynamic theme changes.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/design-system/theme/preview/index.html#_snippet_1
+
+LANGUAGE: JavaScript
+CODE:
+```
+tintColor(c, tint) {
+  const color = c.replace('#', '');
+  let red = parseInt(color.slice(0, 2), 16);
+  let green = parseInt(color.slice(2, 4), 16);
+  let blue = parseInt(color.slice(4, 6), 16);
+  if (tint === 0) { // when primary color is in its rgb space
+    return [red, green, blue].join(',');
+  } else {
+    red += Math.round(tint * (255 - red));
+    green += Math.round(tint * (255 - green));
+    blue += Math.round(tint * (255 - blue));
+    red = red.toString(16);
+    green = green.toString(16);
+    blue = blue.toString(16);
+    return `#${red}${green}${blue}`;
+  }
+},
+hexToHSL(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  var r = parseInt(result[1], 16);
+  var g = parseInt(result[2], 16);
+  var b = parseInt(result[3], 16);
+  (r /= 255), (g /= 255), (b /= 255);
+  var max = Math.max(r, g, b), min = Math.min(r, g, b);
+  var h, s, l = (max + min) / 2;
+  if (max == min) {
+    h = s = 0; // achromatic
+  } else {
+    var d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+  s = s * 100;
+  s = Math.round(s);
+  l = l * 100;
+  l = Math.round(l);
+  h = Math.round(360 * h);
+  return { h: h, s: s + '%', l: l + '%', };
+},
+setCssVariable(key, color) {
+  const hslColor = this.hexToHSL(color);
+  document.documentElement.style.setProperty(`--${key}-h`, hslColor.h);
+  document.documentElement.style.setProperty(`--${key}-s`, hslColor.s);
+  document.documentElement.style.setProperty(`--${key}-l`, hslColor.l);
+}
+```
+
+----------------------------------------
+
+TITLE: n8n Node Property Definition Properties
+DESCRIPTION: Specifies the properties that can be set for individual fields within an n8n node's configuration, such as display name, default value, type, and display logic. These properties control how user-configurable fields are rendered and validated in the n8n editor.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/node-dev/README.md#_snippet_6
+
+LANGUAGE: APIDOC
+CODE:
+```
+Node Property Definition Properties:
+
+default [required]: Default value of the property
+description [required]: Description that is displayed to users in the Editor UI
+displayName [required]: Name that is displayed to users in the Editor UI
+displayOptions [optional]: Defines logic to decide if a property should be displayed or not
+name [required]: Name of the property (for n8n to use internally, in camelCase)
+options [optional]: The options the user can select when type of property is ""collection"", ""fixedCollection"" or ""options""
+placeholder [optional]: Placeholder text that is displayed to users in the Editor UI
+type [required]: Type of the property. If it is for example a ""string"", ""number"", ...
+typeOptions [optional]: Additional options for type. Like for example the min or max value of a number
+required [optional]: Defines if the value has to be set or if it can stay empty
+```
+
+----------------------------------------
+
+TITLE: Module Management via Environment Variables
+DESCRIPTION: Defines the environment variables used to manage the activation and deactivation of backend modules in an n8n instance. These variables control which modules are loaded and run during instance startup.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/scripts/backend-module/backend-module.guide.md#_snippet_2
+
+LANGUAGE: env
+CODE:
+```
+# To enable a module (activate it on instance startup), use the env var N8N_ENABLED_MODULES.
+# To disable a module (skip it on instance startup), use the env var N8N_DISABLED_MODULES.
+# Some modules are **default modules** so they are always enabled unless specifically disabled.
+# Modules that are under a license flag are automatically skipped on startup if the instance is not licensed to use the feature.
+```
+
+----------------------------------------
+
+TITLE: Run Unit Tests
+DESCRIPTION: Command to execute the unit test suite for the n8n project. Running it in the root folder executes all tests, while running it in a package folder runs tests only for that specific package. Use the '-u' flag or 'u' in watch mode to update snapshot files.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_26
+
+LANGUAGE: shell
+CODE:
+```
+pnpm test
+```
+
+----------------------------------------
+
+TITLE: Run All Tests
+DESCRIPTION: Executes all the tests defined within the n8n project. This is a crucial step to ensure code quality and stability.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_16
+
+LANGUAGE: shell
+CODE:
+```
+pnpm test
+```
+
+----------------------------------------
+
+TITLE: Translate Event Trigger Description for Webhook Node in i18n JSON
+DESCRIPTION: This snippet illustrates how to translate dynamic node properties like `eventTriggerDescription` for a Webhook node. The translation key is placed at the root level of the `nodeView` property within the node's specific translation file.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/ADDENDUM.md#_snippet_4
+
+LANGUAGE: json
+CODE:
+```
+{
+	""nodeView.eventTriggerDescription"": ""🇩🇪 Waiting for you to call the Test URL""
+}
+```
+
+----------------------------------------
+
+TITLE: Convert JSON Schema to Zod Schema using TypeScript
+DESCRIPTION: Illustrates a basic usage of the `jsonSchemaToZod` function in TypeScript. It takes a simple JSON schema object defining an object with a string property and converts it into a corresponding Zod schema at runtime. The `myObject` variable is assumed to be the input JSON schema.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/json-schema-to-zod/README.md#_snippet_1
+
+LANGUAGE: typescript
+CODE:
+```
+import { jsonSchemaToZod } from ""json-schema-to-zod"";
+
+const jsonSchema = {
+  type: ""object"",
+  properties: {
+    hello: {
+      type: ""string"",
+    },
+  },
+};
+
+const zodSchema = jsonSchemaToZod(myObject);
+```
+
+----------------------------------------
+
+TITLE: Configure n8n Node Options Parameter in JavaScript
+DESCRIPTION: Defines an n8n node parameter of type 'options', allowing users to select from a predefined list of resources like 'File' or 'Issue'. This configuration includes the display name, internal name, type, available options with their values, and a default selection, enabling dynamic UI generation for node parameters.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_15
+
+LANGUAGE: javascript
+CODE:
+```
+{
+	displayName: 'Resource',
+	name: 'resource',
+	type: 'options',
+	options: [
+		{
+			name: 'File',
+			value: 'file', // key to use in translation
+		},
+		{
+			name: 'Issue',
+			value: 'issue', // key to use in translation
+		},
+	],
+	default: 'issue',
+	description: 'Resource to operate on',
+}
+```
+
+----------------------------------------
+
+TITLE: Integrate n8n Expression Language with CodeMirror
+DESCRIPTION: This JavaScript snippet demonstrates how to configure CodeMirror's language support to parse n8n expressions alongside standard JavaScript. It uses `@n8n/codemirror-lang` and `@lezer/javascript` to create a mixed parser, specifically wrapping 'Resolvable' nodes with the JavaScript parser. The `n8nExpressionLanguageSupport` function returns a `LanguageSupport` instance for use in CodeMirror.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/codemirror-lang/src/expressions/README.md#_snippet_0
+
+LANGUAGE: JavaScript
+CODE:
+```
+import { parserWithMetaData as n8nParser } from '@n8n/codemirror-lang';
+import { LanguageSupport, LRLanguage } from '@codemirror/language';
+import { parseMixed } from '@lezer/common';
+import { parser as jsParser } from '@lezer/javascript';
+
+const n8nPlusJsParser = n8nParser.configure({
+	wrap: parseMixed((node) => {
+		if (node.type.isTop) return null;
+
+		return node.name === 'Resolvable'
+			? { parser: jsParser, overlay: (node) => node.type.name === 'Resolvable' }
+			: null;
+	}),
+});
+
+const n8nLanguage = LRLanguage.define({ parser: n8nPlusJsParser });
+
+export function n8nExpressionLanguageSupport() {
+	return new LanguageSupport(n8nLanguage);
+}
+```
+
+----------------------------------------
+
+TITLE: Add Upstream Remote
+DESCRIPTION: Adds the official n8n repository as an 'upstream' remote. This is crucial for fetching updates from the original project.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_10
+
+LANGUAGE: shell
+CODE:
+```
+git remote add upstream https://github.com/n8n-io/n8n.git
+```
+
+----------------------------------------
+
+TITLE: Install n8n-node-dev CLI Globally
+DESCRIPTION: This command installs the n8n-node-dev command-line interface globally on your system, allowing you to use its commands from any directory to manage n8n node and credential development.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/node-dev/README.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+npm install n8n-node-dev -g
+```
+
+----------------------------------------
+
+TITLE: Install n8n-core package via npm
+DESCRIPTION: This command installs the n8n-core package, which provides core components for n8n workflow automation, using the Node Package Manager (npm). It's a prerequisite for developing or extending n8n functionalities.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/core/README.md#_snippet_0
+
+LANGUAGE: Bash
+CODE:
+```
+npm install n8n-core
+```
+
+----------------------------------------
+
+TITLE: Lint and fix code style
+DESCRIPTION: Analyzes source code for programmatic and stylistic errors, and automatically fixes them where possible, enforcing coding standards and improving code consistency.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/design-system/README.md#_snippet_4
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm lint
+```
+
+----------------------------------------
+
+TITLE: n8n Node String/Number/Boolean Parameter Definition
+DESCRIPTION: Illustrates the TypeScript definition for a string parameter within an n8n node, showing `displayName`, `name`, `type`, `required`, `placeholder`, and `description` properties.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_13
+
+LANGUAGE: TypeScript
+CODE:
+```
+{
+	displayName: 'Repository Owner',
+	name: 'owner', // key to use in translation
+	type: 'string',
+	required: true,
+	placeholder: 'n8n-io',
+	description: 'Owner of the repository.',
+},
+```
+
+----------------------------------------
+
+TITLE: Parsing n8n Resolvable Expressions with Special Characters and Escaping
+DESCRIPTION: Explores how n8n's parser handles various special characters within resolvable expressions, including parentheses, brackets, braces, and escaped characters, ensuring they are correctly interpreted as part of the expression content.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/codemirror-lang/test/expressions/cases.txt#_snippet_3
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ he ()[]{<>~`!@#$%^&*-_+=|\;:'"",./?{\ llo }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ he { llo }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ he {{ llo }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ he {{{ llo }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ he } llo }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ he \}} llo }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ he \}}} llo }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ he { abc } llo }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ he {{ abc \}} llo }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ he {{{ abc \}}} llo }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ he [ abc ] llo }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ he [[ abc ]] llo }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ he [[[ abc ]]] llo }}
+
+==>
+
+Program(Resolvable)
+```
+
+----------------------------------------
+
+TITLE: Navigate to n8n Directory
+DESCRIPTION: Changes the current working directory to the root of the cloned n8n repository.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_9
+
+LANGUAGE: shell
+CODE:
+```
+cd n8n
+```
+
+----------------------------------------
+
+TITLE: Parsing Basic n8n Plaintext and Empty Content
+DESCRIPTION: Shows how plain text, including single-brace-wrapped text and empty input, is parsed. Empty input results in an empty 'Program', while plaintext is recognized as a 'Plaintext' component.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/codemirror-lang/test/expressions/cases.txt#_snippet_1
+
+LANGUAGE: n8n Expression
+CODE:
+```
+text
+
+==>
+
+Program(Plaintext)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{text}
+
+==>
+
+Program(Plaintext)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+
+
+
+==>
+
+Program
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{
+
+==>
+
+Program(Plaintext)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{ }}
+
+==>
+
+Program(Plaintext)
+```
+
+----------------------------------------
+
+TITLE: Dynamic UI Color CSS Variable Setters
+DESCRIPTION: A collection of properties or methods designed to dynamically set various UI color-related CSS variables (e.g., warning, danger, info, text, border colors) on the document's root element. Each setter takes a hexadecimal color value and internally calls `setCssVariable` to apply the color, converting it to HSL for CSS custom properties.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/design-system/theme/preview/index.html#_snippet_0
+
+LANGUAGE: JavaScript
+CODE:
+```
+color_warning(v) { this.setCssVariable('color-warning-base', v); },
+color_danger(v) { this.setCssVariable('color-danger-base', v); },
+color_info(v) { this.setCssVariable('color-info-base', v); },
+color_text_primary(v) { this.setCssVariable('color-text-dark', v); },
+color_text_regular(v) { this.setCssVariable('color-text-base', v); },
+color_text_secondary(v) { this.setCssVariable('color-text-light', v); },
+color_text_placeholder(v) { this.setCssVariable('color-text-lighter', v); },
+border_color_base(v) { this.setCssVariable('border-color-base', v); },
+border_color_light(v) { this.setCssVariable('border-color-light', v); },
+border_color_lighter(v) { this.setCssVariable('border-color-lighter', v); },
+border_color_extra_light(v) { this.setCssVariable('border-color-xlight', v); }
+```
+
+----------------------------------------
+
+TITLE: n8n Node Operational Parameters for Translation
+DESCRIPTION: Demonstrates how the `properties` array within an n8n node's `INodeTypeDescription` defines operational parameters, with `name` serving as the key for translation in the `nodeView` section.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_11
+
+LANGUAGE: TypeScript
+CODE:
+```
+export class Github implements INodeType {
+	description: INodeTypeDescription = {
+		displayName: 'GitHub',
+		name: 'github',
+		properties: [
+			{
+				displayName: 'Resource',
+				name: 'resource', // key to use in translation
+				type: 'options',
+				options: [],
+				default: 'issue',
+				description: 'The resource to operate on.',
+			},
+
+```
+
+----------------------------------------
+
+TITLE: Enable Local Code Coverage
+DESCRIPTION: Environment variable to set for enabling local code coverage reporting. This allows developers to view coverage details in the 'coverage' folder or via VSCode extensions.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_28
+
+LANGUAGE: shell
+CODE:
+```
+COVERAGE_ENABLED=true pnpm test
+```
+
+----------------------------------------
+
+TITLE: SQL: Create and Populate 'emp' Employee Table
+DESCRIPTION: This SQL snippet defines the 'emp' table schema, including columns like employee number (primary key), name, job, manager ID, hire date, salary, commission, and department ID. It then populates the table with 14 sample employee records, demonstrating data insertion into a newly created table.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/cypress/fixtures/Dummy_sql.txt#_snippet_0
+
+LANGUAGE: SQL
+CODE:
+```
+CREATE TABLE emp (
+empno INT PRIMARY KEY,
+ename VARCHAR(10),
+job VARCHAR(9),
+mgr INT NULL,
+hiredate DATETIME,
+sal NUMERIC(7,2),
+comm NUMERIC(7,2) NULL,
+dept INT)
+begin
+insert into emp values
+    (1,'JOHNSON','ADMIN',6,'12-17-1990',18000,NULL,4)
+insert into emp values
+    (2,'HARDING','MANAGER',9,'02-02-1998',52000,300,3)
+insert into emp values
+    (3,'TAFT','SALES I',2,'01-02-1996',25000,500,3)
+insert into emp values
+    (4,'HOOVER','SALES I',2,'04-02-1990',27000,NULL,3)
+insert into emp values
+    (5,'LINCOLN','TECH',6,'06-23-1994',22500,1400,4)
+insert into emp values
+    (6,'GARFIELD','MANAGER',9,'05-01-1993',54000,NULL,4)
+insert into emp values
+    (7,'POLK','TECH',6,'09-22-1997',25000,NULL,4)
+insert into emp values
+    (8,'GRANT','ENGINEER',10,'03-30-1997',32000,NULL,2)
+insert into emp values
+    (9,'JACKSON','CEO',NULL,'01-01-1990',75000,NULL,4)
+insert into emp values
+    (10,'FILLMORE','MANAGER',9,'08-09-1994',56000,NULL,2)
+insert into emp values
+    (11,'ADAMS','ENGINEER',10,'03-15-1996',34000,NULL,2)
+insert into emp values
+    (12,'WASHINGTON','ADMIN',6,'04-16-1998',18000,NULL,4)
+insert into emp values
+    (13,'MONROE','ENGINEER',10,'12-03-2000',30000,NULL,2)
+insert into emp values
+    (14,'ROOSEVELT','CPA',9,'10-12-1995',35000,NULL,1)
+end
+```
+
+----------------------------------------
+
+TITLE: Define Pluralization for i18n Strings in JSON
+DESCRIPTION: This snippet demonstrates how to define singular and plural forms for internationalization strings within a JSON translation file. The different forms are separated by a pipe (`|`) character, allowing the i18n system to select the appropriate version based on the provided count.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/ADDENDUM.md#_snippet_0
+
+LANGUAGE: json
+CODE:
+```
+{
+	""tagsView.inUse"": ""{count} workflow | {count} workflows""
+}
+```
+
+----------------------------------------
+
+TITLE: Embed n8n Chat in Vue.js
+DESCRIPTION: Shows how to integrate the n8n Chat widget within a Vue.js application. It imports the necessary CSS and initializes the chat component using the `createChat` function within the `onMounted` lifecycle hook.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/chat/README.md#_snippet_2
+
+LANGUAGE: vue
+CODE:
+```
+<script lang=""ts"" setup>
+// App.vue
+import { onMounted } from 'vue';
+import '@n8n/chat/style.css';
+import { createChat } from '@n8n/chat';
+
+onMounted(() => {
+	createChat({
+		webhookUrl: 'YOUR_PRODUCTION_WEBHOOK_URL'
+	});
+});
+</script>
+<template>
+	<div></div>
+</template>
+```
+
+----------------------------------------
+
+TITLE: Parsing n8n Resolvable Expressions with Unicode Characters
+DESCRIPTION: Demonstrates the parser's ability to correctly handle a wide range of Unicode characters within resolvable expressions, including currency symbols, Cyrillic, pictographs, emoticons, punctuation, superscripts, CJK characters, and various emoji ranges.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/@n8n/codemirror-lang/test/expressions/cases.txt#_snippet_4
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ '€' }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ 'л' }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ '🎉' }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ '😎' }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ '†' }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ '⁷' }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ '漢' }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ '🟢' }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ '🫸' }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ '✀' }}
+
+==>
+
+Program(Resolvable)
+```
+
+LANGUAGE: n8n Expression
+CODE:
+```
+{{ '➿' }}
+
+==>
+
+Program(Resolvable)
+```
+
+----------------------------------------
+
+TITLE: Translate n8n Node Collection Parameter Display Names
+DESCRIPTION: Provides the JSON format for translating various components of an n8n node's 'collection' parameter, including its display name, the text for the 'add multiple values' button, and the display name, description, and placeholder for its nested items. This structure facilitates comprehensive internationalization for dynamic input fields.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_19
+
+LANGUAGE: json
+CODE:
+```
+{
+	""nodeView.labels.displayName"": ""🇩🇪 Labels"",
+	""nodeView.labels.multipleValueButtonText"": ""🇩🇪 Add Label"",
+	""nodeView.labels.options.label.displayName"": ""🇩🇪 Label"",
+	""nodeView.labels.options.label.description"": ""🇩🇪 Label to add to issue"",
+	""nodeView.labels.options.label.placeholder"": ""🇩🇪 Some placeholder""
+}
+```
+
+----------------------------------------
+
+TITLE: Generate and Watch n8n Translation Files
+DESCRIPTION: Executed in a separate terminal, these commands prepare the environment for translation generation. It sets the default locale, navigates into the `packages/nodes-base` directory, runs the translation generation script, and then initiates a watch process to automatically re-generate translations upon file changes.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_24
+
+LANGUAGE: sh
+CODE:
+```
+export N8N_DEFAULT_LOCALE=de
+cd packages/nodes-base
+pnpm n8n-generate-translations
+pnpm watch
+```
+
+----------------------------------------
+
+TITLE: Pull n8n Docker Images
+DESCRIPTION: These commands allow pulling different versions of the n8n Docker image from the official registry. You can pull the latest stable version, a specific version by tag, or the unstable 'next' version for development or testing purposes. This is a prerequisite for updating your n8n container.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/docker/images/n8n/README.md#_snippet_3
+
+LANGUAGE: bash
+CODE:
+```
+docker pull docker.n8n.io/n8nio/n8n
+```
+
+LANGUAGE: bash
+CODE:
+```
+docker pull docker.n8n.io/n8nio/n8n:0.220.1
+```
+
+LANGUAGE: bash
+CODE:
+```
+docker pull docker.n8n.io/n8nio/n8n:next
+```
+
+----------------------------------------
+
+TITLE: Run n8n Docker Container with PostgreSQL
+DESCRIPTION: This command initializes and runs an n8n Docker container, configuring it to use PostgreSQL as its primary database. It sets various environment variables for PostgreSQL connection details (database name, host, port, user, schema, password) and mounts a Docker volume for persistent n8n user data and credentials. Remember to replace the placeholder values with your actual PostgreSQL credentials.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/docker/images/n8n/README.md#_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+docker volume create n8n_data
+
+docker run -it --rm \
+ --name n8n \
+ -p 5678:5678 \
+ -e DB_TYPE=postgresdb \
+ -e DB_POSTGRESDB_DATABASE=<POSTGRES_DATABASE> \
+ -e DB_POSTGRESDB_HOST=<POSTGRES_HOST> \
+ -e DB_POSTGRESDB_PORT=<POSTGRES_PORT> \
+ -e DB_POSTGRESDB_USER=<POSTGRES_USER> \
+ -e DB_POSTGRESDB_SCHEMA=<POSTGRES_SCHEMA> \
+ -e DB_POSTGRESDB_PASSWORD=<POSTGRES_PASSWORD> \
+ -v n8n_data:/home/node/.n8n \
+ docker.n8n.io/n8nio/n8n
+```
+
+----------------------------------------
+
+TITLE: Embed n8n Chat via CDN
+DESCRIPTION: Integrates the n8n Chat widget into an HTML page using a Content Delivery Network (CDN). This method includes linking the CSS for styling and importing a JavaScript module to initialize the chat interface.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/chat/README.md#_snippet_0
+
+LANGUAGE: html
+CODE:
+```
+<link href=""https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css"" rel=""stylesheet"" />
+<script type=""module"">
+	import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+	createChat({
+		webhookUrl: 'YOUR_PRODUCTION_WEBHOOK_URL'
+	});
+</script>
+```
+
+----------------------------------------
+
+TITLE: Open Cypress Test Runner
+DESCRIPTION: Command to open the Cypress test runner interface, allowing interactive execution and debugging of E2E tests.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_35
+
+LANGUAGE: shell
+CODE:
+```
+cypress open
+```
+
+----------------------------------------
+
+TITLE: Configure n8n Node Collection Parameter in JavaScript
+DESCRIPTION: Configures an n8n node parameter of type 'collection', designed to allow users to add multiple instances of a sub-parameter, such as 'Labels'. This JavaScript object defines the collection's display properties, its behavior (e.g., `multipleValues`), display conditions, and the schema for its nested individual items.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_18
+
+LANGUAGE: javascript
+CODE:
+```
+{
+	displayName: 'Labels',
+	name: 'labels', // key to use in translation
+	type: 'collection',
+	typeOptions: {
+		multipleValues: true,
+		multipleValueButtonText: 'Add Label',
+	},
+	displayOptions: {
+		show: {
+			operation: [
+				'create',
+			],
+			resource: [
+				'issue',
+			],
+		},
+	},
+	default: { 'label': '' },
+	options: [
+		{
+			displayName: 'Label',
+			name: 'label', // key to use in translation
+			type: 'string',
+			default: '',
+			description: 'Label to add to issue',
+		},
+	],
+}
+```
+
+----------------------------------------
+
+TITLE: SQL: Create and Populate 'dept' Department Table
+DESCRIPTION: This SQL snippet defines the 'dept' table schema, including columns for department number, name, and location. It then populates the table with four sample department records, illustrating how to insert data into a simple lookup table.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/cypress/fixtures/Dummy_sql.txt#_snippet_1
+
+LANGUAGE: SQL
+CODE:
+```
+CREATE TABLE dept (
+deptno INT NOT NULL,
+dname VARCHAR(14),
+loc VARCHAR(13))
+begin
+insert into dept values (1,'ACCOUNTING','ST LOUIS')
+insert into dept values (2,'RESEARCH','NEW YORK')
+insert into dept values (3,'SALES','ATLANTA')
+insert into dept values (4, 'OPERATIONS','SEATTLE')
+end
+```
+
+----------------------------------------
+
+TITLE: n8n Node Translation File Directory Structure
+DESCRIPTION: Illustrates the expected directory structure for node translation files within an n8n project, showing how locale-specific JSON files are placed under a `translations` directory.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_5
+
+LANGUAGE: Filesystem
+CODE:
+```
+GitHub
+	├── GitHub.node.ts
+	├── GitHubTrigger.node.ts
+	└── translations
+		└── de
+			├── github.json
+			└── githubTrigger.json
+```
+
+----------------------------------------
+
+TITLE: Install Cypress for E2E Tests
+DESCRIPTION: Command required to install Cypress dependencies before running End-to-End (E2E) tests for the first time or when updating Cypress.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_29
+
+LANGUAGE: shell
+CODE:
+```
+pnpm cypress:install
+```
+
+----------------------------------------
+
+TITLE: Update Test Snapshots
+DESCRIPTION: Flag to pass to the test runner to update snapshot files when changes are required. This is typically done when test outputs have legitimately changed.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_27
+
+LANGUAGE: shell
+CODE:
+```
+pnpm test -u
+```
+
+----------------------------------------
+
+TITLE: Chat Window CSS Variables
+DESCRIPTION: Defines CSS variables for extensive customization of the n8n Chat window's appearance. These variables control colors, spacing, borders, fonts, and layout elements, allowing for a tailored user interface.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/chat/README.md#_snippet_5
+
+LANGUAGE: css
+CODE:
+```
+:root {
+	--chat--color-primary: #e74266;
+	--chat--color-primary-shade-50: #db4061;
+	--chat--color-primary-shade-100: #cf3c5c;
+	--chat--color-secondary: #20b69e;
+	--chat--color-secondary-shade-50: #1ca08a;
+	--chat--color-white: #ffffff;
+	--chat--color-light: #f2f4f8;
+	--chat--color-light-shade-50: #e6e9f1;
+	--chat--color-light-shade-100: #c2c5cc;
+	--chat--color-medium: #d2d4d9;
+	--chat--color-dark: #101330;
+	--chat--color-disabled: #777980;
+	--chat--color-typing: #404040;
+
+	--chat--spacing: 1rem;
+	--chat--border-radius: 0.25rem;
+	--chat--transition-duration: 0.15s;
+
+	--chat--window--width: 400px;
+	--chat--window--height: 600px;
+
+	--chat--header-height: auto;
+	--chat--header--padding: var(--chat--spacing);
+	--chat--header--background: var(--chat--color-dark);
+	--chat--header--color: var(--chat--color-light);
+	--chat--header--border-top: none;
+	--chat--header--border-bottom: none;
+	--chat--heading--font-size: 2em;
+	--chat--subtitle--font-size: inherit;
+	--chat--subtitle--line-height: 1.8;
+
+	--chat--textarea--height: 50px;
+
+	--chat--message--font-size: 1rem;
+	--chat--message--padding: var(--chat--spacing);
+	--chat--message--border-radius: var(--chat--border-radius);
+	--chat--message-line-height: 1.8;
+	--chat--message--bot--background: var(--chat--color-white);
+	--chat--message--bot--color: var(--chat--color-dark);
+	--chat--message--bot--border: none;
+	--chat--message--user--background: var(--chat--color-secondary);
+	--chat--message--user--color: var(--chat--color-white);
+	--chat--message--user--border: none;
+	--chat--message--pre--background: rgba(0, 0, 0, 0.05);
+
+	--chat--toggle--background: var(--chat--color-primary);
+	--chat--toggle--hover--background: var(--chat--color-primary-shade-50);
+	--chat--toggle--active--background: var(--chat--color-primary-shade-100);
+	--chat--toggle--color: var(--chat--color-white);
+	--chat--toggle--size: 64px;
+}
+```
+
+----------------------------------------
+
+TITLE: n8n Node Description Name Property for Translation File
+DESCRIPTION: Shows how the `name` property within an n8n node's `INodeTypeDescription` is used to determine the name of its corresponding translation file.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_6
+
+LANGUAGE: TypeScript
+CODE:
+```
+export class Github implements INodeType {
+	description: INodeTypeDescription = {
+		displayName: 'GitHub',
+		name: 'github', // to use for node translation file name
+		icon: 'file:github.svg',
+		group: ['input'],
+
+```
+
+----------------------------------------
+
+TITLE: Configure n8n Node Fixed Collection Parameter in JavaScript
+DESCRIPTION: Defines an n8n node parameter of type 'fixedCollection', which groups a predefined set of related sub-parameters, such as 'Author' details (Name, Email). This JavaScript configuration specifies the collection's display name, placeholder, description, display conditions, and the detailed schema for each fixed sub-parameter, including their types, defaults, and descriptions.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_20
+
+LANGUAGE: javascript
+CODE:
+```
+{
+	displayName: 'Additional Parameters',
+	name: 'additionalParameters',
+	placeholder: 'Add Parameter',
+	description: 'Additional fields to add.',
+	type: 'fixedCollection',
+	default: {},
+	displayOptions: {
+		show: {
+			operation: [
+				'create',
+				'delete',
+				'edit',
+			],
+			resource: [
+				'file',
+			],
+		},
+	},
+	options: [
+		{
+			name: 'author',
+			displayName: 'Author',
+			values: [
+				{
+					displayName: 'Name',
+					name: 'name',
+					type: 'string',
+					default: '',
+					description: 'Name of the author of the commit',
+					placeholder: 'John',
+				},
+				{
+					displayName: 'Email',
+					name: 'email',
+					type: 'string',
+					default: '',
+					description: 'Email of the author of the commit',
+					placeholder: 'john@email.com',
+				},
+			],
+		},
+	],
+}
+```
+
+----------------------------------------
+
+TITLE: Watch and rebuild CSS theme files
+DESCRIPTION: Monitors changes in theme-related CSS files and automatically rebuilds them upon detection, facilitating rapid development and styling iterations.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/design-system/README.md#_snippet_6
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm watch:theme
+```
+
+----------------------------------------
+
+TITLE: Translate n8n Node Options Parameter Display Names
+DESCRIPTION: Illustrates the JSON structure used for internationalizing the display names and descriptions of an n8n node's 'options' parameter. This snippet shows how to provide localized text for the parameter itself and its individual resource choices, ensuring multi-language support for the node interface.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_16
+
+LANGUAGE: json
+CODE:
+```
+{
+	""nodeView.resource.displayName"": ""🇩🇪 Resource"",
+	""nodeView.resource.description"": ""🇩🇪 Resource to operate on"",
+	""nodeView.resource.options.file.name"": ""🇩🇪 File"",
+	""nodeView.resource.options.issue.name"": ""🇩🇪 Issue""
+}
+```
+
+----------------------------------------
+
+TITLE: Activate Specific pnpm Version (Windows Administrator)
+DESCRIPTION: Activates a specific version of pnpm managed by corepack on Windows, requiring administrator privileges.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_7
+
+LANGUAGE: powershell
+CODE:
+```
+corepack prepare --activate
+```
+
+----------------------------------------
+
+TITLE: Activate Specific pnpm Version
+DESCRIPTION: Activates a specific version of pnpm managed by corepack, ensuring compatibility with the project.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+corepack prepare --activate
+```
+
+----------------------------------------
+
+TITLE: Run Cypress Tests Headless
+DESCRIPTION: Command to execute Cypress tests in a headless environment, suitable for automated execution without a GUI.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md#_snippet_36
+
+LANGUAGE: shell
+CODE:
+```
+cypress run --headless
+```
+
+----------------------------------------
+
+TITLE: Translate n8n Node Fixed Collection Parameter Display Names
+DESCRIPTION: Illustrates the JSON structure for translating the display names, placeholders, and descriptions of an n8n node's 'fixedCollection' parameter and its nested fixed values. This ensures that all static and dynamic text elements within a fixed collection are properly localized for different languages.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_21
+
+LANGUAGE: json
+CODE:
+```
+{
+	""nodeView.additionalParameters.displayName"": ""🇩🇪 Additional Parameters"",
+	""nodeView.additionalParameters.placeholder"": ""🇩🇪 Add Field"",
+	""nodeView.additionalParameters.options.author.displayName"": ""🇩🇪 Author"",
+	""nodeView.additionalParameters.options.author.values.name.displayName"": ""🇩🇪 Name"",
+	""nodeView.additionalParameters.options.author.values.name.description"": ""🇩🇪 Name of the author of the commit"",
+	""nodeView.additionalParameters.options.author.values.name.placeholder"": ""🇩🇪 Jan"",
+	""nodeView.additionalParameters.options.author.values.email.displayName"": ""🇩🇪 Email"",
+	""nodeView.additionalParameters.options.author.values.email.description"": ""🇩🇪 Email of the author of the commit"",
+	""nodeView.additionalParameters.options.author.values.email.placeholder"": ""🇩🇪 jan@n8n.io""
+}
+```
+
+----------------------------------------
+
+TITLE: Install n8n-nodes-base globally
+DESCRIPTION: This command installs the n8n-nodes-base package globally using npm. This makes the default n8n nodes available for use in your n8n instance.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/nodes-base/README.md#_snippet_0
+
+LANGUAGE: npm
+CODE:
+```
+npm install n8n-nodes-base -g
+```
+
+----------------------------------------
+
+TITLE: n8n Credential Translation File Structure
+DESCRIPTION: This snippet illustrates the expected directory structure for credential translation files within n8n. Each credential type has its own dedicated JSON translation file, organized under `credentials/translations/{localeIdentifier}/`, ensuring modular and locale-specific text management.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_3
+
+LANGUAGE: Text
+CODE:
+```
+credentials
+	└── translations
+		└── de
+			├── githubApi.json
+			└── githubOAuth2Api.json
+```
+
+----------------------------------------
+
+TITLE: Copy English Base Text File for New Locale
+DESCRIPTION: This command demonstrates how to create a new locale-specific base text file by copying the existing English (`en.json`) file. This is the initial step in the translation workflow, providing a template for localizing n8n's UI into a new language like German (`de`).
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_2
+
+LANGUAGE: Shell
+CODE:
+```
+cp ./packages/frontend/@n8n/i18n/src/locales/en.json ./packages/frontend/@n8n/i18n/src/locales/de.json
+```
+
+----------------------------------------
+
+TITLE: n8n Node Header Properties for Translation
+DESCRIPTION: Illustrates how `displayName` and `description` within an n8n node's `INodeTypeDescription` are used as keys for the `header` section of the node translation file.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_9
+
+LANGUAGE: TypeScript
+CODE:
+```
+export class Github implements INodeType {
+	description: INodeTypeDescription = {
+		displayName: 'GitHub', // key to use in translation
+		description: 'Consume GitHub API', // key to use in translation
+		name: 'github',
+		icon: 'file:github.svg',
+		group: ['input'],
+		version: 1,
+
+```
+
+----------------------------------------
+
+TITLE: n8n Credential Type Properties for Translation
+DESCRIPTION: Defines the structure of an n8n credential type, highlighting how `displayName` and `name` properties of `INodeProperties` are used as keys for translation.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/i18n/docs/README.md#_snippet_7
+
+LANGUAGE: TypeScript
+CODE:
+```
+export class GithubApi implements ICredentialType {
+	name = 'githubApi';
+	displayName = 'Github API';
+	documentationUrl = 'github';
+	properties: INodeProperties[] = [
+		{
+			displayName: 'Github Server',
+			name: 'server', // key to use in translation
+			type: 'string',
+			default: 'https://api.github.com',
+			description: 'The server to connect to. Only has to be set if Github Enterprise is used.',
+		},
+		{
+			displayName: 'User',
+			name: 'user', // key to use in translation
+			type: 'string',
+			default: '',
+		},
+		{
+			displayName: 'Access Token',
+			name: 'accessToken', // key to use in translation
+			type: 'string',
+			default: '',
+		},
+	];
+}
+```
+
+----------------------------------------
+
+TITLE: Fullscreen Mode CSS Setup
+DESCRIPTION: Ensures the Chat window occupies the full width and height of its container when in fullscreen mode. This requires the parent container, typically 'html', 'body', and '#n8n-chat', to have explicit width and height set to 100%.
+SOURCE: https://github.com/n8n-io/n8n/blob/master/packages/frontend/@n8n/chat/README.md#_snippet_6
+
+LANGUAGE: css
+CODE:
+```
+html,
+body,
+#n8n-chat {
+	width: 100%;
+	height: 100%;
+}
+```","n8n",""

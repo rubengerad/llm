@@ -1,0 +1,1473 @@
+"react","TITLE: Complete Teleportation VR Application Component
+DESCRIPTION: A full implementation of a React component that combines all teleportation elements into a working VR application. It includes store configuration, position state management, VR entry button, and the 3D scene with teleport targets.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/teleport.md#2025-04-11_snippet_4
+
+LANGUAGE: tsx
+CODE:
+```
+const store = createXRStore({
+  hand: { teleportPointer: true },
+  controller: { teleportPointer: true },
+})
+
+export function App() {
+  const [position, setPosition] = useState(new Vector3())
+  return (
+    <>
+      <button onClick={() => store.enterVR()}>Enter VR</button>
+      <Canvas>
+        <XR store={store}>
+          <ambientLight />
+          <XROrigin position={position} />
+          <TeleportTarget onTeleport={setPosition}>
+            <mesh scale={[10, 1, 10]} position={[0, -0.5, 0]}>
+              <boxGeometry />
+              <meshBasicMaterial color=""green"" />
+            </mesh>
+          </TeleportTarget>
+        </XR>
+      </Canvas>
+    </>
+ )
+}
+```
+
+----------------------------------------
+
+TITLE: Basic React Three Fiber XR Application
+DESCRIPTION: A complete example of a React Three Fiber XR application with a color-changing 3D box that toggles between red and blue when clicked. Shows how to create an XR store, implement an AR entry button, and wrap 3D content in the XR component.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/getting-started/introduction.md#2025-04-11_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+import { Canvas } from '@react-three/fiber'
+import { XR, createXRStore } from '@react-three/xr'
+import { useState } from 'react'
+
+const store = createXRStore()
+
+export function App() {
+  const [red, setRed] = useState(false)
+  return <>
+    <button onClick={() => store.enterAR()}>Enter AR</button>
+    <Canvas>
+      <XR store={store}>
+        <mesh pointerEventsType={{ deny: 'grab' }} onClick={() => setRed(!red)} position={[0, 1, -1]}>
+          <boxGeometry />
+          <meshBasicMaterial color={red ? 'red' : 'blue'} />
+        </mesh>
+      </XR>
+    </Canvas>
+  </>
+}
+```
+
+----------------------------------------
+
+TITLE: Implementing XR Controller Locomotion in React Three Fiber
+DESCRIPTION: Examples demonstrating basic XR controller locomotion implementation, including both standard movement and integration with Rapier physics engine. Shows how to handle user movement and rotation in VR space.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/getting-started/all-hooks.md#2025-04-11_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+// Example showing basic usage
+export const userMovement = () => {
+  const originRef = useRef<THREE.Group>(null);
+   useXRControllerLocomotion(originRef);
+  return <XROrigin ref={originRef} />
+}
+
+// Example using rapier physics
+export const userMovementWithPhysics = () => {
+  const userRigidBodyRef = useRef<RapierRigidBody>(null);
+
+  const userMove = (inputVector: Vector3, rotationInfo: Euler) => {
+    if (userRigidBodyRef.current) {
+      const currentLinvel = userRigidBodyRef.current.linvel()
+      const newLinvel = { x: inputVector.x, y: currentLinvel.y, z: inputVector.z }
+      userRigidBodyRef.current.setLinvel(newLinvel, true)
+      userRigidBodyRef.current.setRotation(new Quaternion().setFromEuler(rotationInfo), true)
+    }
+  }
+
+  useXRControllerLocomotion(userMove)
+
+  return <>
+    <RigidBody
+      ref={userRigidBodyRef}
+      colliders={false}
+      type='dynamic'
+      position={[0, 2, 0]}
+      enabledRotations={[false, false, false]}
+      canSleep={false}
+    >
+      <CapsuleCollider args={[.3, .5]} />
+      <XROrigin position={[0, -1, 0]} />
+    </RigidBody>
+}
+```
+
+----------------------------------------
+
+TITLE: Basic React Three XR Application Setup
+DESCRIPTION: Example showing how to create a basic XR-enabled React Three Fiber application with an interactive mesh that changes color on click. Demonstrates XR store creation, AR entry, and basic interaction handling.
+SOURCE: https://github.com/pmndrs/xr/blob/main/README.md#2025-04-11_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+import { Canvas } from '@react-three/fiber'
+import { XR, createXRStore } from '@react-three/xr'
+import { useState } from 'react'
+
+const store = createXRStore()
+
+export function App() {
+  const [red, setRed] = useState(false)
+  return (
+    <>
+      <button onClick={() => store.enterAR()}>Enter AR</button>
+      <Canvas>
+        <XR store={store}>
+          <mesh pointerEventsType={{ deny: 'grab' }} onClick={() => setRed(!red)} position={[0, 1, -1]}>
+            <boxGeometry />
+            <meshBasicMaterial color={red ? 'red' : 'blue'} />
+          </mesh>
+        </XR>
+      </Canvas>
+    </>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Creating an Interactive AR Experience with DOM Overlay in TSX
+DESCRIPTION: This code snippet demonstrates a complete AR experience using WebXR and the XRDomOverlay component. It includes an 'Enter AR' button and an interactive overlay that changes color when clicked. The example uses React hooks and a custom XR store.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/dom-overlay.md#2025-04-11_snippet_1
+
+LANGUAGE: TSX
+CODE:
+```
+const store = createXRStore()
+
+export function App() {
+  const [bool, setBool] = useState(false)
+  return (
+    <>
+      <button onClick={() => store.enterAR()}>Enter AR</button>
+      <Canvas>
+        <XR store={store}>
+          <ambientLight />
+          <XRDomOverlay
+            style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <div
+              style={{ backgroundColor: bool ? 'red' : 'green', padding: '1rem 2rem' }}
+              onClick={() => setBool((b) => !b)}
+            >
+ Hello World
+            </div>
+          </XRDomOverlay>
+        </XR>
+      </Canvas>
+    </>
+ )
+}
+```
+
+----------------------------------------
+
+TITLE: Implementing Resizable XR Experience with XROrigin in React Three Fiber
+DESCRIPTION: This snippet shows how to use the XROrigin component to create a resizable XR experience. It demonstrates scaling and repositioning the XROrigin based on a state variable, allowing the user to switch between normal and miniature views of the scene.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/origin.md#2025-04-11_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+const store = createXRStore()
+
+function App() {
+  const [miniature, setMinitature] = useState(false)
+  return (
+    <>
+      <button onClick={() => store.enterAR()}>Enter VR</button>
+      <Canvas>
+        <XR store={store}>
+          <Gltf src=""model.glb"" />
+          <XROrigin scale={miniature ? 0.01 : 1} position-y={miniature ? -1 : 0} />
+        </XR>
+      </Canvas>
+    </>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Complete AR Anchor Component Implementation with react-three/xr
+DESCRIPTION: A complete example of an Anchor component that uses useXRAnchor to create an anchor at the right hand or controller position when selected, and renders a box at that position.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/anchors.md#2025-04-11_snippet_3
+
+LANGUAGE: tsx
+CODE:
+```
+export function Anchor() {
+  const [anchor, requestAnchor] = useXRAnchor()
+  const controllerState = useXRInputSourceState('controller', 'right')
+  const handState = useXRInputSourceState('hand', 'right')
+  const inputSource = controllerState?.inputSource ?? handState?.inputSource
+  useXRInputSourceEvent(
+    inputSource,
+    'select',
+    async () => {
+      if (inputSource == null) {
+        return
+      }
+      requestAnchor({ relativeTo: 'space', space: inputSource.targetRaySpace })
+    },
+    [requestAnchor, inputSource],
+  )
+  if (anchor == null) {
+    return null
+  }
+  return (
+    <XRSpace space={anchor.anchorSpace}>
+      <mesh scale={0.1}>
+        <boxGeometry />
+      </mesh>
+    </XRSpace>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Component replacement examples for migrating from Natuerlich to @react-three/xr
+DESCRIPTION: Examples showing the equivalent components and structure when moving from Natuerlich to @react-three/xr. This includes replacing ImmersiveSessionOrigin with XROrigin, changing XRCanvas to a Canvas+XR combination, and using createXRStore for configuration.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/migration/from-natuerlich.md#2025-04-11_snippet_0
+
+LANGUAGE: markdown
+CODE:
+```
+- use `XROrigin` instead of `ImmersiveSessionOrigin`
+- use `<Canvas><XR>...</XR></Canvas>` instead of `XRCanvas`
+- configure settings such as `foveation` through `createXRStore`
+- use `store.enterXR` instead of `useEnterXR`
+- use `DragControls` **TBD** instead of `Grabbale`
+- don't add hands and controllers yourself, and configure them through the `createXRStore` options. Click [here](../tutorials/custom-inputs.md) for more info regarding controller/hand/... customization.
+- use teleport as described [here](../tutorials/teleport.md)
+```
+
+----------------------------------------
+
+TITLE: Basic Three.js XR Scene Implementation
+DESCRIPTION: Example showing how to create a basic Three.js scene with XR capabilities, including a clickable mesh that changes color and proper rendering setup. Demonstrates scene initialization, XR store creation, animation loop, and window resize handling.
+SOURCE: https://github.com/pmndrs/xr/blob/main/packages/xr/README.md#2025-04-11_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+import { createXRStore } from '@pmndrs/xr'
+import { BoxGeometry, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, WebGLRenderer } from 'three'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+
+const camera = new PerspectiveCamera(70, 1, 0.01, 100)
+const scene = new Scene()
+const canvas = document.getElementById('root') as HTMLCanvasElement
+const renderer = new WebGLRenderer({ antialias: true, canvas, alpha: true })
+
+const boxMaterial = new MeshBasicMaterial({ color: 'red' })
+const box = new Mesh(new BoxGeometry(), boxMaterial)
+box.pointerEventsType = { deny: 'grab' }
+let red = false
+box.addEventListener('click', () => {
+  red = !red
+  boxMaterial.color.set(red ? 'red' : 'blue')
+})
+scene.add(box)
+
+const store = createXRStore(canvas, scene, camera, renderer.xr)
+document.getElementById('enter-ar')?.addEventListener('click', () => store.enterAR())
+
+let prevTime: undefined | number
+
+renderer.setAnimationLoop((time, frame) => {
+  const delta = prevTime == null ? 0 : time - prevTime
+  prevTime = time
+  store.update(frame, delta)
+  renderer.render(scene, camera)
+})
+
+function updateSize() {
+  renderer.setSize(window.innerWidth, window.innerHeight)
+  renderer.setPixelRatio(window.devicePixelRatio)
+  camera.aspect = window.innerWidth / window.innerHeight
+  camera.updateProjectionMatrix()
+}
+
+updateSize()
+window.addEventListener('resize', updateSize)
+```
+
+----------------------------------------
+
+TITLE: Implementing Basic VR Locomotion with XR Controller Gamepad
+DESCRIPTION: This example demonstrates how to create a simple VR locomotion system that reads thumbstick input from the right controller to move the XROrigin. It sets up the XR store, creates a basic scene with a floor, and implements the locomotion logic using the controller's gamepad thumbstick values.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/gamepad.md#2025-04-11_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+const store = createXRStore()
+
+export function App() {
+  return (
+    <>
+      <button onClick={() => store.enterVR()}>Enter VR</button>
+      <Canvas>
+        <XR store={store}>
+          <ambientLight />
+          <Locomotion />
+          <mesh scale={[10, 1, 10]} position={[0, -0.5, 0]}>
+            <boxGeometry />
+            <meshBasicMaterial color=""green"" />
+          </mesh>
+        </XR>
+      </Canvas>
+    </>
+  )
+}
+
+function Locomotion() {
+  const controller = useXRInputSourceState('controller', 'right')
+  const ref = useRef<Group>(null)
+  useFrame((_, delta) => {
+    if (ref.current == null || controller == null) {
+      return
+    }
+    const thumstickState = controller.gamepad['xr-standard-thumbstick']
+    if (thumstickState == null) {
+      return
+    }
+    ref.current.position.x += (thumstickState.xAxis ?? 0) * delta
+    ref.current.position.z += (thumstickState.yAxis ?? 0) * delta
+  })
+  return <XROrigin ref={ref} />
+}
+```
+
+----------------------------------------
+
+TITLE: Implementing XR Roller Coaster with XROrigin in React Three Fiber
+DESCRIPTION: This snippet demonstrates how to create an XR roller coaster experience using the XROrigin component. It includes setting up the XR store, creating a Canvas with a roller coaster model, and positioning the XROrigin within the moving roller coaster seat.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/origin.md#2025-04-11_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+const store = createXRStore({
+  controller: false,
+})
+
+export function App() {
+  return (
+    <>
+      <button onClick={() => store.enterVR()}>Enter VR</button>
+      <Canvas>
+        <directionalLight position={[1, 1, 1]} />
+        <ambientLight />
+        <OrbitControls />
+        <XR store={store}>
+          <RollerCoaster />
+        </XR>
+      </Canvas>
+    </>
+  )
+}
+
+function RollerCoaster() {
+  const gltf = useGLTF('rollercoaster.glb')
+
+  const mixer = useMemo(() => new AnimationMixer(gltf.scene), [])
+  useEffect(() => {
+    for (const animation of gltf.animations) {
+      mixer.clipAction(animation).play()
+    }
+  }, [gltf, mixer])
+  useFrame((state, delta) => mixer.update(delta))
+  return (
+    <>
+      <primitive object={gltf.scene} />
+      {createPortal(
+        <group rotation-y={-Math.PI / 2} rotation-x={Math.PI / 2}>
+          <XROrigin scale={0.24} position-y={-0.1} />
+        </group>,
+        gltf.scene.getObjectByName('Sessel')!,
+      )}
+    </>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Complete WebXR Video Layer Application
+DESCRIPTION: A complete React Three Fiber application that creates a WebXR scene with a video layer. It combines the video element creation and the XRLayer component within a Canvas and XR context.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/layers.md#2025-04-11_snippet_2
+
+LANGUAGE: tsx
+CODE:
+```
+export function App() {
+  const video = useMemo(() => {
+    const result = document.createElement('video')
+    result.src = 'test.mp4'
+    return result
+  }, [])
+  return (
+    <Canvas>
+      <XR store={store}>
+        <XRLayer position={[0, 1.5, -0.5]} onClick={() => video.play()} scale={0.5} src={video} />
+      </XR>
+    </Canvas>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Setting up Hit Testing with XRHitTest in React Three XR
+DESCRIPTION: This code snippet demonstrates how to set up hit testing for the right hand using the XRHitTest component. It uses a matrix helper and a vector to store the world position of the hit test result.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/hit-test.md#2025-04-11_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+const matrixHelper = new Matrix4()
+const hitTestPosition = new Vector3()
+
+const store = createXRStore({
+  hand: {
+    right: () => {
+      const state = useXRHandState()
+      return (
+        <>
+          <XRHandModel />
+          <XRHitTest
+            space={state.inputSource.targetRaySpace}
+            onResults={(results, getWorldMatrix) => {
+              if (results.length === 0) {
+                return
+              }
+              getWorldMatrix(matrixHelper, results[0])
+              hitTestPosition.setFromMatrixPosition(matrixHelper)
+            }}
+          />
+        </>
+      )
+    },
+  },
+})
+```
+
+----------------------------------------
+
+TITLE: Basic Handle Component Implementation in React Three Fiber
+DESCRIPTION: Example showing how to implement a Handle component to enable scaling of a cube by dragging it outward from its center.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/handles/handle-component.md#2025-04-11_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+<Handle translate=""as-scale"" scale={{ uniform: true }}>
+    <mesh>
+        <boxGeometry />
+    </mesh>
+</Handle>
+```
+
+----------------------------------------
+
+TITLE: Using IfInSessionMode Guard with @react-three/xr
+DESCRIPTION: This example demonstrates how to conditionally render content based on XR session mode. It creates an XR store, provides an 'Enter AR' button, and uses the IfInSessionMode guard to only display a red background when not in AR mode.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/guards.md#2025-04-11_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Canvas } from '@react-three/fiber'
+import { IfInSessionMode, XR, createXRStore } from '@react-three/xr'
+
+const store = createXRStore()
+
+export function App() {
+  return (
+    <>
+      <button onClick={() => store.enterAR()}>Enter AR</button>
+      <Canvas>
+        <XR store={store}>
+          <IfInSessionMode deny=""immersive-ar"">
+            <color args={['red']} attach=""background"" />
+          </IfInSessionMode>
+        </XR>
+      </Canvas>
+    </>
+ )
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring XR Store Session Parameters
+DESCRIPTION: Configuration options for initializing and controlling XR sessions, including layer management, detection capabilities, input handling, and session types.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/store.md#2025-04-11_snippet_1
+
+LANGUAGE: javascript
+CODE:
+```
+{
+  layers: true,
+  meshDetection: true,
+  planeDetection: true,
+  depthSensing: false,
+  customSessionInit: undefined,
+  hitTest: true,
+  domOverlay: true,
+  secondaryInputSources: false,
+  offerSession: true
+}
+```
+
+----------------------------------------
+
+TITLE: Rendering Dynamic 3D Content to an XRLayer
+DESCRIPTION: Creates an XRLayer that renders a dynamic 3D scene with a red cube. Unlike the video example, this demonstrates how to render Three.js meshes directly onto a layer for fully dynamic content that updates every frame.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/layers.md#2025-04-11_snippet_3
+
+LANGUAGE: tsx
+CODE:
+```
+<XRLayer position={[0, 1.5, -0.5]} scale={0.5}>
+  <mesh>
+    <boxGeometry />
+    <meshBasicMaterial color=""red"" />
+  </mesh>
+</XRLayer>
+```
+
+----------------------------------------
+
+TITLE: Rendering Detected Wall Planes in WebXR using React
+DESCRIPTION: This code demonstrates how to use the useXRPlanes hook to detect wall planes in AR/VR environments and render them with a red material. It maps through detected planes, positions them using XRSpace, and applies styling with XRPlaneModel.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/object-detection.md#2025-04-11_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+function RedWalls() {
+  const wallPlanes = useXRPlanes('wall')
+  return (
+    <>
+      {wallPlanes.map((plane) => (
+        <XRSpace space={plane.planeSpace}>
+          <XRPlaneModel plane={plane}>
+            <meshBasicMaterial color=""red"" />
+          </XRPlaneModel>
+        </XRSpace>
+ ))}    
+</>
+ )
+}
+```
+
+----------------------------------------
+
+TITLE: Accessing Camera Position in XR with React Three Fiber
+DESCRIPTION: This snippet demonstrates how to read the current global camera position in XR using the useFrame hook from React Three Fiber. It works both inside and outside of XR sessions.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/getting-started/faq.md#2025-04-11_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+useFrame((state) => console.log(state.camera.getWorldPosition(new Vector3())))
+```
+
+----------------------------------------
+
+TITLE: Creating an Interactive 3D Scene with React Three Handle
+DESCRIPTION: Example of how to use @react-three/handle to create an interactive 3D scene with a red cube that can be manipulated in XR and non-XR applications. It demonstrates the usage of Canvas, PointerEvents, Environment, and Handle components.
+SOURCE: https://github.com/pmndrs/xr/blob/main/packages/react/handle/README.md#2025-04-11_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+import { Canvas } from '@react-three/fiber'
+import { noEvents, PointerEvents } from '@react-three/xr'
+import { Handle } from '@react-three/handle'
+
+export function App() {
+  return (
+    <Canvas events={noEvents}>
+      <PointerEvents />
+      <Environment preset=""city"" />
+      <Handle>
+        <mesh position-z={-1}>
+          <boxGeometry />
+          <meshStandardMaterial color=""red"" />
+        </mesh>
+      </Handle>
+    </Canvas>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Implementing Door with Handles in React Three Fiber
+DESCRIPTION: This code snippet demonstrates how to create a 3D door with interactive handles using @react-three/handle. It separates the door components and wraps them with Handle and HandleTarget components for interaction.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/handles/introduction.md#2025-04-11_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+export function Door() {
+  const { nodes, materials } = useGLTF('/door.glb')
+  return (
+    <group rotation={[-Math.PI / 2, 0, 0]} scale={100}>
+      <group position={[-0.435, -0.101, 0.249]}>
+        <HandleTarget>
+          <mesh geometry={nodes.Plane001_Glossy_0.geometry} material={materials.Glossy} />
+          <mesh geometry={nodes.Plane001_Door_0.geometry} material={materials.Door} />
+          <mesh geometry={nodes.Plane003_Door_0.geometry} material={materials.Door} position={[0.852, 0.017, 0.782]} />
+          <Handle targetRef=""from-context"" translate=""as-rotate"" rotate={{ x: false, y: false, z: [-Math.PI, 0] }}>
+            <group position={[0.81, 0.043, 0.803]}>
+              <mesh geometry={nodes.Circle002_Glossy_0.geometry} material={materials.Glossy} />
+            </group>
+          </Handle>
+        </HandleTarget>
+      </group>
+      <mesh geometry={nodes.Plane002_Glossy_0.geometry} material={materials.Glossy} />
+      <mesh geometry={nodes.Plane002_Door_0.geometry} material={materials.Door} />
+    </group>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Wrapping Scene with XR Component in React
+DESCRIPTION: Wrapping the existing scene with the XR component and passing the XR store. This final step makes the application usable with AR or VR headsets.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/getting-started/convert-to-xr.md#2025-04-11_snippet_3
+
+LANGUAGE: tsx
+CODE:
+```
+<>
+    <button onClick={() => store.enterVR()}>Enter VR</button>
+    <button onClick={() => store.enterAR()}>Enter AR</button>
+    <Canvas>
+        <XR store={store}>
+ ...your scene
+        </XR>
+    </Canvas>
+</>
+```
+
+----------------------------------------
+
+TITLE: Implementing XRDomOverlay Component in TSX for WebXR
+DESCRIPTION: This snippet shows how to use the XRDomOverlay component to add an HTML div element as an overlay in a WebXR experience. The overlay is centered and displays a red 'Hello World' message.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/dom-overlay.md#2025-04-11_snippet_0
+
+LANGUAGE: TSX
+CODE:
+```
+<XRDomOverlay
+  style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+>
+  <div style={{ backgroundColor: 'red', padding: '1rem 2rem' }}>Hello World</div>
+</XRDomOverlay>
+```
+
+----------------------------------------
+
+TITLE: Creating a Draggable 3D Cube with Pointer Events
+DESCRIPTION: Demonstrates how to implement a simple dragging interaction using pointer events. This component tracks the dragging state with a ref and updates the mesh position based on pointer movement. Note that this implementation works only for meshes not inside transformed groups.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/interactions.md#2025-04-11_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+function DraggableCube() {
+  const isDraggingRef = useRef(false)
+  const meshRef = useRef<Mesh>(null)
+
+  return (
+    <mesh
+      ref={meshRef}
+      onPointerDown={(e) => {
+        if (isDraggingRef.current) {
+          return
+ }
+        isDraggingRef.current = true
+        meshRef.position.copy(e.point)
+ }}
+      onPointerMove={(e) => {
+        if (!isDraggingRef.current) {
+          return
+ }
+        meshRef.position.copy(e.point)
+ }}
+      onPointerUp={(e) => (isDraggingRef.current = false)}
+    >
+      <boxGeometry />
+    </mesh>
+ )
+}
+```
+
+----------------------------------------
+
+TITLE: Creating a Simple Video Layer in WebXR with React Three Fiber
+DESCRIPTION: Creates an XRLayer component positioned in 3D space that displays a video and plays it when clicked. The component is scaled to 0.5 of its original size and positioned at coordinates [0, 1.5, -0.5].
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/layers.md#2025-04-11_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+<XRLayer position={[0, 1.5, -0.5]} onClick={() => video.play()} scale={0.5} src={video} />
+```
+
+----------------------------------------
+
+TITLE: Implementing OrbitHandles with PointerEvents in React Three Fiber
+DESCRIPTION: Basic code setup for adding OrbitHandles to a React Three Fiber Canvas. This requires disabling the built-in event system and adding the PointerEvents component from @react-three/xr to handle interactions appropriately.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/handles/screen-handle-components.md#2025-04-11_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { OrbitHandles } from '@react-three/handles'
+import { noEvents, PointerEvents } from '@react-three/xr'
+
+<Canvas events={noEvents}>
+  <PointerEvents />
+  <OrbitHandles />
+</Canvas>
+```
+
+----------------------------------------
+
+TITLE: Optimizing Performance with CombinedPointer in Three.js
+DESCRIPTION: Example demonstrating how to improve performance when using multiple pointers simultaneously by combining them with CombinedPointer. This reduces scene graph traversals by calculating intersections once per combined pointer.
+SOURCE: https://github.com/pmndrs/xr/blob/main/packages/pointer-events/README.md#2025-04-11_snippet_2
+
+LANGUAGE: typescript
+CODE:
+```
+leftGrabPointer.move()
+leftTouchPointer.move()
+leftRayPointer.move()
+rightGrabPointer.move()
+rightTouchPointer.move()
+rightRayPointer.move()
+```
+
+LANGUAGE: typescript
+CODE:
+```
+const leftPointer = new CombinedPointer()
+const rightPointer = new CombinedPointer()
+leftPointer.register(leftGrabPointer)
+leftPointer.register(leftTouchPointer)
+leftPointer.register(leftRayPointer)
+rightPointer.register(rightGrabPointer)
+rightPointer.register(rightTouchPointer)
+rightPointer.register(rightRayPointer)
+
+leftPointer.move()
+rightPointer.move()
+```
+
+----------------------------------------
+
+TITLE: Setting Up OrbitHandles for XR in React Three Fiber
+DESCRIPTION: This code snippet shows how to set up OrbitHandles from @react-three/handles for XR sessions. It includes the necessary components and event handling setup to prevent conflicts with WebXR camera controls.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/getting-started/faq.md#2025-04-11_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+import { OrbitHandles } from '@react-three/handles'
+import { noEvents, PointerEvents } from '@react-three/xr'
+
+<Canvas events={noEvents}>
+  <PointerEvents />
+  <OrbitHandles />
+</Canvas>
+```
+
+----------------------------------------
+
+TITLE: XR Store Control Functions
+DESCRIPTION: Core functions for managing XR sessions, including session initialization, input handling, and performance controls. These functions enable runtime control and modification of XR experiences.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/store.md#2025-04-11_snippet_2
+
+LANGUAGE: javascript
+CODE:
+```
+{
+  destroy: () => void,
+  enterXR: (mode) => Promise<XRSession | undefined>,
+  enterAR: () => Promise<XRSession | undefined>,
+  enterVR: () => Promise<XRSession | undefined>,
+  setHand: (implementation, handedness?) => void,
+  setController: (implementation, handedness?) => void,
+  setGaze: (implementation) => void,
+  setScreenInput: (implementation) => void,
+  setTransientPointer: (implementation, handedness?) => void,
+  setFrameRate: (value) => void,
+  requestFrame: () => Promise<XRFrame>
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Vite for WebXR Development with React and SSL
+DESCRIPTION: A basic Vite configuration for developing WebXR applications. It includes the React plugin for hot module reloading and the Basic SSL plugin to enable HTTPS, which is required for WebXR experiences. After setup, the application can be exposed to the local network with the '--host' argument.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/getting-started/development-setup.md#2025-04-11_snippet_0
+
+LANGUAGE: typescript
+CODE:
+```
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import basicSsl from '@vitejs/plugin-basic-ssl'
+
+export default defineConfig({
+  plugins: [react(), basicSsl()],
+})
+```
+
+----------------------------------------
+
+TITLE: Retrieving XR Session with useXR Hook in React
+DESCRIPTION: Demonstrates how to use the useXR hook to access the current XR session state from any component within the XR component hierarchy. The hook accepts a selector function that extracts the desired state from the XR store.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/store.md#2025-04-11_snippet_3
+
+LANGUAGE: javascript
+CODE:
+```
+const session = useXR(xr => xr.session)
+```
+
+----------------------------------------
+
+TITLE: Suspense Boundary for XR Scene Loading in React Three Fiber
+DESCRIPTION: This snippet demonstrates how to properly set up a Suspense boundary around the scene content within an XR component. This ensures that the XR component remains mounted while the scene assets are loading.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/getting-started/faq.md#2025-04-11_snippet_2
+
+LANGUAGE: tsx
+CODE:
+```
+<Canvas>
+  <XR>
+    <Suspense>... your scene</Suspense>
+  </XR>
+</Canvas>
+```
+
+----------------------------------------
+
+TITLE: Managing Teleportation Position State with React Hooks
+DESCRIPTION: Creates a state variable to track the user's current position in 3D space using React's useState hook. This gives full control over when and how teleportation updates the user's position.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/teleport.md#2025-04-11_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+const [position, setPosition] = useState(new Vector3())
+```
+
+----------------------------------------
+
+TITLE: HandleTarget Component with Nested Handle Implementation
+DESCRIPTION: Example demonstrating how to use HandleTarget component with a nested Handle component to control a hierarchical structure of 3D objects.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/handles/handle-component.md#2025-04-11_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+<HandleTarget>
+    <group>
+        <mesh>
+            <boxGeometry />
+            <Handle targetRef=""from-context"">
+                <mesh position-x={2}>  
+                    <boxGeometry />
+                </mesh>
+            </Handle>
+        </mesh>
+    </group>
+</HandleTarget>
+```
+
+----------------------------------------
+
+TITLE: Implementing onClick Handler with React-Three XR
+DESCRIPTION: A basic example showing how to attach a click event handler to a 3D mesh, which will work in both XR and non-XR environments. The event object contains useful information like the intersection point in world space.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/interactions.md#2025-04-11_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+<mesh onClick={(event) => console.log(""I've been clicked"", event)}>
+  <boxGeometry />
+</mesh>
+```
+
+----------------------------------------
+
+TITLE: Creating a Teleport Target in the Scene
+DESCRIPTION: Implements a teleport target with an onTeleport handler that updates the user's position when teleportation occurs. The target is visualized as a green platform that users can teleport to.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/teleport.md#2025-04-11_snippet_3
+
+LANGUAGE: tsx
+CODE:
+```
+<TeleportTarget onTeleport={setPosition}>
+    <mesh scale={[10, 1, 10]} position={[0, -0.5, 0]}>
+        <boxGeometry />
+        <meshBasicMaterial color=""green"" />
+    </mesh>
+</TeleportTarget>
+```
+
+----------------------------------------
+
+TITLE: Enabling Teleport Pointers in XR Store Configuration
+DESCRIPTION: Configures the XR store to enable teleport pointers for both hands and controllers, which allows users to point and select teleportation destinations in VR.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/teleport.md#2025-04-11_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+const store = createXRStore({
+  hand: { teleportPointer: true },
+  controller: { teleportPointer: true },
+})
+```
+
+----------------------------------------
+
+TITLE: Creating a 3D Object Synced with Hit Test Position in React Three Fiber
+DESCRIPTION: This code snippet shows how to create a 3D sphere that syncs its position with the hit test result on every frame. It uses the useRef and useFrame hooks from React Three Fiber.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/hit-test.md#2025-04-11_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+function Point() {
+  const ref = useRef<Mesh>(null)
+  useFrame(() => ref.current?.position.copy(hitTestPosition))
+  return (
+    <mesh scale={0.05} ref={ref}>
+      <sphereGeometry />
+      <meshBasicMaterial />
+    </mesh>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Installing React Three Fiber XR packages
+DESCRIPTION: Command to install the necessary dependencies for creating XR experiences with React Three Fiber, including three.js, @react-three/fiber, and the latest version of @react-three/xr.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/getting-started/introduction.md#2025-04-11_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+npm install three @react-three/fiber @react-three/xr@latest
+```
+
+----------------------------------------
+
+TITLE: Implementing Basic Pointer Events in Three.js
+DESCRIPTION: A basic example showing how to set up pointer events in a Three.js scene. The code creates a cube that changes color when the pointer hovers over it, using the forwardHtmlEvents function to connect DOM events to the 3D scene.
+SOURCE: https://github.com/pmndrs/xr/blob/main/packages/pointer-events/README.md#2025-04-11_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+import * as THREE from 'three'
+import { forwardHtmlEvents } from '@pmndrs/pointer-events'
+
+const canvas = document.getElementById('canvas')
+const scene = new THREE.Scene()
+const camera = new THREE.PerspectiveCamera(70, width / height, 0.01, 10)
+camera.position.z = 1
+const { update } = forwardHtmlEvents(canvas, () => camera, scene)
+
+const width = window.innerWidth,
+  height = window.innerHeight
+
+const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2)
+const material = new THREE.MeshBasicMaterial({ color: new THREE.Color('red') })
+const mesh = new THREE.Mesh(geometry, material)
+scene.add(mesh)
+
+mesh.addEventListener('pointerover', () => material.color.set('blue'))
+mesh.addEventListener('pointerout', () => material.color.set('red'))
+
+const renderer = new THREE.WebGLRenderer({ antialias: true })
+renderer.setSize(width, height)
+renderer.setAnimationLoop(() => {
+  update()
+  renderer.render(scene, camera)
+})
+```
+
+----------------------------------------
+
+TITLE: Initializing an Anchor with useXRAnchor in react-three/xr
+DESCRIPTION: Basic usage of the useXRAnchor hook which returns a tuple containing the current anchor and a function to request a new anchor.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/anchors.md#2025-04-11_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+const [anchor, requestAnchor] = useXRAnchor()
+```
+
+----------------------------------------
+
+TITLE: Configuring XR Store Controller Settings in TypeScript
+DESCRIPTION: Example demonstrating how to disable the default controller for the left hand when creating an XR store. This shows basic configuration using the controller option object.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/store.md#2025-04-11_snippet_0
+
+LANGUAGE: typescript
+CODE:
+```
+createXRStore({
+  controller: { left: false },
+})
+```
+
+----------------------------------------
+
+TITLE: Conditional Controller Rendering Based on Input Source Type
+DESCRIPTION: Implementation showing how to render different controller visualizations based on whether the input source is primary or secondary. Primary controllers use the default XR controller component while secondary inputs are rendered as simple cubes.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/secondary-input-sources.md#2025-04-11_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+createXRStore({
+  secondaryInputSources: true,
+  controller: () => {
+    const { isPrimary } = useXRInputSourceStateContext('controller')
+    if (isPrimary) {
+      return <DefaultXRController />
+    }
+    return (
+      <mesh>
+        <boxGeometry />
+      </mesh>
+    )
+  },
+})
+```
+
+----------------------------------------
+
+TITLE: Adding VR/AR Entry Buttons in React
+DESCRIPTION: Adding HTML buttons to enter VR and AR experiences using the XR store. These buttons are placed above the Canvas component containing the scene.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/getting-started/convert-to-xr.md#2025-04-11_snippet_2
+
+LANGUAGE: tsx
+CODE:
+```
+<>
+    <button onClick={() => store.enterVR()}>Enter VR</button>
+    <button onClick={() => store.enterAR()}>Enter AR</button>
+    <Canvas>
+ ...your scene
+    </Canvas>
+</>
+```
+
+----------------------------------------
+
+TITLE: Rendering Content in an AR Anchor with XRSpace in react-three/xr
+DESCRIPTION: How to use the XRSpace component to render content in an anchor's space once the anchor has been created.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/anchors.md#2025-04-11_snippet_2
+
+LANGUAGE: tsx
+CODE:
+```
+<XRSpace space={anchor.anchorSpace}>...your content</XRSpace>
+```
+
+----------------------------------------
+
+TITLE: Enabling Secondary Input Sources in XR Store
+DESCRIPTION: Basic configuration to enable secondary input source tracking in the XR store. This allows access to additional input sources beyond the primary controller inputs.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/secondary-input-sources.md#2025-04-11_snippet_0
+
+LANGUAGE: typescript
+CODE:
+```
+createXRStore({ secondaryInputSources: true })
+```
+
+----------------------------------------
+
+TITLE: Applying Position to XR Origin
+DESCRIPTION: Sets the position of the XR origin component based on the current position state, which moves the user's viewpoint in the virtual environment.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/teleport.md#2025-04-11_snippet_2
+
+LANGUAGE: tsx
+CODE:
+```
+<XROrigin position={position}>
+```
+
+----------------------------------------
+
+TITLE: Complete Custom Hand Implementation in React Three Fiber
+DESCRIPTION: This is the full implementation of a custom hand component that renders a hand model with a touch interaction using the middle finger.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/custom-inputs.md#2025-04-11_snippet_4
+
+LANGUAGE: tsx
+CODE:
+```
+export function CustomHand() {
+  const state = useXRInputSourceStateContext('hand')
+  const middleFingerRef = useRef<Object3D>(null)
+  const pointer = useTouchPointer(middleFingerRef, state)
+  return (
+    <>
+      <XRSpace ref={middleFingerRef} space={state.inputSource.hand.get('middle-finger-tip')!} />
+      <Suspense>
+        <XRHandModel />
+      </Suspense>
+      <PointerCursorModel pointer={pointer} opacity={defaultTouchPointerOpacity} />
+    </>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Creating XR Store in React
+DESCRIPTION: Importing createXRStore and XR from @react-three/xr and creating an XR store. This store will be used to manage the XR state and interactions.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/getting-started/convert-to-xr.md#2025-04-11_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+import { createXRStore, XR } from '@react-three/xr'
+
+const store = createXRStore()
+```
+
+----------------------------------------
+
+TITLE: Setting Up Custom Hand State and Touch Pointer
+DESCRIPTION: This snippet shows how to get the state of the hand, create a reference to the middle finger position, and set up a touch pointer for custom hand implementation.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/custom-inputs.md#2025-04-11_snippet_2
+
+LANGUAGE: tsx
+CODE:
+```
+const state = useXRInputSourceStateContext('hand')
+const middleFingerRef = useRef<Object3D>(null)
+const pointer = useTouchPointer(middleFingerRef, state)
+```
+
+----------------------------------------
+
+TITLE: Configuring Ray Pointer Color in XR Store
+DESCRIPTION: This snippet shows how to configure the ray color of the ray pointer in the user's hand using the createXRStore function.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/custom-inputs.md#2025-04-11_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+const store = createXRStore({ hand: { rayPointer: { rayModel: { color: 'red' } } } })
+```
+
+----------------------------------------
+
+TITLE: Installing React Three XR Dependencies
+DESCRIPTION: NPM installation command for required dependencies including Three.js, React Three Fiber, and React Three XR.
+SOURCE: https://github.com/pmndrs/xr/blob/main/README.md#2025-04-11_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+npm install three @react-three/fiber @react-three/xr@latest
+```
+
+----------------------------------------
+
+TITLE: Exiting XR Session with react-three/xr
+DESCRIPTION: This code snippet shows how to programmatically exit an active XR session using the react-three/xr store state.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/getting-started/faq.md#2025-04-11_snippet_3
+
+LANGUAGE: ts
+CODE:
+```
+store.getState().session?.end()
+```
+
+----------------------------------------
+
+TITLE: Creating an HTML Video Element for WebXR Layer
+DESCRIPTION: Uses React's useMemo hook to create an HTML video element that loads a video file from 'test.mp4'. The memoization ensures the element is only created once during component initialization.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/layers.md#2025-04-11_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+const video = useMemo(() => {
+  const result = document.createElement('video')
+  result.src = 'test.mp4'
+  return result
+}, [])
+```
+
+----------------------------------------
+
+TITLE: Installing @react-three/xr Package
+DESCRIPTION: Command to install the latest version of @react-three/xr using npm. This is the first step in converting a React Three Fiber app to XR.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/getting-started/convert-to-xr.md#2025-04-11_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+npm install @react-three/xr@latest
+```
+
+----------------------------------------
+
+TITLE: Creating a Translation Handle in Three.js with TypeScript
+DESCRIPTION: This snippet demonstrates how to create a handle that constrains an object's movement to the x-axis translation only. It creates a HandleStore instance bound to the object itself, disabling scale and rotate operations while enabling x-axis translation.
+SOURCE: https://github.com/pmndrs/xr/blob/main/packages/handle/README.md#2025-04-11_snippet_0
+
+LANGUAGE: typescript
+CODE:
+```
+//lets create a handle to translate the object on the x axis (the target and the handle are both the object)
+const store = new HandleStore(object, () => ({ scale: false, rotate: false, translate: ""x"" }))
+store.bind(object)
+```
+
+----------------------------------------
+
+TITLE: Requesting an AR Anchor Relative to a Space in react-three/xr
+DESCRIPTION: Example of requesting an anchor relative to a specific space using the requestAnchor function.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/anchors.md#2025-04-11_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+requestAnchor({ relativeTo: ""space"", space: ... })
+```
+
+----------------------------------------
+
+TITLE: Providing Custom Hand Implementation in XR Store
+DESCRIPTION: This code sample demonstrates how to provide a custom hand implementation through the XR store options.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/custom-inputs.md#2025-04-11_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+const store = createXRStore({ hand: CustomHand })
+```
+
+----------------------------------------
+
+TITLE: Creating Grid Layout with XR Demo Examples
+DESCRIPTION: A grid layout component displaying interactive gif thumbnails that link to various XR demos. The grid is structured with 3 columns and contains links to live examples with preview images.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/getting-started/examples.md#2025-04-11_snippet_0
+
+LANGUAGE: html
+CODE:
+```
+<Grid cols={3}>
+  <li>
+    [![Screenshot from Room demo](./room-demo.gif)](https://pmndrs.github.io/xr/examples/room-with-shadows/)
+  </li>
+  <li>
+    [![Screenshot from Stage demo](./stage-demo.gif)](https://pmndrs.github.io/xr/examples/stage/)
+  </li>
+  <li>
+    [![Screenshot from Ragdoll demo](./ragdoll-demo.gif)](https://pmndrs.github.io/xr/examples/rag-doll/)
+  </li>
+  <li>
+    [![Screenshot from Watch demo](./watch-demo.gif)](https://pmndrs.github.io/xr/examples/watch/)
+  </li>
+  <li>
+    [![Screenshot from Minecraft demo](./minecraft-demo.gif)](https://pmndrs.github.io/xr/examples/minecraft/)
+  </li>
+  <li>
+    [![Screenshot from Pingpong demo](./pingpong-demo.gif)](https://pmndrs.github.io/xr/examples/pingpong/)
+  </li>
+  <li>
+    [![Screenshot from Layers demo](./layers.gif)](https://pmndrs.github.io/xr/examples/layers/)
+  </li>
+  <li>
+    [![Screenshot from Secondary Input Sources demo](./secondary-input-sources.gif)](https://pmndrs.github.io/xr/examples/secondary-input-sources/)
+  </li>
+  <li>
+    [![Screenshot from the React-three-handle Editor demo](./editor.gif)](https://pmndrs.github.io/xr/examples/editor/)
+  </li>
+  <li>
+    [![Screenshot from the hit testing demo](./hit-testing.gif)](https://pmndrs.github.io/xr/examples/hit-testing/)
+    by [Sung Powley](https://bsky.app/profile/sung-powley.bsky.social) 
+  </li>
+  <li>
+    [![Screenshot from the uikit + handle demo](./uikit.gif)](https://pmndrs.github.io/xr/examples/uikit/)
+  </li>
+  <li>
+    [![Screenshot from the portal demo](./portal.gif)](https://pmndrs.github.io/xr/examples/portal/)
+  </li>
+</Grid>
+```
+
+----------------------------------------
+
+TITLE: Configuring Pointer Events Filtering in Three.js
+DESCRIPTION: Example showing how to configure pointer event filtering for a 3D object using the pointerEvents property. This controls whether an object responds to pointer events, similar to the CSS pointer-events property.
+SOURCE: https://github.com/pmndrs/xr/blob/main/packages/pointer-events/README.md#2025-04-11_snippet_1
+
+LANGUAGE: javascript
+CODE:
+```
+object.pointerEvents = 'none'
+```
+
+----------------------------------------
+
+TITLE: Rendering Custom Hand Components in React Three Fiber
+DESCRIPTION: This code renders the custom hand components, including the XRSpace for the middle finger, XRHandModel, and PointerCursorModel for visualization.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/tutorials/custom-inputs.md#2025-04-11_snippet_3
+
+LANGUAGE: tsx
+CODE:
+```
+<XRSpace ref={middleFingerRef} space={state.inputSource.hand.get('middle-finger-tip')!}/>
+<Suspense>
+  <XRHandModel />
+</Suspense>
+<PointerCursorModel pointer={pointer} opacity={defaultTouchPointerOpacity} />
+```
+
+----------------------------------------
+
+TITLE: Installing Dependencies and Building XR Libraries
+DESCRIPTION: Commands to install project dependencies, generate necessary files, and build the libraries using PNPM package manager. Requires Node.js and PNPM to be installed.
+SOURCE: https://github.com/pmndrs/xr/blob/main/CONTRIBUTING.md#2025-04-11_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+pnpm i
+pnpm -r copy
+pnpm -r build
+```
+
+----------------------------------------
+
+TITLE: Installing XR Library Dependencies
+DESCRIPTION: Command to install the required npm packages for using XR functionality with Three.js
+SOURCE: https://github.com/pmndrs/xr/blob/main/packages/xr/README.md#2025-04-11_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+npm install three @pmndrs/xr
+```
+
+----------------------------------------
+
+TITLE: Running XR Example Development Server
+DESCRIPTION: Commands to navigate to the React Three XR example directory and start the development server. Note that Vite cache needs to be cleared when making changes to packages.
+SOURCE: https://github.com/pmndrs/xr/blob/main/CONTRIBUTING.md#2025-04-11_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+cd examples/react-three-xr
+pnpm dev
+```
+
+----------------------------------------
+
+TITLE: Installing React Three Handle and Dependencies
+DESCRIPTION: Command to install the necessary dependencies for using @react-three/handle, including Three.js, React Three Fiber, and React Three XR.
+SOURCE: https://github.com/pmndrs/xr/blob/main/packages/react/handle/README.md#2025-04-11_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+npm install three @react-three/fiber @react-three/handle@latest @react-three/xr@latest
+```
+
+----------------------------------------
+
+TITLE: Creating Grid Layout for XR Showcases in Markdown
+DESCRIPTION: Markdown code for displaying a grid of showcase items with images and links. The code creates a 2-column grid with a single showcase item for Volu.dev, a spatial development hub.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/getting-started/showcases.md#2025-04-11_snippet_0
+
+LANGUAGE: markdown
+CODE:
+```
+<Grid cols={2}>
+  <li>
+    ![volu.dev](./showcases/volu-dev.gif)
+    [Spatial development hub](https://volu.dev)
+  </li>
+</Grid>
+```
+
+----------------------------------------
+
+TITLE: Implementing TransformHandles in React Three Fiber
+DESCRIPTION: Basic setup for using TransformHandles component in React Three Fiber with XR event system. Requires disabling default events and adding PointerEvents from @react-three/xr.
+SOURCE: https://github.com/pmndrs/xr/blob/main/docs/handles/prebuild-handles.md#2025-04-11_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { TransformHandles } from '@react-three/handles'
+import { noEvents, PointerEvents } from '@react-three/xr'
+
+<Canvas events={noEvents}>
+  <PointerEvents />
+  <TransformHandles>
+    <mesh>
+      <boxGeometry />
+    </mesh>
+  </TransformHandles>
+</Canvas>
+```
+
+----------------------------------------
+
+TITLE: Configuring Web Crawler Access in robots.txt
+DESCRIPTION: This robots.txt configuration allows all user agents (web crawlers) to access all content on the website. The configuration is minimal with no path restrictions.
+SOURCE: https://github.com/pmndrs/xr/blob/main/examples/minecraft/public/robots.txt#2025-04-11_snippet_0
+
+LANGUAGE: plaintext
+CODE:
+```
+User-agent: *
+Disallow:
+```","react",""

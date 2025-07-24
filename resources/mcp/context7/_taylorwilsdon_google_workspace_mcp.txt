@@ -1,0 +1,338 @@
+"mcp google workspace","TITLE: Quick Start: Run Google Workspace MCP Server with uvx
+DESCRIPTION: This snippet demonstrates how to quickly start the Google Workspace MCP server using `uvx`. It includes setting necessary Google OAuth credentials as environment variables and examples for starting the server with all tools, specific tools, or in HTTP debug mode. This method is recommended for instant setup and requires Python 3.11+ and `uvx`.
+SOURCE: https://github.com/taylorwilsdon/google_workspace_mcp/blob/main/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+export GOOGLE_OAUTH_CLIENT_ID=""your-client-id.apps.googleusercontent.com""
+export GOOGLE_OAUTH_CLIENT_SECRET=""your-client-secret""
+
+uvx workspace-mcp
+
+uvx workspace-mcp --tools gmail drive calendar
+
+uvx workspace-mcp --transport streamable-http
+```
+
+----------------------------------------
+
+TITLE: Google Workspace Tools API Reference
+DESCRIPTION: Detailed reference for available Google Workspace tools, categorized by service, including their names and functionalities. All tools support automatic authentication via @require_google_service() decorators with 30-minute service caching.
+SOURCE: https://github.com/taylorwilsdon/google_workspace_mcp/blob/main/README.md#_snippet_10
+
+LANGUAGE: APIDOC
+CODE:
+```
+Google Calendar:
+  list_calendars: List accessible calendars
+  get_events: Retrieve events with time range filtering
+  get_event: Fetch detailed information of a single event by ID
+  create_event: Create events (all-day or timed) with optional Drive file attachments
+  modify_event: Update existing events
+  delete_event: Remove events
+
+Google Drive:
+  search_drive_files: Search files with query syntax
+  get_drive_file_content: Read file content (supports Office formats)
+  list_drive_items: List folder contents
+  create_drive_file: Create new files or fetch content from public URLs
+
+Gmail:
+  search_gmail_messages: Search with Gmail operators
+  get_gmail_message_content: Retrieve message content
+  send_gmail_message: Send emails
+  draft_gmail_message: Create drafts
+
+Google Docs:
+  search_docs: Find documents by name
+  get_doc_content: Extract document text
+  list_docs_in_folder: List docs in folder
+  create_doc: Create new documents
+  read_doc_comments: Read all comments and replies
+  create_doc_comment: Create new comments
+  reply_to_comment: Reply to existing comments
+  resolve_comment: Resolve comments
+
+Google Sheets:
+  list_spreadsheets: List accessible spreadsheets
+  get_spreadsheet_info: Get spreadsheet metadata
+  read_sheet_values: Read cell ranges
+  modify_sheet_values: Write/update/clear cells
+  create_spreadsheet: Create new spreadsheets
+  create_sheet: Add sheets to existing files
+  read_sheet_comments: Read all comments and replies
+  create_sheet_comment: Create new comments
+  reply_to_sheet_comment: Reply to existing comments
+  resolve_sheet_comment: Resolve comments
+
+Google Slides:
+  create_presentation: Create new presentations
+  get_presentation: Retrieve presentation details
+  batch_update_presentation: Apply multiple updates at once
+  get_page: Get specific slide information
+  get_page_thumbnail: Generate slide thumbnails
+  read_presentation_comments: Read all comments and replies
+  create_presentation_comment: Create new comments
+  reply_to_presentation_comment: Reply to existing comments
+  resolve_presentation_comment: Resolve comments
+
+Google Forms:
+  create_form: Create new forms with title and description
+  get_form: Retrieve form details, questions, and URLs
+  set_publish_settings: Configure form template and authentication settings
+  get_form_response: Get individual form response details
+  list_form_responses: List all responses to a form with pagination
+
+Google Chat:
+  list_spaces: List chat spaces/rooms
+  get_messages: Retrieve space messages
+  send_message: Send messages to spaces
+  search_messages: Search across chat history
+```
+
+----------------------------------------
+
+TITLE: Start Google Workspace MCP Server with uv
+DESCRIPTION: This section provides various `uv run` commands to start the Google Workspace MCP server in different modes: default stdio, HTTP streamable, single-user, and with selective tool registration. It illustrates how to customize server behavior.
+SOURCE: https://github.com/taylorwilsdon/google_workspace_mcp/blob/main/README.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+# Default (stdio mode for MCP clients)
+uv run main.py
+```
+
+LANGUAGE: bash
+CODE:
+```
+# HTTP mode (for web interfaces and debugging)
+uv run main.py --transport streamable-http
+```
+
+LANGUAGE: bash
+CODE:
+```
+# Single-user mode (simplified authentication)
+uv run main.py --single-user
+```
+
+LANGUAGE: bash
+CODE:
+```
+# Selective tool registration (only register specific tools)
+uv run main.py --tools gmail drive calendar
+```
+
+LANGUAGE: bash
+CODE:
+```
+uv run main.py --tools sheets docs
+```
+
+LANGUAGE: bash
+CODE:
+```
+uv run main.py --single-user --tools gmail  # Can combine with other flags
+```
+
+----------------------------------------
+
+TITLE: Start MCPO Proxy Server with Bash
+DESCRIPTION: This Bash command initiates the MCPO proxy server, making the configured Google Workspace tools available on a specified port. It allows for custom port assignment, loading a configuration file, and securing the proxy with an optional API key for external access.
+SOURCE: https://github.com/taylorwilsdon/google_workspace_mcp/blob/main/README.md#_snippet_14
+
+LANGUAGE: bash
+CODE:
+```
+mcpo --port 8001 --config config.json --api-key ""your-optional-secret-key""
+```
+
+----------------------------------------
+
+TITLE: Development Installation: Clone and Run Google Workspace MCP Server
+DESCRIPTION: This snippet provides instructions for setting up the Google Workspace MCP server for development or customization. It involves cloning the repository from GitHub, navigating into the directory, and running the main script using `uv`. This method is suitable for contributors or users who need to modify the codebase.
+SOURCE: https://github.com/taylorwilsdon/google_workspace_mcp/blob/main/README.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+git clone https://github.com/taylorwilsdon/google_workspace_mcp.git
+cd google_workspace_mcp
+uv run main.py
+```
+
+----------------------------------------
+
+TITLE: Define a Google Workspace Tool in Python
+DESCRIPTION: This Python snippet demonstrates how to define a new tool that interacts with Google Workspace services. It utilizes the @require_google_service decorator for automatic service injection and scope management, allowing the tool to access Google Drive and return native Python objects.
+SOURCE: https://github.com/taylorwilsdon/google_workspace_mcp/blob/main/README.md#_snippet_12
+
+LANGUAGE: python
+CODE:
+```
+from auth.service_decorator import require_google_service
+
+@require_google_service(""drive"", ""drive_read"")  # Service + scope group
+async def your_new_tool(service, param1: str, param2: int = 10):
+    """"""Tool description""""""
+    # service is automatically injected and cached
+    result = service.files().list().execute()
+    return result  # Return native Python objects
+```
+
+----------------------------------------
+
+TITLE: Configure MCPO for Open WebUI Integration with JSON
+DESCRIPTION: This JSON configuration defines how the MCPO server should expose a Google Workspace service as a streamable HTTP endpoint. It specifies the type of server and the URL where the Google Workspace MCP is running, enabling integration with external platforms like Open WebUI.
+SOURCE: https://github.com/taylorwilsdon/google_workspace_mcp/blob/main/README.md#_snippet_13
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""mcpServers"": {
+    ""google_workspace"": {
+      ""type"": ""streamablehttp"",
+      ""url"": ""http://localhost:8000/mcp""
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Run Google Workspace MCP Server using Docker
+DESCRIPTION: This snippet provides Docker commands to build an image for the Google Workspace MCP server and then run it, mapping port 8000 and mounting the current directory. It demonstrates containerized deployment.
+SOURCE: https://github.com/taylorwilsdon/google_workspace_mcp/blob/main/README.md#_snippet_5
+
+LANGUAGE: bash
+CODE:
+```
+docker build -t workspace-mcp .
+docker run -p 8000:8000 -v $(pwd):/app workspace-mcp --transport streamable-http
+```
+
+----------------------------------------
+
+TITLE: Set Development and User Email Environment Variables
+DESCRIPTION: This snippet demonstrates setting OAUTHLIB_INSECURE_TRANSPORT for development purposes and USER_GOOGLE_EMAIL as an optional default email for authentication, simplifying single-user setups.
+SOURCE: https://github.com/taylorwilsdon/google_workspace_mcp/blob/main/README.md#_snippet_3
+
+LANGUAGE: bash
+CODE:
+```
+export OAUTHLIB_INSECURE_TRANSPORT=1  # Development only
+export USER_GOOGLE_EMAIL=your.email@gmail.com  # Optional: Default email for auth - use this for single user setups and you won't need to set your email in system prompt for magic auth
+```
+
+----------------------------------------
+
+TITLE: Google Workspace MCP Project Directory Structure
+DESCRIPTION: Illustrates the hierarchical organization of files and directories within the Google Workspace Multi-Cloud Proxy (MCP) project, highlighting key components like authentication, core utilities, service-specific tools, and entry points.
+SOURCE: https://github.com/taylorwilsdon/google_workspace_mcp/blob/main/README.md#_snippet_11
+
+LANGUAGE: text
+CODE:
+```
+google_workspace_mcp/
+├── auth/              # Authentication system with decorators
+├── core/              # MCP server and utilities
+├── g{service}/        # Service-specific tools
+├── main.py            # Server entry point
+├── client_secret.json # OAuth credentials (not committed)
+└── pyproject.toml     # Dependencies
+```
+
+----------------------------------------
+
+TITLE: Configure Google OAuth Credentials via Environment Variables
+DESCRIPTION: This snippet shows how to set Google OAuth client ID, client secret, and redirect URI as environment variables. This method is recommended for production and containerized deployments as it avoids storing secrets in version control.
+SOURCE: https://github.com/taylorwilsdon/google_workspace_mcp/blob/main/README.md#_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+export GOOGLE_OAUTH_CLIENT_ID=""your-client-id.apps.googleusercontent.com""
+export GOOGLE_OAUTH_CLIENT_SECRET=""your-client-secret""
+export GOOGLE_OAUTH_REDIRECT_URI=""http://localhost:8000/oauth2callback""  # Optional
+```
+
+----------------------------------------
+
+TITLE: Manually Configure Claude Desktop for Stdio Mode (uv Development)
+DESCRIPTION: This JSON configuration snippet provides an alternative manual setup for Claude Desktop, specifically for development installations using `uv run main.py`. It includes specifying the current working directory (`cwd`) in addition to command, arguments, and environment variables.
+SOURCE: https://github.com/taylorwilsdon/google_workspace_mcp/blob/main/README.md#_snippet_8
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""mcpServers"": {
+    ""google_workspace"": {
+      ""command"": ""uv"",
+      ""args"": [""run"", ""main.py""],
+      ""cwd"": ""/path/to/google_workspace_mcp"",
+      ""env"": {
+        ""GOOGLE_OAUTH_CLIENT_ID"": ""your-client-id.apps.googleusercontent.com"",
+        ""GOOGLE_OAUTH_CLIENT_SECRET"": ""your-client-secret""
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Manually Configure Claude Desktop for Stdio Mode (uvx)
+DESCRIPTION: This JSON configuration snippet shows how to manually set up Claude Desktop to connect to the Google Workspace MCP server using `uvx` in stdio mode. It includes specifying the command, arguments, and environment variables for OAuth credentials.
+SOURCE: https://github.com/taylorwilsdon/google_workspace_mcp/blob/main/README.md#_snippet_7
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""mcpServers"": {
+    ""google_workspace"": {
+      ""command"": ""uvx"",
+      ""args"": [""workspace-mcp""],
+      ""env"": {
+        ""GOOGLE_OAUTH_CLIENT_ID"": ""your-client-id.apps.googleusercontent.com"",
+        ""GOOGLE_OAUTH_CLIENT_SECRET"": ""your-client-secret""
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Claude Desktop for HTTP Mode
+DESCRIPTION: This JSON configuration snippet demonstrates how to set up Claude Desktop to connect to the Google Workspace MCP server via HTTP mode. It uses `npx mcp-remote` to proxy the connection to the specified local server URL.
+SOURCE: https://github.com/taylorwilsdon/google_workspace_mcp/blob/main/README.md#_snippet_9
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""mcpServers"": {
+    ""google_workspace"": {
+      ""command"": ""npx"",
+      ""args"": [""mcp-remote"", ""http://localhost:8000/mcp""]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Auto-install Claude Desktop Configuration for Stdio Mode
+DESCRIPTION: This command executes a Python script to automatically configure Claude Desktop for connecting to the Google Workspace MCP server in stdio mode. This is the recommended approach for quick setup.
+SOURCE: https://github.com/taylorwilsdon/google_workspace_mcp/blob/main/README.md#_snippet_6
+
+LANGUAGE: python
+CODE:
+```
+python install_claude.py
+```","mcp google workspace",""

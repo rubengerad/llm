@@ -1,0 +1,1928 @@
+"react-js","TITLE: Basic Usage of RichTextEditor Component (React/TSX)
+DESCRIPTION: Demonstrates how to import and use the RichTextEditor component in a React application. It shows how to import necessary modules, configure extensions like BaseKit with options for placeholder and character count, manage editor content using state, and render the component with basic props.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/getting-started.md#_snippet_2
+
+LANGUAGE: tsx
+CODE:
+```
+import RichTextEditor from 'reactjs-tiptap-editor';
+import { BaseKit } from 'reactjs-tiptap-editor';
+// import { BaseKit } from 'reactjs-tiptap-editor/extension-bundle'; // for version 0.1.16 and lower
+
+// Import CSS
+import 'reactjs-tiptap-editor/style.css';
+
+const extensions = [
+  BaseKit.configure({
+    // Show placeholder
+    placeholder: {  // [!code highlight]
+      showOnlyCurrent: true, // [!code highlight]
+    },  // [!code highlight]
+
+    // Character count
+    characterCount: {  // [!code highlight]
+      limit: 50_000,  // [!code highlight]
+    },  // [!code highlight]
+  }),
+  ...
+  // Import Extensions Here
+];
+
+const DEFAULT = '';
+
+const App = () => {
+  const [content, setContent] = useState(DEFAULT);
+
+  const onChangeContent = (value: any) => {
+    setContent(value);
+  };
+
+  return (
+    <RichTextEditor
+      output='html'
+      content={content}
+      onChangeContent={onChangeContent}
+      extensions={extensions}
+    />
+  );
+};
+
+```
+
+----------------------------------------
+
+TITLE: Implementing Custom Bubble Menu with Selection Logging - React/TypeScript
+DESCRIPTION: This snippet demonstrates how to integrate `reactjs-tiptap-editor` with a custom `BubbleMenu` component. It shows how to access the editor's state to retrieve the currently selected text and perform an action (logging to console) based on the selection. It requires the `reactjs-tiptap-editor` and `extension-bundle` dependencies.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/customize.md#_snippet_5
+
+LANGUAGE: tsx
+CODE:
+```
+import RichTextEditor, { BubbleMenu, useEditorState } from 'reactjs-tiptap-editor'
+import { BaseKit } from 'reactjs-tiptap-editor/extension-bundle'
+import type { Editor } from 'reactjs-tiptap-editor'
+import 'reactjs-tiptap-editor/style.css'
+
+interface CustomBubbleMenuProps {
+  editor: Editor
+}
+
+function CustomBubbleMenu({ editor }: CustomBubbleMenuProps) {
+  if (!editor)
+    return null
+
+  const handlePrintSelection = () => {
+    const { from, to } = editor.state.selection
+    const text = editor.state.doc.textBetween(from, to)
+    console.log('Selected text:', text)
+  }
+
+  return (
+    <BubbleMenu
+      editor={editor}
+    >
+      <button
+        type=""button""
+        onClick={handlePrintSelection}
+      >
+        Print Selection
+      </button>
+    </BubbleMenu>
+  )
+}
+
+const extensions = [BaseKit]
+
+export default function App() {
+  const { isReady, editor, editorRef } = useEditorState()
+
+  return (
+    <div>
+      <RichTextEditor
+        ref={editorRef}
+        content=""""
+        output=""html""
+        extensions={extensions}
+        hideBubble
+      />
+      {isReady && editor && <CustomBubbleMenu editor={editor} />}
+    </div>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Adding Extensions to RichTextEditor (TSX)
+DESCRIPTION: This snippet demonstrates how to import specific extensions (like Bold, BulletList, Heading, Italic) from the extension bundle and pass them as an array to the `extensions` prop of the `RichTextEditor` component to enable additional formatting and features.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/customize.md#_snippet_0
+
+LANGUAGE: TSX
+CODE:
+```
+import React from 'react'
+import RichTextEditor from 'reactjs-tiptap-editor'
+import { BaseKit, Bold, BulletList, Heading, Italic } from 'reactjs-tiptap-editor/extension-bundle'
+import 'reactjs-tiptap-editor/style.css'
+
+const extensions = [BaseKit, Heading, Italic, Bold, BulletList]
+
+export default function App() {
+  return (
+    <RichTextEditor
+      content=""""
+      output=""html""
+      extensions={extensions}
+    />
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Install reactjs-tiptap-editor for React 19+
+DESCRIPTION: Provides commands to install the latest version of the reactjs-tiptap-editor library using npm, pnpm, or yarn, suitable for projects using React 19 or later.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/getting-started.md#_snippet_0
+
+LANGUAGE: sh
+CODE:
+```
+npm install reactjs-tiptap-editor@latest
+```
+
+LANGUAGE: sh
+CODE:
+```
+pnpm install reactjs-tiptap-editor@latest
+```
+
+LANGUAGE: sh
+CODE:
+```
+yarn add reactjs-tiptap-editor@latest
+```
+
+----------------------------------------
+
+TITLE: RichTextEditor Component Props Interface (TypeScript)
+DESCRIPTION: Defines the TypeScript interface RichTextEditorProps which specifies the available properties for configuring the RichTextEditor component. It lists various options for content, extensions, output format, styling, behavior, and callbacks.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/getting-started.md#_snippet_3
+
+LANGUAGE: ts
+CODE:
+```
+/**
+ * Interface for RichTextEditor component props
+ */
+export interface RichTextEditorProps {
+  /** Content of the editor */
+  content: string
+  /** Extensions for the editor */
+  extensions: AnyExtension[]
+
+  /** Output format */
+  output: 'html' | 'json' | 'text'
+  /** Model value */
+  modelValue?: string | object
+  /** Dark mode flag */
+  dark?: boolean
+  /** Dense mode flag */
+  dense?: boolean
+  /** Disabled flag */
+  disabled?: boolean
+  /** Label for the editor */
+  label?: string
+  /** Hide toolbar flag */
+  hideToolbar?: boolean
+  /** Disable bubble menu flag */
+  disableBubble?: boolean
+  /** Hide bubble menu flag */
+  hideBubble?: boolean
+  /** Remove default wrapper flag */
+  removeDefaultWrapper?: boolean
+  /** Maximum width */
+  maxWidth?: string | number
+  /** Minimum height */
+  minHeight?: string | number
+  /** Maximum height */
+  maxHeight?: string | number
+  /** Content class */
+  contentClass?: string | string[] | Record<string, any>
+  /** Content change callback */
+  onChangeContent?: (val: any) => void
+  /** Bubble menu props */
+  bubbleMenu?: BubbleMenuProps
+
+  /** Use editor options */
+  useEditorOptions?: UseEditorOptions
+}
+```
+
+----------------------------------------
+
+TITLE: UseEditorOptions Interface Definition (TSX)
+DESCRIPTION: This snippet defines the TypeScript interface `UseEditorOptions`, which specifies the available properties for configuring the editor's behavior. It includes various callback functions for handling editor events (update, selection change, focus, blur, transaction, create, destroy) and properties for initial state, input/paste rule toggles, editability, autofocus, and editor view props.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/customize.md#_snippet_1
+
+LANGUAGE: TSX
+CODE:
+```
+interface UseEditorOptions {
+  /** Called when editor content is updated */
+  onUpdate?: (props: { editor: Editor, transaction: Transaction }) => void
+
+  /** Called when editor selection changes */
+  onSelectionUpdate?: (props: { editor: Editor, transaction: Transaction }) => void
+
+  /** Called when editor gains focus */
+  onFocus?: (props: { editor: Editor, event: FocusEvent }) => void
+
+  /** Called when editor loses focus */
+  onBlur?: (props: { editor: Editor, event: FocusEvent }) => void
+
+  /** Called when editor transaction is created */
+  onTransaction?: (props: { editor: Editor, transaction: Transaction }) => void
+
+  /** Called when editor is created */
+  onCreate?: (props: { editor: Editor }) => void
+
+  /** Called before editor is destroyed */
+  onDestroy?: () => void
+
+  /** Initial editor state */
+  editorState?: string
+
+  /** Enable or disable parsing content */
+  enableInputRules?: boolean
+  enablePasteRules?: boolean
+
+  /** Enable or disable content editing */
+  editable?: boolean
+
+  /** Custom autofocus behavior */
+  autofocus?: boolean | 'start' | 'end' | number
+
+  /** Editor view props */
+  editorProps?: EditorProps
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Image Extension with Upload Function (TSX)
+DESCRIPTION: Demonstrates how to import and configure the Image extension for reactjs-tiptap-editor. It shows how to add the extension to the editor's `extensions` array and provides an example implementation for the `upload` function, which handles file uploads and returns a promise resolving with the image URL.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Image/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Image } from 'reactjs-tiptap-editor/image'; // [!code ++]
+import 'react-image-crop/dist/ReactCrop.css'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Image.configure({// [!code ++]
+    upload: (files: File) => {// [!code ++]
+      return new Promise((resolve) => {// [!code ++]
+        setTimeout(() => {// [!code ++]
+          resolve(URL.createObjectURL(files))// [!code ++]
+        }, 500)// [!code ++]
+      })// [!code ++]
+    },// [!code ++]
+  }),// [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Customize Full Toolbar Rendering (JSX)
+DESCRIPTION: Shows how to provide a custom render function for the entire toolbar using the 'toolbar.render' prop on the RichTextEditor component. This function receives props, toolbar items, and DOM elements to allow complete control over the toolbar's appearance.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/toolbar.md#_snippet_1
+
+LANGUAGE: jsx
+CODE:
+```
+<RichTextEditor
+  toolbar={{
+    render: (props, toolbarItems, dom, containerDom) => {
+      return containerDom(dom)
+    }
+  }}
+/>
+```
+
+----------------------------------------
+
+TITLE: Accessing Editor Instance with useEditorState (TSX)
+DESCRIPTION: This snippet illustrates using the `useEditorState` hook to manage and access the editor instance. The hook provides `isReady`, `editor`, and `editorRef`. It shows how to attach `editorRef` to the `RichTextEditor` and use the `editor` object to call methods like `getText()` after checking if the editor is ready using `isReady`.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/customize.md#_snippet_4
+
+LANGUAGE: TSX
+CODE:
+```
+import RichTextEditor, { useEditorState } from 'reactjs-tiptap-editor'
+import { BaseKit } from 'reactjs-tiptap-editor/extension-bundle'
+import 'reactjs-tiptap-editor/style.css'
+
+const extensions = [BaseKit]
+
+export default function App() {
+  const { isReady, editor, editorRef } = useEditorState()
+
+  const handleCustomButton = () => {
+    if (editor) {
+      const text = editor.getText()
+      console.log('Current text:', text)
+    }
+  }
+
+  return (
+    <div>
+      <RichTextEditor
+        content=""""
+        output=""html""
+        ref={editorRef}
+        extensions={extensions}
+      />
+      {isReady && (
+        <button type=""button"" onClick={handleCustomButton}>
+          Custom Action
+        </button>
+      )}
+    </div>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Setting Editor Language (JavaScript)
+DESCRIPTION: This snippet shows how to import the 'locale' object from the locale-bundle and use the 'setLang' method to change the editor's language to a supported locale code, such as 'en' for English.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/internationalization.md#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+import { locale } from 'reactjs-tiptap-editor/locale-bundle';
+// Set the language to English
+locale.setLang('en');
+```
+
+----------------------------------------
+
+TITLE: Toolbar Property Interfaces (TS)
+DESCRIPTION: Defines the TypeScript interfaces for the properties related to toolbar items and the toolbar component itself, including 'ToolbarItemProps', 'ToolbarRenderProps', and 'ToolbarProps'. These interfaces specify the expected structure and types for customizing and rendering the toolbar.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/toolbar.md#_snippet_2
+
+LANGUAGE: ts
+CODE:
+```
+export interface ToolbarItemProps {
+  button: {
+    component: React.ComponentType<any>
+    componentProps: Record<string, any>
+  }
+  divider: boolean
+  spacer: boolean
+  type: string
+  name: string
+}
+export interface ToolbarRenderProps {
+  editor: Editor
+  disabled: boolean
+}
+export interface ToolbarProps {
+  render?: (props: ToolbarRenderProps, toolbarItems: ToolbarItemProps[], dom: JSX.Element[], containerDom: (innerContent: React.ReactNode) => React.ReactNode) => React.ReactNode
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring RichTextEditor with UseEditorOptions (TSX)
+DESCRIPTION: This snippet demonstrates how to create a configuration object conforming to the `UseEditorOptions` interface. It shows examples of defining callback functions for `onUpdate`, `onSelectionUpdate`, `onFocus`, and `onBlur`, and setting properties like `editable` and `autofocus`, then passing this object to the `useEditorOptions` prop of the `RichTextEditor` component.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/customize.md#_snippet_2
+
+LANGUAGE: TSX
+CODE:
+```
+import React from 'react'
+import RichTextEditor, { type UseEditorOptions } from 'reactjs-tiptap-editor'
+import { BaseKit } from 'reactjs-tiptap-editor/extension-bundle'
+import 'reactjs-tiptap-editor/style.css'
+
+const extensions = [BaseKit]
+
+const customOptions: UseEditorOptions = {
+  onUpdate: ({ editor }) => console.log('Content updated:', editor.getText()),
+  onSelectionUpdate: ({ editor }) => console.log('Selection updated:', editor.getText()),
+  onFocus: () => console.log('Editor focused'),
+  onBlur: () => console.log('Editor blurred'),
+  editable: true,
+  autofocus: 'start',
+}
+
+export default function App() {
+  return (
+    <RichTextEditor
+      content=""""
+      output=""html""
+      useEditorOptions={customOptions}
+      extensions={extensions}
+    />
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Video Extension in TSX
+DESCRIPTION: This snippet demonstrates how to import and configure the Video extension within a React Tiptap editor setup. It shows how to add the extension to the extensions array and provides an example implementation for the required 'upload' function, which handles file uploads and returns a promise resolving with the video URL.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Video/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Video } from 'reactjs-tiptap-editor/video';
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Video.configure({
+    upload: (files: File) => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(URL.createObjectURL(files))
+        }, 500)
+      })
+    }
+  })
+];
+```
+
+----------------------------------------
+
+TITLE: Accessing Editor Instance with useRef (TSX)
+DESCRIPTION: This snippet shows how to use the `useRef` hook to obtain a reference to the editor instance managed by the `RichTextEditor` component. It demonstrates how to attach the ref to the component and then access the editor object via `editorRef.current?.editor` to call methods like `getText()` from a custom button handler.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/customize.md#_snippet_3
+
+LANGUAGE: TSX
+CODE:
+```
+import React, { useRef } from 'react'
+import RichTextEditor, { type Editor } from 'reactjs-tiptap-editor'
+import { BaseKit } from 'reactjs-tiptap-editor/extension-bundle'
+import 'reactjs-tiptap-editor/style.css'
+
+const extensions = [BaseKit]
+
+export default function App() {
+  const editorRef = useRef<{ editor: Editor | null }>(null)
+
+  const handleCustomButton = () => {
+    if (editorRef.current?.editor) {
+      const text = editorRef.current.editor.getText()
+      console.log('Current selected text:', text)
+    }
+  }
+
+  return (
+    <div>
+      <RichTextEditor
+        content=""""
+        output=""html""
+        ref={editorRef}
+        extensions={extensions}
+      />
+      <button type=""button"" onClick={handleCustomButton}>
+        Custom Action
+      </button>
+    </div>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Toolbar Item Visibility (JS)
+DESCRIPTION: Demonstrates how to hide a specific toolbar item, such as the Bold button, by configuring its 'toolbar' property to false.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/toolbar.md#_snippet_0
+
+LANGUAGE: js
+CODE:
+```
+Bold.configure({
+  toolbar: false,
+})
+```
+
+----------------------------------------
+
+TITLE: Customizing Bubble Menu Render in RichTextEditor (JSX)
+DESCRIPTION: Provides a custom rendering function for the bubble menu using the `render` property within the `bubbleMenu` configuration, allowing replacement with a custom React component.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/bubble-menu.md#_snippet_2
+
+LANGUAGE: jsx
+CODE:
+```
+<RichTextEditor
+  {...otherProps}
+  bubbleMenu={{
+    render: (props, menuDom) => {
+      return <YourComponent />
+    },
+  }}
+/>
+```
+
+----------------------------------------
+
+TITLE: Configuring the Attachment Extension in TSX
+DESCRIPTION: This snippet demonstrates how to import and configure the Attachment extension for the reactjs-tiptap-editor. It shows how to add it to the extensions array and configure the required `upload` function, which handles file uploads to a server.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Attachment/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Attachment } from 'reactjs-tiptap-editor/attachment'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Attachment.configure({// [!code ++]
+    upload: (file: any) => {// [!code ++]
+      // upload file to server return url
+    },// [!code ++]
+  }),// [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Importing and Using History Extension in TSX
+DESCRIPTION: This snippet demonstrates how to import the History extension from 'reactjs-tiptap-editor/history' and include it in the list of extensions used by the editor. This is a required step to enable undo and redo features.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/History/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { History } from 'reactjs-tiptap-editor/history'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  History // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Using BaseKit Extension in React Tiptap
+DESCRIPTION: This code snippet demonstrates how to import the BaseKit extension and add it to the array of extensions used by the Tiptap editor instance. BaseKit is a fundamental extension required for most other extensions to function correctly.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/BaseKit/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { BaseKit } from 'reactjs-tiptap-editor'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  BaseKit // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Adding Custom Language Translations (JavaScript)
+DESCRIPTION: This example demonstrates how to add translations for a new, unsupported language code (e.g., 'fr') using the 'setMessage' method. It takes the language code and an object mapping translation keys to their translated strings.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/internationalization.md#_snippet_1
+
+LANGUAGE: javascript
+CODE:
+```
+locale.setMessage('fr', {
+  'editor.remove': 'Supprimer',
+  // ...
+});
+```
+
+----------------------------------------
+
+TITLE: Using the Document Extension in TSX
+DESCRIPTION: This snippet demonstrates how to import the Document extension from 'reactjs-tiptap-editor/document' and include it in the extensions array when initializing the editor. This is a required step to enable the core document node for the editor content.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Document/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Document } from 'reactjs-tiptap-editor/document'; // [!code ++]\n\nconst extensions = [\n  ...,\n  // Import Extensions Here\n  Document // [!code ++]\n];
+```
+
+----------------------------------------
+
+TITLE: Disabling Specific Bubble Menu in RichTextEditor (JSX)
+DESCRIPTION: Disables a specific bubble menu component, such as the text menu, by configuring the `bubbleMenu` property with the corresponding configuration field and setting `hidden` to `true`.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/bubble-menu.md#_snippet_1
+
+LANGUAGE: jsx
+CODE:
+```
+<RichTextEditor
+  {...otherProps}
+  bubbleMenu={{
+    textConfig: {
+      hidden: true,
+    }
+  }}
+/>
+```
+
+----------------------------------------
+
+TITLE: Overriding Default Language Translations (JavaScript)
+DESCRIPTION: This snippet illustrates how to override specific translations for an existing or new language code. It imports the default language data (e.g., 'en') and uses the spread operator within 'setMessage' to provide custom translations for certain keys.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/internationalization.md#_snippet_2
+
+LANGUAGE: javascript
+CODE:
+```
+import { en } from 'reactjs-tiptap-editor/locale-bundle';
+locale.setMessage('en_US', {
+  ...en,
+  'editor.remove': 'Delete',
+});
+```
+
+----------------------------------------
+
+TITLE: Configuring ImageGif Extension with API Key (TSX)
+DESCRIPTION: This code snippet demonstrates how to import and configure the ImageGif Tiptap editor extension in a React/TypeScript environment. It shows how to add the extension to the `extensions` array and configure it with the required `GIPHY_API_KEY`.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/ImageGif/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { ImageGif } from 'reactjs-tiptap-editor/imagegif'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  ImageGif.configure({// [!code ++]
+    GIPHY_API_KEY: 'GIPHY_API_KEY', // [!code ++]
+  }),// [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Integrate Mermaid Bubble Menu in reactjs-tiptap-editor (TSX)
+DESCRIPTION: Shows how to integrate the BubbleMenuMermaid component into the bubbleMenu prop of the RichTextEditor. It conditionally renders the bubble menu based on whether the 'mermaid' extension is active.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Mermaid/index.md#_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+import { BubbleMenuMermaid } from 'reactjs-tiptap-editor/bubble-extra'; // [!code ++]
+
+const App = () => {
+
+  return  <RichTextEditor
+    bubbleMenu={{
+      render({ extensionsNames, editor, disabled }, bubbleDefaultDom) {
+        return <>
+          {bubbleDefaultDom}
+
+          {extensionsNames.includes('mermaid')  ? <BubbleMenuMermaid disabled={disabled}
+            editor={editor}
+            key=""mermaid""
+          /> : null}
+        </>
+      },\n    }}
+  />
+}
+```
+
+----------------------------------------
+
+TITLE: Importing and Using ListItem Extension in TSX
+DESCRIPTION: This snippet demonstrates how to import the ListItem extension from the reactjs-tiptap-editor library and include it in the extensions array when initializing the editor.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/ListItem/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { ListItem } from 'reactjs-tiptap-editor/listitem'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  ListItem // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Configure Twitter Bubble Menu (TSX)
+DESCRIPTION: Demonstrates how to integrate the BubbleMenuTwitter component into the RichTextEditor's bubble menu configuration. It conditionally renders the Twitter bubble menu when the 'twitter' extension is active.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Twitter/index.md#_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+import { BubbleMenuTwitter } from 'reactjs-tiptap-editor/bubble-extra';
+
+const App = () => {
+
+  return  <RichTextEditor
+    bubbleMenu={{
+      render({ extensionsNames, editor, disabled }, bubbleDefaultDom) {
+        return <>
+          {bubbleDefaultDom}
+
+          {extensionsNames.includes('twitter')  ? <BubbleMenuTwitter disabled={disabled}
+            editor={editor}
+            key=""twitter""
+          /> : null}
+        </>
+      },
+    }}
+  />
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring LineHeight Options (JS)
+DESCRIPTION: Shows how to configure options for the LineHeight extension, specifically demonstrating how to customize the list of available line height values by combining the default list with additional values. Note: The provided code snippet uses `FontSize.configure` but is presented in the context of LineHeight options.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/LineHeight/index.md#_snippet_1
+
+LANGUAGE: js
+CODE:
+```
+import { DEFAULT_LINE_HEIGHT_LIST, LineHeight } from 'reactjs-tiptap-editor/lineheight'
+
+FontSize.configure({
+  LineHeight: [
+    // Use default line height list
+    ...DEFAULT_LINE_HEIGHT_LIST,
+    '1',
+    '1.5',
+    '2',
+    '2.5'
+  ]
+})
+```
+
+----------------------------------------
+
+TITLE: Disabling Bubble Menu in RichTextEditor (JSX)
+DESCRIPTION: Disables the entire bubble menu feature for the RichTextEditor component by setting the `hideBubble` property to `true`.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/bubble-menu.md#_snippet_0
+
+LANGUAGE: jsx
+CODE:
+```
+<RichTextEditor
+  {...otherProps}
+  hideBubble={true}
+/>
+```
+
+----------------------------------------
+
+TITLE: Configuring FontFamily List (JS)
+DESCRIPTION: This example shows how to configure the FontFamily extension to specify a custom list of available font families using the `fontFamilyList` option. The list can include strings for simple font names or objects with `name` and `value` properties for more control.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/FontFamily/index.md#_snippet_1
+
+LANGUAGE: js
+CODE:
+```
+import { DEFAULT_FONT_FAMILY_LIST, FontFamily } from 'reactjs-tiptap-editor/fontfamily'
+
+FontFamily.configure({
+  fontFamilyList: [
+    // Use default font list
+    ...DEFAULT_FONT_FAMILY_LIST,
+    // Two formats
+    //   1. string
+    //   2. { name: 'xxx', value: 'xxx' }
+
+    '黑体',
+    '楷体',
+    { name: '仿宋', value: '仿宋' },
+    'Arial',
+    'Tahoma',
+    'Verdana'
+  ]
+})
+```
+
+----------------------------------------
+
+TITLE: Adding Italic Extension to Tiptap Editor (TSX)
+DESCRIPTION: This snippet demonstrates how to import the Italic extension from 'reactjs-tiptap-editor' and include it in the 'extensions' array when configuring the Tiptap editor. This enables italic text formatting within the editor instance.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Italic/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Italic } from 'reactjs-tiptap-editor/italic'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Italic // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Importing and Using Heading Extension in TSX
+DESCRIPTION: This snippet demonstrates how to import the Heading extension from 'reactjs-tiptap-editor/heading' and add it to the list of extensions used in a TipTap editor configuration.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Heading/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Heading } from 'reactjs-tiptap-editor/heading'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Heading // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Using the TextUnderline Extension in React
+DESCRIPTION: This snippet demonstrates how to import the TextUnderline extension from the reactjs-tiptap-editor library and include it in the extensions array when initializing the TipTap editor. Adding this extension enables the text underlining functionality in the editor.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/TextUnderline/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { TextUnderline } from 'reactjs-tiptap-editor/textunderline'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  TextUnderline // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Integrate Bubble Menu Drawer Component (TSX)
+DESCRIPTION: Shows how to import the BubbleMenuDrawer component and integrate it into the RichTextEditor's custom bubble menu render function, conditionally rendering it based on whether the 'drawer' extension is active.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Drawer/index.md#_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+import { BubbleMenuDrawer } from 'reactjs-tiptap-editor/bubble-extra'; // [!code ++]
+
+const App = () => {
+
+  return  <RichTextEditor
+    bubbleMenu={{
+      render({ extensionsNames, editor, disabled }, bubbleDefaultDom) {
+        return <>
+          {bubbleDefaultDom}
+
+          {extensionsNames.includes('drawer')  ? <BubbleMenuDrawer disabled={disabled}
+            editor={editor}
+            key=""drawer""
+          /> : null}
+        </>
+      },
+    }}
+  />
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Excalidraw Bubble Menu in RichTextEditor (TSX)
+DESCRIPTION: This snippet demonstrates how to integrate a custom bubble menu component (`BubbleMenuExcalidraw`) for the Excalidraw extension within the `RichTextEditor`. It conditionally renders the Excalidraw menu when the extension is active.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Excalidraw/index.md#_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+import { BubbleMenuExcalidraw } from 'reactjs-tiptap-editor/bubble-extra';
+
+const App = () => {
+
+  return  <RichTextEditor
+    bubbleMenu={{
+      render({ extensionsNames, editor, disabled }, bubbleDefaultDom) {
+        return <>
+          {bubbleDefaultDom}
+
+          {extensionsNames.includes('excalidraw')  ? <BubbleMenuExcalidraw disabled={disabled}
+            editor={editor}
+            key=""excalidraw""
+          /> : null}
+        </>
+      },
+    }}
+  />
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Bubble Menu for Katex Extension in Tiptap Editor (TSX)
+DESCRIPTION: This snippet demonstrates how to integrate the BubbleMenuKatex component into the RichTextEditor's bubbleMenu render function, conditionally displaying it when the 'katex' extension is active.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Katex/index.md#_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+import { BubbleMenuKatex } from 'reactjs-tiptap-editor/bubble-extra';
+
+const App = () => {
+
+  return  <RichTextEditor
+    bubbleMenu={{
+      render({ extensionsNames, editor, disabled }, bubbleDefaultDom) {
+        return <>
+          {bubbleDefaultDom}
+
+          {extensionsNames.includes('katex')  ? <BubbleMenuKatex disabled={disabled}
+            editor={editor}
+            key=""katex""
+          /> : null}
+        </>
+      },
+    }}
+  />
+}
+```
+
+----------------------------------------
+
+TITLE: Configuring Font Sizes for FontSize Extension (JS)
+DESCRIPTION: This example demonstrates how to configure the 'fontSizes' option for the FontSize extension, allowing you to specify a custom list of available font sizes using string or object formats, in addition to the default list.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/FontSize/index.md#_snippet_1
+
+LANGUAGE: js
+CODE:
+```
+import { DEFAULT_FONT_SIZE_LIST, FontSize } from 'reactjs-tiptap-editor/fontsize'
+
+FontSize.configure({
+  fontSizes: [
+    // Use default font size list
+    ...DEFAULT_FONT_SIZE_LIST,
+    // Two formats
+    //   1. string
+    //   2. { name: 'xxx', value: 'xxx' }
+
+    '10px',
+    { name: '200 pixel', value: '200px' }
+  ]
+})
+```
+
+----------------------------------------
+
+TITLE: Configuring TextDirection Extension in reactjs-tiptap-editor (TSX)
+DESCRIPTION: This snippet demonstrates how to configure the TextDirection extension, specifying which node types it applies to, the allowed direction values, and the default direction.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/TextDirection/index.md#_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+import { TextDirection } from 'reactjs-tiptap-editor/textdirection';
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  TextDirection.configure({
+    types: ['heading', 'paragraph', 'blockquote', 'list_item'],
+    directions: ['ltr', 'rtl'],
+    defaultDirection: 'ltr',
+  })
+];
+```
+
+----------------------------------------
+
+TITLE: Importing and Using ExportWord Extension in TSX
+DESCRIPTION: This snippet demonstrates how to import the ExportWord extension from the reactjs-tiptap-editor library and add it to the list of extensions used by the Tiptap editor instance.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/ExportWord/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { ExportWord } from 'reactjs-tiptap-editor/exportword'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+   ExportWord, // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Importing and Using CodeBlock Extension in React Tiptap Editor (TSX)
+DESCRIPTION: Demonstrates how to import the `CodeBlock` extension and its required CSS files for syntax highlighting, and how to include the extension in the list of editor extensions.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/CodeBlock/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { CodeBlock } from 'reactjs-tiptap-editor/codeblock'; // [!code ++]
+
+import 'prism-code-editor-lightweight/layout.css'; // [!code ++]
+import 'prism-code-editor-lightweight/themes/github-dark.css'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  CodeBlock, // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Using BulletList Extension in React/TSX
+DESCRIPTION: This snippet demonstrates how to import the BulletList extension from the reactjs-tiptap-editor package and include it in the array of extensions used to configure the editor. It shows the necessary import statement and how to add the extension to the existing list.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/BulletList/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { BulletList } from 'reactjs-tiptap-editor/bulletlist'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  BulletList // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Adding FontSize Extension to reactjs-tiptap-editor (TSX)
+DESCRIPTION: This snippet shows how to import the FontSize extension and add it to the list of extensions used by the reactjs-tiptap-editor instance.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/FontSize/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { FontSize } from 'reactjs-tiptap-editor/fontsize'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  FontSize // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Adding OrderedList Extension to Editor
+DESCRIPTION: This snippet demonstrates how to import the OrderedList extension from the reactjs-tiptap-editor library and include it in the array of extensions used to configure the Tiptap editor instance.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/OrderedList/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { OrderedList } from 'reactjs-tiptap-editor/orderedlist'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  OrderedList // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Importing and Using ExportPdf Extension in TSX
+DESCRIPTION: This snippet demonstrates how to import the ExportPdf extension and add it to the extensions array when initializing the Tiptap editor.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/ExportPdf/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { ExportPdf } from 'reactjs-tiptap-editor/exportpdf'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+   ExportPdf, // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Configure Mermaid Extension in reactjs-tiptap-editor (TSX)
+DESCRIPTION: Demonstrates how to import and add the Mermaid extension to the list of extensions for the reactjs-tiptap-editor. It includes configuration options like the 'upload' function for handling file uploads.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Mermaid/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Mermaid } from 'reactjs-tiptap-editor/mermaid'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Mermaid.configure({// [!code ++]
+    upload: (file: any) => {// [!code ++]
+      // upload file to server return url
+    },// [!code ++]
+  }),// [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Importing COLORS_LIST for Reactjs-Tiptap-Editor (JS)
+DESCRIPTION: This snippet shows how to import the `COLORS_LIST` constant from `reactjs-tiptap-editor`. This constant provides a predefined array of color options that can be used with the `colors` option of the Color extension to customize the available color palette.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Color/index.md#_snippet_1
+
+LANGUAGE: js
+CODE:
+```
+import { COLORS_LIST } from 'reactjs-tiptap-editor'
+```
+
+----------------------------------------
+
+TITLE: Importing and Adding Blockquote Extension (TSX)
+DESCRIPTION: This snippet demonstrates how to import the Blockquote extension from the reactjs-tiptap-editor library and include it in the array of extensions used to configure a Tiptap editor instance in a React/TSX application.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Blockquote/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Blockquote } from 'reactjs-tiptap-editor/blockquote';
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Blockquote
+];
+```
+
+----------------------------------------
+
+TITLE: Importing and Adding Strike Extension in TSX
+DESCRIPTION: This snippet demonstrates how to import the Strike extension from the reactjs-tiptap-editor library and include it in the array of extensions used to configure the Tiptap editor instance.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Strike/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Strike } from 'reactjs-tiptap-editor/strike'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Strike // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Adding FontFamily Extension (TSX)
+DESCRIPTION: This snippet demonstrates how to import the FontFamily extension and include it in the list of extensions used by the reactjs-tiptap-editor. The extension is added to the `extensions` array, typically alongside other editor extensions.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/FontFamily/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { FontFamily } from 'reactjs-tiptap-editor/fontfamily';
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  FontFamily
+];
+```
+
+----------------------------------------
+
+TITLE: Importing and Using LineHeight Extension (TSX)
+DESCRIPTION: Demonstrates how to import the LineHeight extension from the library and include it in the list of extensions used by the React Tiptap editor component.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/LineHeight/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { LineHeight } from 'reactjs-tiptap-editor/lineheight';
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  LineHeight
+];
+```
+
+----------------------------------------
+
+TITLE: Importing and Using Code Extension in React/TSX
+DESCRIPTION: This snippet demonstrates how to import the Code extension from the library and include it in the list of extensions used by the editor.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Code/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Code } from 'reactjs-tiptap-editor/code'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Code // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Using the Bold Extension in React Tiptap
+DESCRIPTION: This snippet demonstrates how to import the Bold extension from the reactjs-tiptap-editor library and include it in the list of extensions provided to the Tiptap editor instance.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Bold/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Bold } from 'reactjs-tiptap-editor/bold'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Bold // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Importing and Adding TaskList Extension (TSX)
+DESCRIPTION: This snippet demonstrates how to import the TaskList extension from the 'reactjs-tiptap-editor/tasklist' module and add it to the list of editor extensions.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/TaskList/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { TaskList } from 'reactjs-tiptap-editor/tasklist'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  TaskList // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Importing and Using TextBubble Extension in TSX
+DESCRIPTION: This snippet demonstrates how to import the TextBubble extension from the reactjs-tiptap-editor library and add it to the list of extensions used in your Tiptap editor configuration.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/TextBubble/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { TextBubble } from 'reactjs-tiptap-editor/textbubble'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  TextBubble // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Adding Iframe Extension to Editor
+DESCRIPTION: This snippet demonstrates how to import the Iframe extension and add it to the list of extensions used by the reactjs-tiptap-editor.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Iframe/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Iframe } from 'reactjs-tiptap-editor/iframe'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Iframe // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Using the Clear Extension in TSX
+DESCRIPTION: This snippet demonstrates how to import the Clear extension and add it to the list of extensions used by the reactjs-tiptap-editor. The Clear extension allows clearing the editor's content.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Clear/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Clear } from 'reactjs-tiptap-editor/clear'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Clear // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Adding SubAndSuperScript Extension to Tiptap (TSX)
+DESCRIPTION: Imports the `SubAndSuperScript` extension from the `reactjs-tiptap-editor` package and includes it in the array of Tiptap editor extensions. This makes the subscript functionality available in the editor.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/SubAndSuperScript/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { SubAndSuperScript } from 'reactjs-tiptap-editor/subandsuperscript'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  SubAndSuperScript // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Adding FormatPainter Extension to reactjs-tiptap-editor
+DESCRIPTION: This snippet demonstrates how to import the FormatPainter extension and add it to the list of extensions used by the reactjs-tiptap-editor. It shows the necessary import statement and how to include the extension in the extensions array.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/FormatPainter/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { FormatPainter } from 'reactjs-tiptap-editor/formatpainter'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  FormatPainter // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Adding TextAlign Extension to Tiptap Editor (TSX)
+DESCRIPTION: This snippet demonstrates how to import the `TextAlign` extension from the `reactjs-tiptap-editor` package and include it in the `extensions` array when configuring a Tiptap editor instance. This step is necessary to enable text alignment features in the editor.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/TextAlign/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { TextAlign } from 'reactjs-tiptap-editor/textalign'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  TextAlign // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Importing and Adding Katex Extension to Tiptap Editor (TSX)
+DESCRIPTION: This snippet shows how to import the Katex extension and its required CSS, and then add it to the list of extensions used by the Tiptap editor instance.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Katex/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Katex } from 'reactjs-tiptap-editor/katex';
+
+import 'katex/dist/katex.min.css';
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+   Katex,
+];
+```
+
+----------------------------------------
+
+TITLE: Configure Drawer Extension (TSX)
+DESCRIPTION: Demonstrates how to import the Drawer node extension and its required CSS, and how to add it to the editor's extensions array with basic configuration, including a placeholder for the file upload logic.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Drawer/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Drawer } from 'reactjs-tiptap-editor/drawer'; // [!code ++]
+import 'easydrawer/styles.css'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Drawer.configure({// [!code ++]
+    upload: (file: any) => {// [!code ++]
+      // upload file to server return url
+    },// [!code ++]
+  }),// [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Using TextDirection Extension in reactjs-tiptap-editor (TSX)
+DESCRIPTION: This snippet shows the basic usage of the TextDirection extension by importing it from the extension bundle and adding it to the list of editor extensions.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/TextDirection/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { TextDirection } from 'reactjs-tiptap-editor/extension-bundle';
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  TextDirection
+];
+```
+
+----------------------------------------
+
+TITLE: Importing and Using ColumnActionButton in TSX
+DESCRIPTION: This snippet demonstrates how to import the ColumnActionButton component and include it in the list of extensions for the reactjs-tiptap-editor.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/MultiColumn/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { ColumnActionButton } from 'reactjs-tiptap-editor/multicolumn'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  ColumnActionButton,  // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Using the Indent Extension in reactjs-tiptap-editor (TSX)
+DESCRIPTION: This snippet demonstrates how to import and add the 'Indent' extension to the list of extensions used by the Tiptap editor instance. It shows the necessary import statement and how to include 'Indent' in the 'extensions' array.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Indent/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Indent } from 'reactjs-tiptap-editor/indent'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Indent // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Import and add ImportWord extension
+DESCRIPTION: Import the 'ImportWord' extension from 'reactjs-tiptap-editor/importword' and add it to the list of Tiptap extensions.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/ImportWord/index.md#_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+import { ImportWord } from 'reactjs-tiptap-editor/importword'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+   ImportWord, // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Importing and Using MoreMark Extension - TSX
+DESCRIPTION: This snippet demonstrates how to import the `MoreMark` extension from the `reactjs-tiptap-editor/moremark` package and add it to the `extensions` array when configuring a TipTap editor instance. Including `MoreMark` in the extensions array makes its provided marks available for use in the editor.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/MoreMark/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { MoreMark } from 'reactjs-tiptap-editor/moremark'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  MoreMark // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Adding Selection Extension to Editor (TSX)
+DESCRIPTION: This snippet demonstrates how to integrate the Selection extension into your reactjs-tiptap-editor instance. It requires importing the Selection class and including it in the array of extensions provided to the editor configuration.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Selection/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Selection } from 'reactjs-tiptap-editor/selection'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Selection // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Importing and Adding Emoji Extension (TSX)
+DESCRIPTION: This snippet demonstrates how to import the `Emoji` extension from the library and add it to the list of extensions used by the editor instance.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Emoji/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Emoji } from 'reactjs-tiptap-editor/emoji'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+   Emoji, // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Importing and Adding Highlight Extension in TSX
+DESCRIPTION: This snippet shows how to import the `Highlight` extension from the `reactjs-tiptap-editor/highlight` path and include it in the array of extensions used to initialize a Tiptap editor instance.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Highlight/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Highlight } from 'reactjs-tiptap-editor/highlight'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Highlight // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Adding Mention Extension to Tiptap Editor (TSX)
+DESCRIPTION: This snippet demonstrates how to import the Mention extension from the reactjs-tiptap-editor library and include it in the array of extensions used to initialize the Tiptap editor.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Mention/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Mention } from 'reactjs-tiptap-editor/mention'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Mention // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Importing and Adding Link Extension
+DESCRIPTION: This snippet demonstrates how to import the Link extension from the reactjs-tiptap-editor library and add it to the array of extensions used when initializing the editor.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Link/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Link } from 'reactjs-tiptap-editor/link'; // [!code ++]\n\nconst extensions = [\n  ...,\n  // Import Extensions Here\n  Link // [!code ++]\n];
+```
+
+----------------------------------------
+
+TITLE: Using TrailingNode Extension in TSX
+DESCRIPTION: This snippet demonstrates how to import the TrailingNode extension and add it to the list of extensions used by the reactjs-tiptap-editor.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/TrailingNode/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { TrailingNode } from 'reactjs-tiptap-editor/trailingnode';
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  TrailingNode
+];
+```
+
+----------------------------------------
+
+TITLE: Integrating Color Extension in Reactjs-Tiptap-Editor (TSX)
+DESCRIPTION: This snippet demonstrates how to import and include the `Color` extension into the `extensions` array for a `reactjs-tiptap-editor` instance. It shows the necessary import statement and its placement within the editor's configuration to enable color functionality.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Color/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Color } from 'reactjs-tiptap-editor/color';
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Color
+];
+```
+
+----------------------------------------
+
+TITLE: Importing SearchAndReplace Extension (TSX)
+DESCRIPTION: This snippet demonstrates how to import the SearchAndReplace extension and include it in the array of extensions used by the Tiptap editor instance in a React/TSX application. It shows the required import statement and how to add the extension to the existing extensions array.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/SearchAndReplace/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { SearchAndReplace } from 'reactjs-tiptap-editor/searchandreplace'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+   SearchAndReplace, // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Adding Excalidraw Extension to Tiptap Editor (TSX)
+DESCRIPTION: This snippet shows how to import and add the Excalidraw extension to the list of extensions used by the Tiptap editor instance. It requires importing the `Excalidraw` class from the library.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Excalidraw/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Excalidraw } from 'reactjs-tiptap-editor/excalidraw';
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Excalidraw
+];
+```
+
+----------------------------------------
+
+TITLE: Importing and Using TableOfContents Extension in TSX
+DESCRIPTION: This snippet shows how to import the TableOfContents extension from the reactjs-tiptap-editor library and include it in the array of extensions used by the editor. The `[!code ++]` annotations highlight the lines added for this extension.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/TableOfContents/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { TableOfContents } from 'reactjs-tiptap-editor/tableofcontent'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  TableOfContents // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Add Twitter Extension to Tiptap Editor (TSX)
+DESCRIPTION: Imports the Twitter node extension and adds it to the list of extensions used by the Tiptap editor instance. This makes the Twitter node available for use in the editor content.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Twitter/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Twitter } from 'reactjs-tiptap-editor/twitter';
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Twitter
+];
+```
+
+----------------------------------------
+
+TITLE: Adding SlashCommand Extension to Editor
+DESCRIPTION: This snippet demonstrates how to import the SlashCommand extension from the reactjs-tiptap-editor library and include it in the array of extensions used when initializing the editor. This is a required step to enable the slash command functionality.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/SlashCommand/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { SlashCommand } from 'reactjs-tiptap-editor/slashcommand'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  SlashCommand // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Adding Table Extension - TSX
+DESCRIPTION: This snippet shows how to import the Table extension from the reactjs-tiptap-editor library and add it to the array of extensions used when initializing the editor.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Table/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { Table } from 'reactjs-tiptap-editor/table'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  Table // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Using HorizontalRule Extension in React TipTap
+DESCRIPTION: This snippet shows how to import the HorizontalRule extension and include it in the array of extensions provided to the TipTap editor instance. This step is necessary to enable the horizontal rule functionality in the editor.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/HorizontalRule/index.md#_snippet_0
+
+LANGUAGE: tsx
+CODE:
+```
+import { HorizontalRule } from 'reactjs-tiptap-editor/horizontalrule'; // [!code ++]
+
+const extensions = [
+  ...,
+  // Import Extensions Here
+  HorizontalRule // [!code ++]
+];
+```
+
+----------------------------------------
+
+TITLE: Importing DEFAULT_COLOR for Reactjs-Tiptap-Editor (JS)
+DESCRIPTION: This snippet demonstrates how to import the `DEFAULT_COLOR` constant from `reactjs-tiptap-editor`. This constant can be used to set a default color for the Color extension, overriding the extension's internal default and providing a specific initial color.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Color/index.md#_snippet_2
+
+LANGUAGE: js
+CODE:
+```
+import { DEFAULT_COLOR } from 'reactjs-tiptap-editor'
+```
+
+----------------------------------------
+
+TITLE: Install reactjs-tiptap-editor for React < 18
+DESCRIPTION: Provides commands to install a specific version (0.1.16) of the reactjs-tiptap-editor library using npm, pnpm, or yarn, required for projects using React versions less than 18.0.0.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/guide/getting-started.md#_snippet_1
+
+LANGUAGE: sh
+CODE:
+```
+npm install reactjs-tiptap-editor@0.1.16
+```
+
+LANGUAGE: sh
+CODE:
+```
+pnpm install reactjs-tiptap-editor@0.1.16
+```
+
+LANGUAGE: sh
+CODE:
+```
+yarn add reactjs-tiptap-editor@0.1.16
+```
+
+----------------------------------------
+
+TITLE: Defining Image Extension Options Interface (TS)
+DESCRIPTION: Defines the `IImageOptions` interface used to configure the Image extension. It includes properties for the upload function, HTML attributes, accepted MIME types, maximum size, and the resource type ('upload', 'link', or 'both').
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Image/index.md#_snippet_1
+
+LANGUAGE: ts
+CODE:
+```
+interface IImageOptions extends GeneralOptions<IImageOptions> {
+  /** Function for uploading files */
+  upload?: (file: File) => Promise<string>
+
+  HTMLAttributes?: any
+
+  acceptMimes?: string[]
+  maxSize?: number
+
+  /** The source URL of the image */
+  resourceImage: 'upload' | 'link' | 'both'
+}
+```
+
+----------------------------------------
+
+TITLE: Video Extension Options Interface in TypeScript
+DESCRIPTION: This TypeScript interface defines the configuration options available for the Video extension. It includes properties such as 'allowFullscreen', 'frameborder', 'width', 'HTMLAttributes' for custom attributes, an optional 'upload' function for file handling, and 'resourceVideo' to specify the source type.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/Video/index.md#_snippet_1
+
+LANGUAGE: ts
+CODE:
+```
+interface VideoOptions extends GeneralOptions<VideoOptions> {
+  /**
+   * Indicates whether fullscreen play is allowed
+   *
+   * @default true
+   */
+  allowFullscreen: boolean
+  /**
+   * Indicates whether to display the frameborder
+   *
+   * @default false
+   */
+  frameborder: boolean
+  /**
+   * Width of the video, can be a number or string
+   *
+   * @default VIDEO_SIZE['size-medium']
+   */
+  width: number | string
+  /** HTML attributes object for passing additional attributes */
+  HTMLAttributes: {
+    [key: string]: any
+  }
+  /** Function for uploading files */
+  upload?: (file: File) => Promise<string>
+
+  /** The source URL of the video */
+  resourceVideo: 'upload' | 'link' | 'both'
+}
+```
+
+----------------------------------------
+
+TITLE: Install mammoth dependency
+DESCRIPTION: Install the required 'mammoth' package using npm, pnpm, or yarn package managers.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/docs/extensions/ImportWord/index.md#_snippet_0
+
+LANGUAGE: sh
+CODE:
+```
+npm install mammoth
+```
+
+LANGUAGE: sh
+CODE:
+```
+pnpm install mammoth
+```
+
+LANGUAGE: sh
+CODE:
+```
+yarn add mammoth
+```
+
+----------------------------------------
+
+TITLE: Install Dependencies with pnpm (Bash)
+DESCRIPTION: Installs all project dependencies using the pnpm package manager. Ensure pnpm is installed globally before running this command.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/CONTRIBUTING.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+pnpm install
+```
+
+----------------------------------------
+
+TITLE: Build Library in Development Mode (Bash)
+DESCRIPTION: Executes the npm script to build the project's library in development mode. This step is necessary before starting the playground or demo server.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/CONTRIBUTING.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+npm run build:lib:dev
+```
+
+----------------------------------------
+
+TITLE: Start Demo Server/Playground (Bash)
+DESCRIPTION: Runs the npm script to start the local demo server or playground, allowing developers to test components and see changes in real-time.
+SOURCE: https://github.com/hunghg255/reactjs-tiptap-editor/blob/main/CONTRIBUTING.md#_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+npm run playground
+```","react-js",""

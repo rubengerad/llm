@@ -1,0 +1,448 @@
+"jenkins","TITLE: Building Jenkins WAR File with Maven
+DESCRIPTION: Command to build jenkins.war file quickly without running tests using Maven quick-build profile
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/CONTRIBUTING.md#2025-04-14_snippet_0
+
+LANGUAGE: sh
+CODE:
+```
+mvn -am -pl war,bom -Pquick-build clean install
+```
+
+----------------------------------------
+
+TITLE: Launching Jenkins Development Instance
+DESCRIPTION: Command to start a development instance of Jenkins using Maven and Jetty with necessary Java module permissions
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/CONTRIBUTING.md#2025-04-14_snippet_1
+
+LANGUAGE: sh
+CODE:
+```
+MAVEN_OPTS='--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED' mvn -pl war jetty:run
+```
+
+----------------------------------------
+
+TITLE: Running Jenkins with Frontend Dev Server
+DESCRIPTION: Command to start Jenkins development server without processing frontend assets
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/CONTRIBUTING.md#2025-04-14_snippet_3
+
+LANGUAGE: sh
+CODE:
+```
+MAVEN_OPTS='--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED' mvn -pl war jetty:run -Dskip.yarn
+```
+
+----------------------------------------
+
+TITLE: Setting Up Node and Yarn Path
+DESCRIPTION: Command to add downloaded Node.js and Yarn to system PATH for frontend development
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/CONTRIBUTING.md#2025-04-14_snippet_2
+
+LANGUAGE: sh
+CODE:
+```
+export PATH=$PWD/node:$PWD/node/node_modules/corepack/shims:$PATH
+```
+
+----------------------------------------
+
+TITLE: Fixing Backend Code Style Issues
+DESCRIPTION: Command to automatically fix backend code style issues using Spotless
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/CONTRIBUTING.md#2025-04-14_snippet_4
+
+LANGUAGE: sh
+CODE:
+```
+mvn spotless:apply
+```
+
+----------------------------------------
+
+TITLE: Running Frontend Linting
+DESCRIPTION: Command to check frontend code for style issues
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/CONTRIBUTING.md#2025-04-14_snippet_5
+
+LANGUAGE: sh
+CODE:
+```
+yarn lint
+```
+
+----------------------------------------
+
+TITLE: Fixing Frontend Code Style Issues
+DESCRIPTION: Command to automatically fix frontend code style issues
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/CONTRIBUTING.md#2025-04-14_snippet_6
+
+LANGUAGE: sh
+CODE:
+```
+yarn lint:fix
+```
+
+----------------------------------------
+
+TITLE: Determining Whitelist Entries Script
+DESCRIPTION: Groovy script to determine whitelist entries for methods and fields in a given class, useful for administrators who need to customize their whitelist.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/core/src/main/resources/jenkins/security/stapler/default-whitelist.txt#2025-04-14_snippet_0
+
+LANGUAGE: groovy
+CODE:
+```
+com.acme.package.ClassName.class.methods.each {
+  println new org.kohsuke.stapler.Function.InstanceFunction(it).signature
+}
+com.acme.package.ClassName.class.fields.each {
+  println org.kohsuke.stapler.lang.FieldRef.wrap(it).signature
+}
+```
+
+----------------------------------------
+
+TITLE: Plugin Whitelist Configuration
+DESCRIPTION: Whitelist configuration entries for various Jenkins plugins including Credentials, JUnit, Metrics, Pipeline, and other plugins. Each entry specifies allowed methods and fields for Stapler request dispatching.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/core/src/main/resources/jenkins/security/stapler/default-whitelist.txt#2025-04-14_snippet_1
+
+LANGUAGE: text
+CODE:
+```
+method com.cloudbees.plugins.credentials.CredentialsSelectHelper getResolver java.lang.String
+method com.cloudbees.plugins.credentials.CredentialsSelectHelper$WrappedContextResolver getProvider java.lang.String
+method com.cloudbees.plugins.credentials.CredentialsStoreAction$DomainWrapper getCredentials
+
+class hudson.tasks.junit.History
+
+method jenkins.metrics.api.MetricsRootAction getCurrentUser
+
+method org.jenkinsci.plugins.workflow.job.WorkflowRun getExecution
+method org.jenkinsci.plugins.workflow.job.views.FlowGraphTableAction getFlowGraph
+
+field hudson.maven.reporters.MavenArtifactRecord attachedArtifacts
+```
+
+----------------------------------------
+
+TITLE: Defining Plugin Dependency Cycle Breaking Rules in Jenkins
+DESCRIPTION: Configuration that specifies which plugin dependency relationships should be ignored to break cycles in the plugin loading process. This is referenced by ClassicPluginStrategy.BREAK_CYCLES and used by plugin-compat-tester according to JENKINS-47634. The file contains multiple sections addressing different cycle issues.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/core/src/main/resources/jenkins/split-plugin-cycles.txt#2025-04-14_snippet_0
+
+LANGUAGE: properties
+CODE:
+```
+# See ClassicPluginStrategy.BREAK_CYCLES. As of JENKINS-47634 also used by plugin-compat-tester.
+# JENKINS-28942 could make this obsolete.
+
+credentials matrix-auth
+
+script-security antisamy-markup-formatter
+script-security bouncycastle-api
+script-security command-launcher
+script-security matrix-auth
+script-security matrix-project
+
+# Weird unexpected cycle that showed up during testing of this new plugin
+# so breaking all potential cycles until JENKINS-28942
+# FIXME: remove when JENKINS-28942 is in (and used in the JAXB plugin)
+script-security jaxb
+maven-plugin jaxb
+subversion jaxb
+cvs jaxb
+ant jaxb
+javadoc jaxb
+external-monitor-job jaxb
+ldap jaxb
+pam-auth jaxb
+mailer jaxb
+matrix-auth jaxb
+antisamy-markup-formatter jaxb
+matrix-project jaxb
+junit jaxb
+bouncycastle-api jaxb
+command-launcher jaxb
+jdk-tool jaxb
+
+javax-activation-api javax-mail-api
+javax-activation-api sshd
+javax-mail-api sshd
+
+# JENKINS-55582
+bouncycastle-api instance-identity
+bouncycastle-api sshd
+javax-activation-api instance-identity
+javax-mail-api instance-identity
+```
+
+----------------------------------------
+
+TITLE: Configuring Jenkins Stapler Whitelist Format Example
+DESCRIPTION: Example demonstrating the format for configuring allowed/denied views for model classes in the whitelist configuration. Shows how to specify the fully qualified class name followed by space-separated view names, with optional denial prefix (!).
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/core/src/main/resources/jenkins/security/stapler/default-views-whitelist.txt#2025-04-14_snippet_0
+
+LANGUAGE: properties
+CODE:
+```
+io.jenkins.plugins.example.ModelClass viewA viewB !viewC
+```
+
+----------------------------------------
+
+TITLE: Configuring Jenkins Plugin Label Mappings
+DESCRIPTION: Defines label pairs that need to be unified across plugins while maintaining compatibility with older Jenkins core versions. Each line represents a mapping from an old label to a new standardized label.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/core/src/main/resources/jenkins/canonical-labels.txt#2025-04-14_snippet_0
+
+LANGUAGE: plaintext
+CODE:
+```
+library api-plugin
+slaves agent
+```
+
+----------------------------------------
+
+TITLE: Defining Jenkins Plugin Detachment Information
+DESCRIPTION: This code snippet defines a list of Jenkins plugins that have been detached from the core. Each line represents a plugin and includes its ID, last core release version, and implied plugin version. Some entries also include comments with additional information or references to specific JIRA issues.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/core/src/main/resources/jenkins/split-plugins.txt#2025-04-14_snippet_0
+
+LANGUAGE: plaintext
+CODE:
+```
+maven-plugin 1.296 1.296
+subversion 1.310 1.0
+cvs 1.340 0.1
+ant 1.430 1.0
+javadoc 1.430 1.0
+external-monitor-job 1.467 1.0
+ldap 1.467 1.0
+pam-auth 1.467 1.0
+mailer 1.493 1.2
+matrix-auth 1.535 1.0.2
+antisamy-markup-formatter 1.553 1.0
+matrix-project 1.561 1.0
+junit 1.577 1.0
+bouncycastle-api 2.16 2.16.0
+# JENKINS-47393
+command-launcher 2.86 1.0
+# JENKINS-22367
+jdk-tool 2.112 1.0
+
+# JENKINS-55681
+jaxb 2.163 2.3.0
+
+#JENKINS-43610 Split Trilead out from Core
+trilead-api 2.184 1.0.4
+
+# JENKINS-64107
+sshd 2.281 3.236.ved5e1b_cb_50b_2
+
+javax-activation-api 2.330 1.2.0-2
+javax-mail-api 2.330 1.6.2-5
+
+# JENKINS-55582
+instance-identity 2.356 3.1
+```
+
+----------------------------------------
+
+TITLE: Configuring Robot Exclusion Standard for Jenkins Server
+DESCRIPTION: A standard robots.txt file that instructs all web crawlers to avoid indexing or traversing any part of the Jenkins server. This prevents search engine bots and other crawlers from accidentally triggering builds by following links.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/war/src/main/webapp/robots.txt#2025-04-14_snippet_0
+
+LANGUAGE: robots.txt
+CODE:
+```
+# we don't want robots to click ""build"" links
+User-agent: *
+Disallow: /
+```
+
+----------------------------------------
+
+TITLE: Coverity Plugin Views Configuration
+DESCRIPTION: Configuration entries for the Coverity plugin, allowing checkConfig and defectFilters views for respective descriptor classes.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/core/src/main/resources/jenkins/security/stapler/default-views-whitelist.txt#2025-04-14_snippet_4
+
+LANGUAGE: properties
+CODE:
+```
+jenkins.plugins.coverity.CheckConfig$DescriptorImpl checkConfig
+jenkins.plugins.coverity.CIMStream$DescriptorImpl defectFilters
+```
+
+----------------------------------------
+
+TITLE: Sounds Plugin View Configuration
+DESCRIPTION: Whitelist configuration for the Sounds plugin, allowing the jsonpdemo view for SoundsAgentAction class.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/core/src/main/resources/jenkins/security/stapler/default-views-whitelist.txt#2025-04-14_snippet_5
+
+LANGUAGE: properties
+CODE:
+```
+net.hurstfrost.hudson.sounds.SoundsAgentAction jsonpdemo
+```
+
+----------------------------------------
+
+TITLE: Gerrit Trigger Plugin View Configuration
+DESCRIPTION: Whitelist configuration for the Gerrit Trigger plugin, allowing the help-Search view for the ManualTriggerAction class.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/core/src/main/resources/jenkins/security/stapler/default-views-whitelist.txt#2025-04-14_snippet_1
+
+LANGUAGE: properties
+CODE:
+```
+com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.actions.manual.ManualTriggerAction help-Search
+```
+
+----------------------------------------
+
+TITLE: Dependency Graph View Plugin Configuration
+DESCRIPTION: Configuration for the Dependency Graph View plugin, allowing the jsplumb view for AbstractDependencyGraphAction class.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/core/src/main/resources/jenkins/security/stapler/default-views-whitelist.txt#2025-04-14_snippet_2
+
+LANGUAGE: properties
+CODE:
+```
+hudson.plugins.depgraph_view.AbstractDependencyGraphAction jsplumb
+```
+
+----------------------------------------
+
+TITLE: Multi-Slave Config Plugin View Configuration
+DESCRIPTION: Whitelist entry for the Multi-Slave Config plugin, permitting the slavefilter view for NodeManageLink class.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/core/src/main/resources/jenkins/security/stapler/default-views-whitelist.txt#2025-04-14_snippet_3
+
+LANGUAGE: properties
+CODE:
+```
+com.sonyericsson.hudson.plugins.multislaveconfigplugin.NodeManageLink slavefilter
+```
+
+----------------------------------------
+
+TITLE: SCM2Job Plugin View Configuration
+DESCRIPTION: Configuration entry for the SCM2Job plugin, permitting the showResultsPlain view for SCM2Job class.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/core/src/main/resources/jenkins/security/stapler/default-views-whitelist.txt#2025-04-14_snippet_6
+
+LANGUAGE: properties
+CODE:
+```
+com.unitedinternet.jenkins.plugins.scm2job.SCM2Job showResultsPlain
+```
+
+----------------------------------------
+
+TITLE: Serenity Plugin View Configuration
+DESCRIPTION: Whitelist entry for the Serenity plugin, allowing the nocoverage view for SerenityProjectAction class.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/core/src/main/resources/jenkins/security/stapler/default-views-whitelist.txt#2025-04-14_snippet_7
+
+LANGUAGE: properties
+CODE:
+```
+com.ikokoon.serenity.hudson.SerenityProjectAction nocoverage
+```
+
+----------------------------------------
+
+TITLE: Pipeline Config History Plugin View Configuration
+DESCRIPTION: Configuration for the Pipeline Config History plugin, allowing the configSingleFile view for PipelineConfigHistoryProjectAction class.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/core/src/main/resources/jenkins/security/stapler/default-views-whitelist.txt#2025-04-14_snippet_8
+
+LANGUAGE: properties
+CODE:
+```
+org.jenkinsci.plugins.pipelineConfigHistory.view.PipelineConfigHistoryProjectAction configSingleFile
+```
+
+----------------------------------------
+
+TITLE: Custom Object Retrieval Methods in StaticRoutingDecisionProviderTest
+DESCRIPTION: Method declarations for retrieving custom objects in Jenkins security Stapler routing test implementation. These methods are part of the ContentProvider inner class and handle custom object routing scenarios.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/test/src/test/resources/jenkins/security/stapler/StaticRoutingDecisionProvider2Test/whitelist_multiline/stapler-whitelist.txt#2025-04-14_snippet_0
+
+LANGUAGE: java
+CODE:
+```
+method jenkins.security.stapler.StaticRoutingDecisionProviderTest$ContentProvider getObjectCustom
+method jenkins.security.stapler.StaticRoutingDecisionProviderTest$ContentProvider getObjectCustom2
+```
+
+----------------------------------------
+
+TITLE: Configuring Jenkins Stapler Dispatch Validator Test Paths
+DESCRIPTION: Defines whitelisted paths for testing Stapler dispatch validation in Jenkins security. Lists root path with fragment restriction and extended whitelisted root path.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/test/src/test/resources/jenkins/security/stapler/StaplerDispatchValidatorTest/whitelist.txt#2025-04-14_snippet_0
+
+LANGUAGE: text
+CODE:
+```
+jenkins.security.stapler.StaplerDispatchValidatorTest$Whitelist root !frag
+jenkins.security.stapler.StaplerDispatchValidatorTest$Extended whitelistedRoot
+```
+
+----------------------------------------
+
+TITLE: Jenkins Build Signature Validation Log
+DESCRIPTION: Log output showing results of signature validation checks, where signatures 1 and 3 passed validation while signatures 2 and 4 failed validation.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/test/src/test/resources/jenkins/security/stapler/StaticRoutingDecisionProvider2Test/greylist_multiline/stapler-whitelist.txt#2025-04-14_snippet_0
+
+LANGUAGE: log
+CODE:
+```
+signature-1-ok
+!signature-2-not-ok
+signature-3-ok
+!signature-4-not-ok
+```
+
+----------------------------------------
+
+TITLE: Defining Signature 1 Template in Jenkins
+DESCRIPTION: This code defines the first signature template labeled 'signature-1' followed by an empty line.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/test/src/test/resources/jenkins/security/stapler/StaticRoutingDecisionProvider2Test/whitelist_emptyline/stapler-whitelist.txt#2025-04-14_snippet_0
+
+LANGUAGE: plaintext
+CODE:
+```
+signature-1
+# just an empty line
+```
+
+----------------------------------------
+
+TITLE: Defining Signature 2 Template with Exclamation Mark Formatting
+DESCRIPTION: This code defines the second signature template with comments explaining exclamation mark formatting - one with space after it and one with no space.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/test/src/test/resources/jenkins/security/stapler/StaticRoutingDecisionProvider2Test/whitelist_emptyline/stapler-whitelist.txt#2025-04-14_snippet_1
+
+LANGUAGE: plaintext
+CODE:
+```
+signature-2
+# space after the exclamation mark
+!      
+# no space
+!
+```
+
+----------------------------------------
+
+TITLE: Defining Signature 3 Template in Jenkins
+DESCRIPTION: This code defines the third signature template labeled 'signature-3'.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/test/src/test/resources/jenkins/security/stapler/StaticRoutingDecisionProvider2Test/whitelist_emptyline/stapler-whitelist.txt#2025-04-14_snippet_2
+
+LANGUAGE: plaintext
+CODE:
+```
+signature-3
+```
+
+----------------------------------------
+
+TITLE: Configuring Jenkins Inclusion/Exclusion List
+DESCRIPTION: This snippet defines a list of items to be included or excluded in a Jenkins configuration. Lines without '#' are included, while lines starting with '#' are treated as comments or excluded items.
+SOURCE: https://github.com/jenkinsci/jenkins/blob/master/test/src/test/resources/jenkins/security/stapler/StaticRoutingDecisionProvider2Test/comment_ignored/stapler-whitelist.txt#2025-04-14_snippet_0
+
+LANGUAGE: Plain Text
+CODE:
+```
+this-one-is
+this-one-also
+```","jenkins",""

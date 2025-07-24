@@ -1,0 +1,109 @@
+"mcp gcp","TITLE: Installing Dependencies for WinTerm MCP npm
+DESCRIPTION: This npm command installs all the necessary project dependencies listed in the package.json file. It must be run from the project's root directory after cloning the repository.
+SOURCE: https://github.com/capecoma/winterm-mcp/blob/master/README.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+npm install
+```
+
+----------------------------------------
+
+TITLE: Building WinTerm MCP Project npm
+DESCRIPTION: This npm command executes the build script defined in package.json, which compiles the project source code. The resulting build artifacts, including the main index.js file, are required to run the server.
+SOURCE: https://github.com/capecoma/winterm-mcp/blob/master/README.md#_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+npm run build
+```
+
+----------------------------------------
+
+TITLE: Cloning the WinTerm MCP Repository Bash
+DESCRIPTION: These bash commands clone the WinTerm MCP source code repository from GitHub and navigate into the project directory. This is the first step required to set up the project locally for installation or development.
+SOURCE: https://github.com/capecoma/winterm-mcp/blob/master/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+git clone https://github.com/capecoma/winterm-mcp.git
+cd winterm-mcp
+```
+
+----------------------------------------
+
+TITLE: Example write_to_terminal Tool Call JSON
+DESCRIPTION: This JSON snippet demonstrates the payload structure for calling the `write_to_terminal` tool. It includes a `command` parameter containing the string that will be sent to the terminal, effectively executing it or writing it as input.
+SOURCE: https://github.com/capecoma/winterm-mcp/blob/master/README.md#_snippet_4
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""command"": ""echo Hello, World!""
+}
+```
+
+----------------------------------------
+
+TITLE: Example read_terminal_output Tool Call JSON
+DESCRIPTION: This JSON snippet illustrates the payload structure for invoking the `read_terminal_output` tool. The `linesOfOutput` parameter specifies the number of lines from the terminal's recent output history that should be retrieved by the server.
+SOURCE: https://github.com/capecoma/winterm-mcp/blob/master/README.md#_snippet_5
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""linesOfOutput"": 5
+}
+```
+
+----------------------------------------
+
+TITLE: Example send_control_character Tool Call JSON
+DESCRIPTION: This JSON snippet provides an example payload for the `send_control_character` tool. The `letter` parameter indicates which control character combination (e.g., 'C' for Ctrl+C) should be sent to the active terminal session.
+SOURCE: https://github.com/capecoma/winterm-mcp/blob/master/README.md#_snippet_6
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""letter"": ""C""
+}
+```
+
+----------------------------------------
+
+TITLE: Running WinTerm MCP in Development Mode npm
+DESCRIPTION: This npm command starts the project in development mode, which typically includes features like automatic code rebuilding or hot-reloading upon file changes. It is useful for developers actively working on the WinTerm MCP source code.
+SOURCE: https://github.com/capecoma/winterm-mcp/blob/master/README.md#_snippet_7
+
+LANGUAGE: bash
+CODE:
+```
+npm run dev
+```
+
+----------------------------------------
+
+TITLE: Configuring Claude Desktop for WinTerm MCP JSON
+DESCRIPTION: This JSON snippet shows the configuration required to integrate WinTerm MCP as an MCP server in the Claude Desktop application. It specifies the command to run the server (node), the path to the built index.js file as arguments, and enables the server.
+SOURCE: https://github.com/capecoma/winterm-mcp/blob/master/README.md#_snippet_3
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""mcpServers"": {
+    ""github.com/capecoma/winterm-mcp"": {
+      ""command"": ""node"",
+      ""args"": [""path/to/build/index.js""],
+      ""disabled"": false,
+      ""autoApprove"": []
+    }
+  }
+}
+```","mcp gcp",""

@@ -1,0 +1,2490 @@
+"android","TITLE: Android Q Beta 1 API Additions
+DESCRIPTION: This section lists the new APIs introduced with Android Q Beta 1. These include MIDI support, Binder extensions, and other API enhancements.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r20.md#_snippet_1
+
+LANGUAGE: APIDOC
+CODE:
+```
+Android Q Beta 1 APIs:
+  - MIDI (<amidi/AMidi.h>)
+  - Binder
+  - Extensions to several APIs from previous releases
+```
+
+----------------------------------------
+
+TITLE: New APIs in Android Q Beta 1 (NDK)
+DESCRIPTION: Android Q Beta 1 introduces new APIs accessible via the NDK. Key additions include support for MIDI functionality through <amidi/AMidi.h> and enhancements to Binder. Several existing APIs also received extensions.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r20-beta1.md#_snippet_1
+
+LANGUAGE: APIDOC
+CODE:
+```
+New APIs:
+  - MIDI (via <amidi/AMidi.h>)
+  - Binder
+  - Extensions to existing APIs
+```
+
+----------------------------------------
+
+TITLE: Android Q Beta 2 NDK APIs
+DESCRIPTION: This section lists the new APIs introduced in Android Q Beta 2 for the NDK. These include new functionalities for MIDI and Binder, along with extensions to several existing APIs from previous releases, providing developers with expanded capabilities.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r20-beta2.md#_snippet_2
+
+LANGUAGE: APIDOC
+CODE:
+```
+Android Q Beta 2 NDK APIs:
+  - MIDI:
+      Header: <amidi/AMidi.h>
+      Description: Provides functionality for MIDI operations.
+  - Binder:
+      Description: Core Android inter-process communication mechanism.
+  - Extensions:
+      Description: Enhancements to several APIs from previous releases.
+```
+
+----------------------------------------
+
+TITLE: JNI Field Signature Examples
+DESCRIPTION: Provides examples of how Java field declarations are translated into JNI string signatures. It illustrates the format for primitive types, arrays, and reference types, including the 'L' prefix and ';' suffix for class names.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_8
+
+LANGUAGE: APIDOC
+CODE:
+```
+int i; // ""I""
+float[] fs; // ""[F""
+
+String s; // ""Ljava/lang/String;""
+Object[] os; // ""[Ljava/lang/Object;""
+```
+
+----------------------------------------
+
+TITLE: JNI Method Signature Examples
+DESCRIPTION: Illustrates how Java method declarations are represented as JNI string signatures. Examples cover various return types and argument lists, including the 'V' character for a 'void' return type.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_9
+
+LANGUAGE: APIDOC
+CODE:
+```
+int f1(); // ""()I""
+String f2(); // ""()Ljava/lang/String;""
+float[] f3(); // ""()[F""
+
+// ""(I[FLjava/lang/String;[Ljava/lang/Object;)V""
+void f4(int i, float[] fs, String s, Object[] os);
+```
+
+----------------------------------------
+
+TITLE: Configure Android Native API Level in CMake
+DESCRIPTION: This CMake variable specifies the target Android native API level. A fix ensures its correct behavior when using the non-legacy toolchain file.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r23.md#_snippet_2
+
+LANGUAGE: APIDOC
+CODE:
+```
+ANDROID_NATIVE_API_LEVEL
+```
+
+----------------------------------------
+
+TITLE: Java System.loadLibrary Method API
+DESCRIPTION: API documentation for the `java.lang.System.loadLibrary` method. This method is used to load a native shared library specified by its undecorated name. It's typically called from a static initializer or application startup.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_32
+
+LANGUAGE: APIDOC
+CODE:
+```
+Method: System.loadLibrary(String libname)
+  Description: Loads a native library specified by the libname argument.
+  Parameters:
+    libname (String): The undecorated name of the library to load (e.g., ""foo"" for libfoo.so).
+  Return Type: void
+  Throws: UnsatisfiedLinkError if the library cannot be found or loaded.
+```
+
+----------------------------------------
+
+TITLE: Android NDK r21d API Updates for Android 11
+DESCRIPTION: This section outlines the new and updated Native Development Kit (NDK) APIs introduced in Android NDK r21d, specifically targeting Android 11. It includes new APIs like ImageDecoder and Thermal, alongside updates to existing ones such as AAudio, Bitmap, and NeuralNetworks. The deprecation of OpenSLES in favor of AAudio is also noted, with a recommendation to use Oboe for automatic API selection.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r21.md#_snippet_1
+
+LANGUAGE: APIDOC
+CODE:
+```
+New APIs:
+  - ImageDecoder: https://developer.android.com/ndk/reference/group/image-decoder
+  - Thermal: https://developer.android.com/ndk/reference/group/thermal
+Updated APIs:
+  - AAudio: https://developer.android.com/ndk/reference/group/audio
+  - Bitmap: https://developer.android.com/ndk/reference/group/bitmap
+  - Camera: https://developer.android.com/ndk/reference/group/camera
+  - Choreographer: https://developer.android.com/ndk/reference/group/choreographer
+  - Native Window: https://developer.android.com/ndk/reference/group/a-native-window
+  - NdkBinder: https://developer.android.com/ndk/reference/group/ndk-binder
+  - NeuralNetworks: https://developer.android.com/ndk/reference/group/neural-networks
+Deprecations:
+  - OpenSLES: Deprecated in favor of AAudio. Developers should use Oboe (https://github.com/google/oboe) for automatic API selection.
+```
+
+----------------------------------------
+
+TITLE: GCC Standalone Toolchain: Unified Headers Workaround
+DESCRIPTION: Provides a workaround for standalone toolchains using GCC that do not work out of the box with unified headers. Users must pass the __ANDROID_API__ define with the correct API level during compilation to make them work.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r14.md#_snippet_2
+
+LANGUAGE: GCC Command Line
+CODE:
+```
+-D__ANDROID_API__=<API_LEVEL>
+```
+
+----------------------------------------
+
+TITLE: Resolve Conflicting libc API Polyfills with Weak API References in Android NDK
+DESCRIPTION: This snippet provides a strategy to fix build issues when using weak API references alongside existing polyfills for libc APIs in the Android NDK. It demonstrates renaming the polyfill function and using a C/C++ preprocessor macro to redirect calls, thereby preventing name collisions and ensuring compatibility.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r28.md#_snippet_0
+
+LANGUAGE: C/C++
+CODE:
+```
+// Original polyfill: conflicting_api
+// Renamed polyfill: conflicting_api_fallback
+// Usage:
+#define conflicting_api() conflicting_api_fallback()
+```
+
+----------------------------------------
+
+TITLE: Fix Linker Flag -Wl,--no-rosegment API Level Check
+DESCRIPTION: This linker flag's API level check has been fixed in `ndk-build` and CMake. It addresses issues related to read-only segments.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r23.md#_snippet_6
+
+LANGUAGE: APIDOC
+CODE:
+```
+-Wl,--no-rosegment
+```
+
+----------------------------------------
+
+TITLE: Direct NDK Clang++ Compiler Invocation
+DESCRIPTION: This example demonstrates how to directly invoke the Clang++ compiler from the NDK toolchain path. This method eliminates the need for creating standalone toolchains for specific API levels and architectures.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r19-beta1.md#_snippet_1
+
+LANGUAGE: Bash
+CODE:
+```
+$NDK/toolchains/llvm/prebuilt/<host-tag>/bin/armv7a-linux-androideabi26-clang++ src.cpp
+```
+
+----------------------------------------
+
+TITLE: Enable Weak Symbols for Android API Additions
+DESCRIPTION: This option enables support for weak symbols when dealing with API additions. It can be provided as a build option or preprocessor definition to handle cases where symbols might be conditionally available.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r26.md#_snippet_2
+
+LANGUAGE: C/C++
+CODE:
+```
+__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__
+```
+
+----------------------------------------
+
+TITLE: Specify Android API Level for GCC Standalone Toolchains
+DESCRIPTION: When compiling with GCC standalone toolchains and unified headers, it may be necessary to explicitly define the Android API level. Pass the `-D__ANDROID_API__` flag followed by the desired API level (e.g., 21) to the compiler.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r14-beta1.md#_snippet_1
+
+LANGUAGE: C/C++ Compiler Flags
+CODE:
+```
+-D__ANDROID_API__=21
+```
+
+----------------------------------------
+
+TITLE: Build Multiple ABIs with ndk-build Loop
+DESCRIPTION: Example of building an Android NDK project for multiple Application Binary Interfaces (ABIs) using a shell loop with `ndk-build`. This workflow is now supported without previous ABI artifacts being removed during successive builds, ensuring all specified ABIs are present at the end of the loop.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r19-beta2.md#_snippet_1
+
+LANGUAGE: Shell
+CODE:
+```
+for abi in armeabi-v7a arm64-v8a x86 x86_64; do
+    ndk-build APP_ABI=$abi
+done
+```
+
+----------------------------------------
+
+TITLE: Iterate and Build Multiple ABIs with ndk-build
+DESCRIPTION: This example demonstrates a shell loop to build Android applications for multiple Application Binary Interfaces (ABIs) using ndk-build. It highlights a recent change where ndk-build no longer removes artifacts from previously built ABIs, allowing for a more efficient multi-ABI build workflow.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r19.md#_snippet_1
+
+LANGUAGE: Shell
+CODE:
+```
+for abi in armeabi-v7a arm64-v8a x86 x86_64; do
+    ndk-build APP_ABI=$abi
+done
+```
+
+----------------------------------------
+
+TITLE: API: _BSD_SOURCE Macro Behavior with Unified Headers
+DESCRIPTION: Explains the behavior of the _BSD_SOURCE macro when using unified headers in the Android NDK. When using unified headers, the NDK will not define _BSD_SOURCE by default; users must explicitly #define it in source files or pass it as a command-line argument for typical Linux code behavior.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r14.md#_snippet_0
+
+LANGUAGE: C/C++ Preprocessor
+CODE:
+```
+#define _BSD_SOURCE
+```
+
+LANGUAGE: Compiler Command Line
+CODE:
+```
+-D_BSD_SOURCE
+```
+
+----------------------------------------
+
+TITLE: Logcat Output for Late-Enabling CheckJNI
+DESCRIPTION: This logcat message appears when CheckJNI is enabled for individual applications after the runtime has already started, typically via the 'debug.checkjni' property. It signifies that CheckJNI is active for the specific app that is launched.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_31
+
+LANGUAGE: Plain Text
+CODE:
+```
+D Late-enabling CheckJNI
+```
+
+----------------------------------------
+
+TITLE: Configure Branch Protection in ndk-build
+DESCRIPTION: The LOCAL_BRANCH_PROTECTION option can be added to ndk-build configurations for aarch64 to enable branch protection (-mbranch-protection) without affecting other ABIs. This example shows how to set the 'standard' protection level.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r24.md#_snippet_0
+
+LANGUAGE: Make
+CODE:
+```
+LOCAL_BRANCH_PROTECTION := standard
+```
+
+----------------------------------------
+
+TITLE: JNIEnv Interface Methods Summary
+DESCRIPTION: This snippet provides a comprehensive summary of key methods available through the JNIEnv interface. It outlines functions for registering native methods, handling exceptions, managing global/local/weak references, allocating objects, looking up classes, fields, and methods, invoking methods, accessing fields, and manipulating strings and arrays. This interface is crucial for C/C++ code interacting with the Java Virtual Machine.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_11
+
+LANGUAGE: C++
+CODE:
+```
+    // Registering native methods.
+    jint           RegisterNatives(JNIEnv*, jclass, const JNINativeMethod*, jint);
+    jint           UnregisterNatives(JNIEnv*, jclass);
+
+    // Exceptions.
+    jint           Throw(JNIEnv*, jthrowable);
+    jint           ThrowNew(JNIEnv *, jclass, const char *);
+    jboolean       ExceptionCheck(JNIEnv*);
+    jthrowable     ExceptionOccurred(JNIEnv*);
+    void           ExceptionDescribe(JNIEnv*);
+    void           ExceptionClear(JNIEnv*);
+    void           FatalError(JNIEnv*, const char*);
+
+    // Global/local/weak references.
+    jobject        NewGlobalRef(JNIEnv*, jobject);
+    void           DeleteGlobalRef(JNIEnv*, jobject);
+    jobject        NewLocalRef(JNIEnv*, jobject);
+    void           DeleteLocalRef(JNIEnv*, jobject);
+    jint           EnsureLocalCapacity(JNIEnv*, jint);
+    jint           PushLocalFrame(JNIEnv*, jint);
+    jobject        PopLocalFrame(JNIEnv*, jobject);
+    jweak          NewWeakGlobalRef(JNIEnv*, jobject);
+    void           DeleteWeakGlobalRef(JNIEnv*, jweak);
+    jobjectRefType GetObjectRefType(JNIEnv*, jobject);
+
+    // Allocation.
+    jobject        AllocObject(JNIEnv*, jclass);
+    jobject        NewObject(JNIEnv*, jclass, jmethodID, ...);
+    jobject        NewObjectV(JNIEnv*, jclass, jmethodID, va_list);
+    jobject        NewObjectA(JNIEnv*, jclass, jmethodID, const jvalue*);
+    jobjectArray   NewObjectArray(JNIEnv*, jsize, jclass, jobject);
+    jintArray      NewIntArray(JNIEnv*, jsize);
+
+    // Class/field/method lookup.
+    jclass         FindClass(JNIEnv*, const char*);
+    jfieldID       GetFieldID(JNIEnv*, jclass, const char*, const char*);
+    jfieldID       GetStaticFieldID(JNIEnv*, jclass, const char*, const char*);
+    jmethodID      GetMethodID(JNIEnv*, jclass, const char*, const char*);
+    jmethodID      GetStaticMethodID(JNIEnv*, jclass, const char*, const char*);
+    // Field/method IDs interoperability with Java reflection.
+    jmethodID      FromReflectedMethod(JNIEnv*, jobject);
+    jfieldID       FromReflectedField(JNIEnv*, jobject);
+    jobject        ToReflectedMethod(JNIEnv*, jclass, jmethodID, jboolean);
+    jobject        ToReflectedField(JNIEnv*, jclass, jfieldID, jboolean);
+
+    // Method invocation.
+    // (There are also Nonvirtual and Static variants of these.)
+    jobject        CallObjectMethod(JNIEnv*, jobject, jmethodID, ...);
+    jobject        CallObjectMethodV(JNIEnv*, jobject, jmethodID, va_list);
+    jobject        CallObjectMethodA(JNIEnv*, jobject, jmethodID, const jvalue*);
+    jint           CallIntMethod(JNIEnv*, jobject, jmethodID, ...);
+    jint           CallIntMethodV(JNIEnv*, jobject, jmethodID, va_list);
+    jint           CallIntMethodA(JNIEnv*, jobject, jmethodID, const jvalue*);
+    void           CallVoidMethod(JNIEnv*, jobject, jmethodID, ...);
+    void           CallVoidMethodV(JNIEnv*, jobject, jmethodID, va_list);
+    void           CallVoidMethodA(JNIEnv*, jobject, jmethodID, const jvalue*);
+
+    // Field access.
+    // (There are also Static variants of these.)
+    jobject        GetObjectField(JNIEnv*, jobject, jfieldID);
+    jint           GetIntField(JNIEnv*, jobject, jfieldID);
+    void           SetObjectField(JNIEnv*, jobject, jfieldID, jobject);
+    void           SetIntField(JNIEnv*, jobject, jfieldID, jint);
+
+    // Strings.
+    jstring        NewString(JNIEnv*, const jchar*, jsize);
+    jsize          GetStringLength(JNIEnv*, jstring);
+    const jchar*   GetStringChars(JNIEnv*, jstring, jboolean*);
+    void           ReleaseStringChars(JNIEnv*, jstring, const jchar*);
+    jstring        NewStringUTF(JNIEnv*, const char*);
+    jsize          GetStringUTFLength(JNIEnv*, jstring);
+    const char*    GetStringUTFChars(JNIEnv*, jstring, jboolean*);
+    void           ReleaseStringUTFChars(JNIEnv*, jstring, const char*);
+    void           GetStringRegion(JNIEnv*, jstring, jsize, jsize, jchar*);
+    void           GetStringUTFRegion(JNIEnv*, jstring, jsize, jsize, char*);
+    const jchar*   GetStringCritical(JNIEnv*, jstring, jboolean*);
+    void           ReleaseStringCritical(JNIEnv*, jstring, const jchar*);
+
+    // Arrays.
+    jsize          GetArrayLength(JNIEnv*, jarray);
+    void*          GetPrimitiveArrayCritical(JNIEnv*, jarray, jboolean*);
+    void           ReleasePrimitiveArrayCritical(JNIEnv*, jarray, void*, jint);
+    jobject        GetObjectArrayElement(JNIEnv*, jobjectArray, jsize);
+    void           SetObjectArrayElement(JNIEnv*, jobjectArray, jsize, jobject);
+    jint*          GetIntArrayElements(JNIEnv*, jintArray, jboolean*);
+    void           ReleaseIntArrayElements(JNIEnv*, jintArray, jint*, jint);
+    void           GetIntArrayRegion(JNIEnv*, jintArray, jsize, jsize, jint*);
+```
+
+----------------------------------------
+
+TITLE: JNI Reference Type Mappings
+DESCRIPTION: Documents the mapping between important Java reference types and their corresponding opaque C/C++ types defined in '<jni.h>' for JNI operations.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_4
+
+LANGUAGE: APIDOC
+CODE:
+```
+C/C++       | Java
+----------- | --------------------
+jclass      | java.lang.Class
+jobject     | java.lang.Object
+jstring     | java.lang.String
+jthrowable  | java.lang.Throwable
+```
+
+----------------------------------------
+
+TITLE: JNI Primitive Type Mappings
+DESCRIPTION: Documents the direct mapping between Java primitive types and their corresponding C/C++ types as defined in the '<jni.h>' header for JNI operations.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_3
+
+LANGUAGE: APIDOC
+CODE:
+```
+C/C++    | Java
+-------- | -------
+jboolean | boolean
+jbyte    | byte
+jchar    | char
+jdouble  | double
+jfloat   | float
+jint     | int
+jlong    | long
+jshort   | short
+```
+
+----------------------------------------
+
+TITLE: NDK Bug Triage Guidelines
+DESCRIPTION: This section outlines the criteria used to classify bugs by severity, determining which issues gate releases and are considered for backports. It details the characteristics of high, medium, and low severity issues, as well as non-issues.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/NDK-Release-Process.md#_snippet_0
+
+LANGUAGE: APIDOC
+CODE:
+```
+High severity issues:
+  - Toolchain crashes or miscompiles with no workaround.
+  - Security vulnerabilities (either in the NDK itself or in generated code).
+  - Regression in compatibility with important third-party libraries (OpenSSL, cURL, etc).
+  - Severe performance regressions in generated code.
+```
+
+LANGUAGE: APIDOC
+CODE:
+```
+Medium severity issues:
+  - Toolchain crashes or miscompiles with a workaround.
+  - Source compatibility issues.
+  - Non-contrived, non-severe performance regressions.
+  - Workarounds for platform bugs.
+```
+
+LANGUAGE: APIDOC
+CODE:
+```
+Low severity issues:
+  - All other bugs.
+  - Toolchain driver issues. Any flags needed to make Android compiles work beyond `-target` fit into this category.
+    - Note that these are not currently blocking, as we have not reached this state yet. Once clean, regressions will be considered blockers.
+```
+
+LANGUAGE: APIDOC
+CODE:
+```
+Non-issues:
+  - Bugs in experimental portions of the toolchain, such as compiler crashes that only occur when using an unfinished C++ standard version. No guarantees are made about the stability or availability of these features, and providing a fix risks destabilizing the rest of the toolchain.
+```
+
+----------------------------------------
+
+TITLE: JNI Native Method Naming Convention
+DESCRIPTION: Describes the naming convention used by ART (Android Runtime) to automatically look up native method implementations at runtime. This convention maps Java method names and package structures to C/C++ function names.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_15
+
+LANGUAGE: APIDOC
+CODE:
+```
+Java_a_b_C_m
+
+- `Java_`: Prefix for all native methods.
+- `a_b_C`: Fully qualified Java class name, with periods replaced by underscores.
+- `m`: The name of the native method.
+
+Special rules apply for non-ASCII characters, underscores within names, or overloaded methods. The `javac -h` command can be used to generate correct header files for native methods.
+```
+
+----------------------------------------
+
+TITLE: JNI String Handling Functions
+DESCRIPTION: Overview of key JNI functions for managing Java strings in native code, including considerations for UTF-8 and UTF-16 encodings and memory management. Emphasizes the need to release obtained string pointers.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_22
+
+LANGUAGE: APIDOC
+CODE:
+```
+JNI String Functions:
+  GetStringChars(JNIEnv* env, jstring str, jboolean* isCopy)
+    Description: Returns a pointer to the UTF-16 string elements. Android currently does not require a copy.
+    Parameters:
+      env: JNI environment pointer.
+      str: The Java string object.
+      isCopy: (Optional) Pointer to a jboolean to indicate if a copy was made.
+    Return Type: jchar* (C-style pointer to UTF-16 data, not zero-terminated).
+
+  GetStringUTFChars(JNIEnv* env, jstring str, jboolean* isCopy)
+    Description: Returns a pointer to the Modified UTF-8 string elements. Requires allocation and conversion.
+    Parameters:
+      env: JNI environment pointer.
+      str: The Java string object.
+      isCopy: (Optional) Pointer to a jboolean to indicate if a copy was made.
+    Return Type: const char* (C-style pointer to Modified UTF-8 data).
+
+  NewStringUTF(JNIEnv* env, const char* bytes)
+    Description: Constructs a new jstring from a Modified UTF-8 byte array. Input must be valid Modified UTF-8.
+    Parameters:
+      env: JNI environment pointer.
+      bytes: A C-style string in Modified UTF-8 format.
+    Return Type: jstring.
+
+  ReleaseStringChars(JNIEnv* env, jstring str, const jchar* chars)
+    Description: Releases the jchar* obtained from GetStringChars. Must be called to prevent memory leaks.
+    Parameters:
+      env: JNI environment pointer.
+      str: The Java string object.
+      chars: The jchar* pointer to release.
+
+  ReleaseStringUTFChars(JNIEnv* env, jstring str, const char* utf)
+    Description: Releases the char* obtained from GetStringUTFChars. Must be called to prevent memory leaks.
+    Parameters:
+      env: JNI environment pointer.
+      str: The Java string object.
+      utf: The char* pointer to release.
+```
+
+----------------------------------------
+
+TITLE: JNIEnv Core Functions Reference
+DESCRIPTION: Reference for various JNIEnv functions available in the Android NDK. This includes functions for array manipulation, class definition and introspection, Java Virtual Machine interaction, object class operations, thread synchronization, and direct byte buffer support.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_12
+
+LANGUAGE: APIDOC
+CODE:
+```
+void SetIntArrayRegion(JNIEnv*, jintArray, jsize, jsize, const jint*);
+
+// Misc.
+jclass DefineClass(JNIEnv*, const char*, jobject, const jbyte*, jsize);
+jint GetVersion(JNIEnv*);
+jint GetJavaVM(JNIEnv*, JavaVM**);
+jclass GetSuperclass(JNIEnv*, jclass);
+jboolean IsAssignableFrom(JNIEnv*, jclass, jclass);
+jclass GetObjectClass(JNIEnv*, jobject);
+jboolean IsInstanceOf(JNIEnv*, jobject, jclass);
+jboolean IsSameObject(JNIEnv*, jobject, jobject);
+
+// Synchronization.
+jint MonitorEnter(JNIEnv*, jobject);
+jint MonitorExit(JNIEnv*, jobject);
+
+// NIO DirectByteBuffer support.
+jobject NewDirectByteBuffer(JNIEnv*, void*, jlong);
+void* GetDirectBufferAddress(JNIEnv*, jobject);
+jlong GetDirectBufferCapacity(JNIEnv*, jobject);
+```
+
+----------------------------------------
+
+TITLE: ndk-build: Allow Missing Dependencies Configuration
+DESCRIPTION: Describes how to revert the ndk-build behavior to allow modules with missing dependencies to build. By default, builds will now fail if dependencies are missing. Setting APP_ALLOW_MISSING_DEPS=true restores the old behavior.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r14.md#_snippet_1
+
+LANGUAGE: ndk-build Configuration
+CODE:
+```
+APP_ALLOW_MISSING_DEPS=true
+```
+
+----------------------------------------
+
+TITLE: JNI Array Type Mappings
+DESCRIPTION: Documents the mapping between Java array types and their corresponding opaque C/C++ types defined in '<jni.h>'. It emphasizes that these C/C++ types are opaque and not direct pointers.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_5
+
+LANGUAGE: APIDOC
+CODE:
+```
+C/C++         | Java
+------------- | --------------------
+jobjectArray  | java.lang.Object[]
+jbooleanArray | boolean[]
+jbyteArray    | byte[]
+jcharArray    | char[]
+jdoubleArray  | double[]
+jfloatArray   | float[]
+jintArray     | int[]
+jlongArray    | long[]
+jshortArray   | short[]
+```
+
+----------------------------------------
+
+TITLE: JNI FindClass Best Practices for Class Loading
+DESCRIPTION: Discusses common issues with `FindClass` when called from threads without application stack frames and provides three workarounds: caching in `JNI_OnLoad`, passing `Class` instances, or using `ClassLoader.loadClass`.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_39
+
+LANGUAGE: APIDOC
+CODE:
+```
+JNI_OnLoad:
+  Purpose: Library initialization callback.
+  Behavior: FindClass calls within JNI_OnLoad use the correct application class loader.
+
+FindClass(className: string):
+  Purpose: Locates a Java class by name.
+  Issue: When called from threads without application stack frames, it defaults to the system class loader, failing to find app-specific classes.
+
+System.loadLibrary(libraryName: string):
+  Purpose: Loads a native library.
+  Behavior: The class loader associated with the caller of this function is used for JNI_OnLoad's FindClass calls.
+
+Class Argument Passing Strategy:
+  Method: Declare native methods to accept a Class argument (e.g., Foo.class).
+  Purpose: Provides the correct class context to native functions.
+
+ClassLoader.loadClass(className: string):
+  Method: Cache a ClassLoader object and use its loadClass method.
+  Purpose: Directly load classes using a specific class loader.
+  Effort: Requires some effort to implement.
+```
+
+----------------------------------------
+
+TITLE: JNI Signature Characters for Primitive Types
+DESCRIPTION: Lists the single-character representations used for primitive types when constructing JNI field and method signatures.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_7
+
+LANGUAGE: APIDOC
+CODE:
+```
+Character | Java
+--------- | -------
+Z         | boolean
+B         | byte
+C         | char
+D         | double
+F         | float
+I         | int
+J         | long
+S         | short
+```
+
+----------------------------------------
+
+TITLE: Android NDK r10e Download Links
+DESCRIPTION: Provides direct download links for Android NDK r10e across different operating systems. This release includes packages for Darwin (Mac), Linux, and Windows.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Unsupported-Downloads.md#_snippet_15
+
+LANGUAGE: APIDOC
+CODE:
+```
+Release: r10e
+Platforms:
+- Platform: Darwin
+  Package: https://dl.google.com/android/repository/android-ndk-r10e-darwin-x86_64.zip
+- Platform: Linux
+  Package: https://dl.google.com/android/repository/android-ndk-r10e-linux-x86_64.zip
+- Platform: Windows
+  Package: https://dl.google.com/android/repository/android-ndk-r10e-windows-x86_64.zip
+```
+
+----------------------------------------
+
+TITLE: Troubleshooting JNI FindClass and GetMethodID Failures
+DESCRIPTION: This section addresses common reasons why JNI functions like FindClass, GetMethodID, or GetFieldID might fail to locate classes, methods, or fields. It emphasizes correct class name formatting (slashes, array syntax, inner class '$'), the impact of code shrinking, and class loader issues, especially with manually created threads.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_38
+
+LANGUAGE: APIDOC
+CODE:
+```
+Troubleshooting FindClass/GetMethodID/GetFieldID failures:
+  - Class Name Format:
+    - JNI class names: 'package/Class' (slashes).
+    - Array classes: '[Lpackage/Class;' (square brackets, 'L', ';').
+    - Inner classes: 'package/OuterClass$InnerClass' (dollar sign).
+    - Use 'javap' on .class files to confirm internal names.
+  - Code Shrinking:
+    - Configure 'keep' rules to prevent removal of JNI-used classes/methods/fields.
+  - Class Loader Issues:
+    - FindClass uses the ClassLoader of the calling code (e.g., from the topmost method in the call stack).
+    - Custom threads (e.g., pthread_create + AttachCurrentThread) might have unexpected ClassLoaders.
+```
+
+LANGUAGE: Java
+CODE:
+```
+Foo.myfunc(Native Method)
+    Foo.main(Foo.java:10)
+```
+
+----------------------------------------
+
+TITLE: Configure wrap.sh with APP_WRAP_SH in ndk-build
+DESCRIPTION: This snippet documents the `APP_WRAP_SH` variable in ndk-build, which allows specifying a shell script to be installed as `wrap.sh` in the APK. It supports both ABI-generic and ABI-specific configurations, enabling custom runtime setup for applications.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r17-beta1.md#_snippet_1
+
+LANGUAGE: APIDOC
+CODE:
+```
+ndk-build Variable:
+- APP_WRAP_SH: Path to a shell script (relative to Android.mk) for ABI-generic wrap.sh.
+- APP_WRAP_SH_<ABI>: Path to a shell script for ABI-specific wrap.sh (e.g., APP_WRAP_SH_arm64-v8a).
+```
+
+----------------------------------------
+
+TITLE: Java Class Initializer for Native ID Caching
+DESCRIPTION: This Java code snippet demonstrates how to use a static initializer block to call a native method (`nativeInit`). This method is intended to look up and cache JNI class, field, and method IDs in native C/C++ code. The static block ensures the native initialization runs once when the class is loaded and automatically re-executes if the class is ever unloaded and reloaded, providing a robust caching mechanism for JNI IDs.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_20
+
+LANGUAGE: java
+CODE:
+```
+    /*
+     * We use a class initializer to allow the native code to cache some
+     * field offsets. This native function looks up and caches interesting
+     * class/field/method IDs. Throws on failure.
+     */
+    private static native void nativeInit();
+
+    static {
+        nativeInit();
+    }
+```
+
+----------------------------------------
+
+TITLE: JNI Primitive Array Access and Release
+DESCRIPTION: Details on JNI functions for accessing and releasing primitive array elements, including the `isCopy` flag and the different release modes (`0`, `JNI_COMMIT`, `JNI_ABORT`) and their implications for memory management. Emphasizes the critical need to release arrays.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_23
+
+LANGUAGE: APIDOC
+CODE:
+```
+JNI Primitive Array Functions:
+  Get<PrimitiveType>ArrayElements(JNIEnv* env, <PrimitiveType>Array array, jboolean* isCopy)
+    Description: Returns a pointer to the elements of a primitive array. May return a direct pointer or a copy. The pointer is valid until Release is called.
+    Parameters:
+      env: JNI environment pointer.
+      array: The JNI array object (e.g., jintArray, jbyteArray).
+      isCopy: (Optional) Pointer to a jboolean to indicate if a copy was made (JNI_TRUE if copied, JNI_FALSE if direct pointer).
+    Return Type: <PrimitiveType>* (e.g., jint*, jbyte*).
+
+  Release<PrimitiveType>ArrayElements(JNIEnv* env, <PrimitiveType>Array array, <PrimitiveType>* elems, jint mode)
+    Description: Releases the array elements obtained from Get<PrimitiveType>ArrayElements. This function is crucial for memory management and unpinning arrays.
+    Parameters:
+      env: JNI environment pointer.
+      array: The JNI array object.
+      elems: The pointer to the array elements obtained from Get<PrimitiveType>ArrayElements.
+      mode: Specifies how the release should behave. Can be 0, JNI_COMMIT, or JNI_ABORT.
+    Modes:
+      0:
+        Actual: The array object is un-pinned.
+        Copy: Data is copied back. The buffer with the copy is freed.
+      JNI_COMMIT:
+        Actual: Does nothing.
+        Copy: Data is copied back. The buffer with the copy is NOT freed.
+      JNI_ABORT:
+        Actual: The array object is un-pinned. Earlier writes are NOT aborted.
+        Copy: The buffer with the copy is freed; any changes to it are lost.
+
+  JNI_COMMIT:
+    Description: Constant used as a mode for Release<PrimitiveType>ArrayElements to commit changes without freeing the buffer if a copy was made.
+
+  JNI_ABORT:
+    Description: Constant used as a mode for Release<PrimitiveType>ArrayElements to discard changes and free the buffer if a copy was made.
+```
+
+----------------------------------------
+
+TITLE: Configure APK wrap.sh with ndk-build
+DESCRIPTION: This snippet documents the `APP_WRAP_SH` variable for ndk-build, which allows specifying a shell script to be installed as `wrap.sh` in the APK. It supports both ABI-generic and ABI-specific configurations for custom runtime setup, useful for integrating tools like sanitizers.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r17-beta2.md#_snippet_1
+
+LANGUAGE: APIDOC
+CODE:
+```
+APP_WRAP_SH: This variable points to a shell script (relative to your Android.mk) that will be installed as a wrap.sh file in your APK. This is an ABI-generic form.
+APP_WRAP_SH_ABI: ABI-specific forms (e.g., APP_WRAP_SH_arm64-v8a) are available to allow for per-ABI customization of the wrap.sh script.
+```
+
+----------------------------------------
+
+TITLE: JNI RegisterNatives Function
+DESCRIPTION: Refers to the `RegisterNatives` JNI function, which provides an explicit and preferred mechanism to match Java native methods with their C/C++ implementations. This method offers more control and is generally recommended over relying solely on naming conventions.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_16
+
+LANGUAGE: APIDOC
+CODE:
+```
+jint RegisterNatives(JNIEnv *env, jclass clazz, const JNINativeMethod *methods, jint numMethods);
+
+- `env`: The JNI environment pointer.
+- `clazz`: The Java class containing the native methods to be registered.
+- `methods`: An array of `JNINativeMethod` structures, each mapping a Java method signature to a native function pointer.
+- `numMethods`: The number of elements in the `methods` array.
+```
+
+----------------------------------------
+
+TITLE: Use ndk-which to Locate LLVM Tools
+DESCRIPTION: The `ndk-which` command now improves its fallback mechanism. When GNU tool names are used, it will return the path to the corresponding LLVM tool, such as `llvm-strip` for `strip`.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r23.md#_snippet_1
+
+LANGUAGE: APIDOC
+CODE:
+```
+ndk-which strip
+```
+
+----------------------------------------
+
+TITLE: JNI JNI_OnLoad Function
+DESCRIPTION: Describes the `JNI_OnLoad` function, which is automatically called by the JVM when a native library is loaded. It is typically used for one-time initialization tasks, such as registering native methods and caching global references. Returning `JNI_VERSION_1_6` is recommended for modern Android development.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_17
+
+LANGUAGE: APIDOC
+CODE:
+```
+jint JNI_OnLoad(JavaVM* vm, void* reserved);
+
+- `vm`: Pointer to the JavaVM instance.
+- `reserved`: Reserved for future use; should typically be NULL.
+
+Returns the JNI version of the native library, e.g., `JNI_VERSION_1_6`.
+```
+
+----------------------------------------
+
+TITLE: Android NDK r11c Download Details
+DESCRIPTION: Provides download links, file sizes, and SHA1 checksums for Android NDK r11c across various operating systems. This release includes specific packages for Linux, Mac, Windows 32-bit, and Windows 64-bit.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Unsupported-Downloads.md#_snippet_14
+
+LANGUAGE: APIDOC
+CODE:
+```
+Release: r11c
+Changelog: Changelog-r11
+Platforms:
+- Platform: Linux
+  Package: https://dl.google.com/android/repository/android-ndk-r11c-linux-x86_64.zip
+  Size: 794135138 bytes
+  SHA1 Checksum: de5ce9bddeee16fb6af2b9117e9566352aa7e279
+- Platform: Mac
+  Package: https://dl.google.com/android/repository/android-ndk-r11c-darwin-x86_64.zip
+  Size: 772428792 bytes
+  SHA1 Checksum: 4ce8e7ed8dfe08c5fe58aedf7f46be2a97564696
+- Platform: Windows 32-bit
+  Package: https://dl.google.com/android/repository/android-ndk-r11c-windows-x86.zip
+  Size: 728899082 bytes
+  SHA1 Checksum: ff939bde6cd374eecbd2c3b2ad218697f9a5038c
+- Platform: Windows 64-bit
+  Package: https://dl.google.com/android/repository/android-ndk-r11c-windows-x86_64.zip
+  Size: 771407642 bytes
+  SHA1 Checksum: 3d89deb97b3191c7e5555f1313ad35059479f071
+```
+
+----------------------------------------
+
+TITLE: Android NDK r14b Download Details
+DESCRIPTION: Provides download links, file sizes, and SHA1 checksums for Android NDK r14b across various operating systems. This release includes specific packages for Linux, Mac, Windows 32-bit, and Windows 64-bit.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Unsupported-Downloads.md#_snippet_11
+
+LANGUAGE: APIDOC
+CODE:
+```
+Release: r14b
+Changelog: Changelog-r14
+Platforms:
+- Platform: Linux
+  Package: https://dl.google.com/android/repository/android-ndk-r14b-linux-x86_64.zip
+  Size: 840626594 bytes
+  SHA1 Checksum: becd161da6ed9a823e25be5c02955d9cbca1dbeb
+- Platform: Mac
+  Package: https://dl.google.com/android/repository/android-ndk-r14b-darwin-x86_64.zip
+  Size: 824705073 bytes
+  SHA1 Checksum: 2bf582c43f6da16416e66203d158a6dfaba4277c
+- Platform: Windows 32-bit
+  Package: https://dl.google.com/android/repository/android-ndk-r14b-windows-x86.zip
+  Size: 707533928 bytes
+  SHA1 Checksum: 070443eaa7fa37ed337f91c655e02ca708d37c92
+- Platform: Windows 64-bit
+  Package: https://dl.google.com/android/repository/android-ndk-r14b-windows-x86_64.zip
+  Size: 769151176 bytes
+  SHA1 Checksum: a625e8c599bccdb9061b61dcf3d1f1a01071613f
+```
+
+----------------------------------------
+
+TITLE: Shell Script Workaround for ASan Exception Handling Crash (Issue 988)
+DESCRIPTION: This `wrap.sh` shell script provides a workaround for Android NDK Issue 988, where ASan exception handling can cause crashes. It ensures that `libc++_shared.so` is correctly preloaded alongside `libclang_rt.asan` by setting `LD_PRELOAD`, specifically addressing the issue for applications using `libc++_shared` on affected devices.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r25.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+#!/system/bin/sh
+HERE=""$(cd ""$(dirname ""$0"")"" && pwd)""
+export ASAN_OPTIONS=log_to_syslog=false,allow_user_segv_handler=1
+ASAN_LIB=$(ls $HERE/libclang_rt.asan-*-android.so)
+if [ -f ""$HERE/libc++_shared.so"" ]; then
+    # Workaround for https://github.com/android/ndk/issues/988.
+    export LD_PRELOAD=""$ASAN_LIB $HERE/libc++_shared.so""
+else
+    export LD_PRELOAD=""$ASAN_LIB""
+fi
+""$@""
+```
+
+----------------------------------------
+
+TITLE: Sharing Raw Data between Java and Native Code
+DESCRIPTION: Explores two primary methods for sharing large raw data buffers (like bitmaps or sound samples) between Java (managed) and C/C++ (native) code: using `byte[]` arrays or `java.nio.ByteBuffer` (direct byte buffers). It outlines the performance implications and access characteristics of each approach.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_40
+
+LANGUAGE: APIDOC
+CODE:
+```
+Data Sharing Method 1: byte[]
+  Managed Access: Very fast.
+  Native Access:
+    Functions: GetByteArrayElements, GetPrimitiveArrayCritical
+    Behavior: May return actual pointers or copy data to a native heap buffer. Copy not guaranteed to be avoided.
+
+Data Sharing Method 2: Direct ByteBuffer
+  Creation (Java): java.nio.ByteBuffer.allocateDirect()
+  Creation (JNI): NewDirectByteBuffer()
+  Storage: Not allocated on managed heap.
+  Native Access: Always direct via GetDirectBufferAddress().
+  Managed Access: Can be very slow.
+
+JNI Functions for Direct ByteBuffer:
+  NewDirectByteBuffer(env: JNIEnv*, address: void*, capacity: jlong): jobject
+    Purpose: Creates a new direct ByteBuffer referring to a given native memory address.
+
+  GetDirectBufferAddress(env: JNIEnv*, buf: jobject): void*
+    Purpose: Returns the native memory address of a direct ByteBuffer.
+
+Decision Factors:
+  1. Primary Data Access Language: Java vs. C/C++
+  2. System API Requirements: What format does the final API expect?
+
+Recommendation: If no clear winner, use Direct ByteBuffer.
+```
+
+----------------------------------------
+
+TITLE: Workaround for ASan Exception Handling Crash with libc++_shared
+DESCRIPTION: This bash script provides a workaround for Issue 988, where ASan exception handling can crash when using `libc++_shared`. It ensures that `libc++_shared.so` is preloaded via `LD_PRELOAD` in `wrap.sh` alongside `libclang_rt.asan`. This is necessary for devices that do not contain the platform fix and is applicable even to the latest Android releases.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r26.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+#!/system/bin/sh
+HERE=""$(cd ""$(dirname ""$0"")"" && pwd)""
+export ASAN_OPTIONS=log_to_syslog=false,allow_user_segv_handler=1
+ASAN_LIB=$(ls $HERE/libclang_rt.asan-*-android.so)
+if [ -f ""$HERE/libc++_shared.so"" ]; then
+    # Workaround for https://github.com/android/ndk/issues/988.
+    export LD_PRELOAD=""$ASAN_LIB $HERE/libc++_shared.so""
+else
+    export LD_PRELOAD=""$ASAN_LIB""
+fi
+""$@""
+```
+
+----------------------------------------
+
+TITLE: JNI C++ JNIEnv Member Function Call
+DESCRIPTION: Demonstrates the C++ syntax for invoking JNI functions, where `JNIEnv` is treated as an object with member functions, providing a more natural and object-oriented syntax.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_13
+
+LANGUAGE: C++
+CODE:
+```
+jstring s = env->NewStringUTF(""hello"");
+```
+
+----------------------------------------
+
+TITLE: Android NDK r13b Download Details
+DESCRIPTION: Provides download links, file sizes, and SHA1 checksums for Android NDK r13b across various operating systems. This release includes specific packages for Linux, Mac, Windows 32-bit, and Windows 64-bit.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Unsupported-Downloads.md#_snippet_12
+
+LANGUAGE: APIDOC
+CODE:
+```
+Release: r13b
+Changelog: Changelog-r13
+Platforms:
+- Platform: Linux
+  Package: https://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip
+  Size: 687311866 bytes
+  SHA1 Checksum: 0600157c4ddf50ec15b8a037cfc474143f718fd0
+- Platform: Mac
+  Package: https://dl.google.com/android/repository/android-ndk-r13b-darwin-x86_64.zip
+  Size: 665967997 bytes
+  SHA1 Checksum: 71fe653a7bf5db08c3af154735b6ccbc12f0add5
+- Platform: Windows 32-bit
+  Package: https://dl.google.com/android/repository/android-ndk-r13b-windows-x86.zip
+  Size: 620461544 bytes
+  SHA1 Checksum: 4eb1288b1d4134a9d6474eb247f0448808d52408
+- Platform: Windows 64-bit
+  Package: https://dl.google.com/android/repository/android-ndk-r13b-windows-x86_64.zip
+  Size: 681320123 bytes
+  SHA1 Checksum: 649d306559435c244cec5881b880318bb3dee53a
+```
+
+----------------------------------------
+
+TITLE: Enable New CMake Toolchain File
+DESCRIPTION: The NDK's CMake toolchain file (`android.toolchain.cmake`) defaults to the legacy version. The new toolchain file can be explicitly enabled by setting this CMake definition to OFF.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r23.md#_snippet_5
+
+LANGUAGE: APIDOC
+CODE:
+```
+-DANDROID_USE_LEGACY_TOOLCHAIN_FILE=OFF
+```
+
+----------------------------------------
+
+TITLE: Android NDK r12b Download Details
+DESCRIPTION: Provides download links, file sizes, and SHA1 checksums for Android NDK r12b across various operating systems. This release includes specific packages for Linux, Mac, Windows 32-bit, and Windows 64-bit.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Unsupported-Downloads.md#_snippet_13
+
+LANGUAGE: APIDOC
+CODE:
+```
+Release: r12b
+Changelog: Changelog-r12
+Platforms:
+- Platform: Linux
+  Package: https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip
+  Size: 755551010 bytes
+  SHA1 Checksum: 170a119bfa0f0ce5dc932405eaa3a7cc61b27694
+- Platform: Mac
+  Package: https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip
+  Size: 734135279 bytes
+  SHA1 Checksum: e257fe12f8947be9f79c10c3fffe87fb9406118a
+- Platform: Windows 32-bit
+  Package: https://dl.google.com/android/repository/android-ndk-r12b-windows-x86.zip
+  Size: 706453972 bytes
+  SHA1 Checksum: 8e6eef0091dac2f3c7a1ecbb7070d4fa22212c04
+- Platform: Windows 64-bit
+  Package: https://dl.google.com/android/repository/android-ndk-r12b-windows-x86_64.zip
+  Size: 749567353 bytes
+  SHA1 Checksum: 337746d8579a1c65e8a69bf9cbdc9849bcacf7f5
+```
+
+----------------------------------------
+
+TITLE: JNI Boolean and Error Constants
+DESCRIPTION: Lists common JNI boolean and error status constants used for return values and checks within native code, providing standard indicators for success, failure, or boolean states.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_19
+
+LANGUAGE: APIDOC
+CODE:
+```
+JNI_TRUE
+JNI_FALSE
+JNI_OK
+JNI_ERR
+```
+
+----------------------------------------
+
+TITLE: Configure Android C++ Features in CMake
+DESCRIPTION: This CMake variable controls C++ features for Android builds. Its behavior has been fixed to work correctly with the new toolchain file.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r23.md#_snippet_3
+
+LANGUAGE: APIDOC
+CODE:
+```
+ANDROID_CPP_FEATURES
+```
+
+----------------------------------------
+
+TITLE: Shell Script Workaround for ASan Exception Handling Crash
+DESCRIPTION: This `wrap.sh` shell script provides a workaround for a known issue (Issue 988) where ASan exception handling can crash when `libc++_shared` is used. It dynamically sets `LD_PRELOAD` to include `libclang_rt.asan` and, if present, `libc++_shared.so`, ensuring proper library loading for ASan.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r24.md#_snippet_2
+
+LANGUAGE: Shell
+CODE:
+```
+#!/system/bin/sh
+HERE=""$(cd ""$(dirname ""$0"")"" && pwd)""
+export ASAN_OPTIONS=log_to_syslog=false,allow_user_segv_handler=1
+ASAN_LIB=$(ls $HERE/libclang_rt.asan-*-android.so)
+if [ -f ""$HERE/libc++_shared.so"" ]; then
+    # Workaround for https://github.com/android/ndk/issues/988.
+    export LD_PRELOAD=""$ASAN_LIB $HERE/libc++_shared.so""
+else
+    export LD_PRELOAD=""$ASAN_LIB""
+fi
+""$@""
+```
+
+----------------------------------------
+
+TITLE: Workaround for ASan Exception Handling Crash in Android NDK
+DESCRIPTION: This Bash script provides a workaround for a known issue where ASan (AddressSanitizer) exception handling can crash when using `wrap.sh`. It ensures that `libc++_shared.so` is correctly preloaded alongside `libclang_rt.asan` to prevent crashes, specifically for `libc++_shared` users. This is a platform bug requiring this workaround until at least Android R.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r23.md#_snippet_7
+
+LANGUAGE: Bash
+CODE:
+```
+#!/system/bin/sh
+HERE=""$(cd ""$(dirname ""$0"")"" && pwd)""
+export ASAN_OPTIONS=log_to_syslog=false,allow_user_segv_handler=1
+ASAN_LIB=$(ls $HERE/libclang_rt.asan-*-android.so)
+if [ -f ""$HERE/libc++_shared.so"" ]; then
+    # Workaround for https://github.com/android/ndk/issues/988.
+    export LD_PRELOAD=""$ASAN_LIB $HERE/libc++_shared.so""
+else
+    export LD_PRELOAD=""$ASAN_LIB""
+fi
+""$@""
+```
+
+----------------------------------------
+
+TITLE: Define JNI Native Method in C++
+DESCRIPTION: Illustrates the C++ implementation of a JNI native method. It includes the necessary 'jni.h' header and the 'JNIEXPORT' and 'JNICALL' macros for proper function signature and export.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_2
+
+LANGUAGE: C++
+CODE:
+```
+#include <jni.h>
+
+extern ""C"" JNIEXPORT void JNICALL Java_com_example_app_Main_foo(JNIEnv* env,
+                                                                jobject o) {
+  // Do stuff here!
+}
+```
+
+----------------------------------------
+
+TITLE: JNI 1.6 Feature Support and Compatibility in Android NDK
+DESCRIPTION: This section outlines the supported JNI 1.6 features in Android, noting that DefineClass is not implemented due to Android's lack of Java bytecodes. It also highlights a backward compatibility change regarding local references, which are unlimited from Android 8.0 (Oreo) onwards.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_35
+
+LANGUAGE: APIDOC
+CODE:
+```
+JNI 1.6 Features:
+  - DefineClass: Not implemented (Android lacks Java bytecodes).
+  - All other JNI 1.6 features are supported.
+
+Backward Compatibility (Local References):
+  - Android < 8.0 (Oreo): Capped local references.
+  - Android >= 8.0 (Oreo): Unlimited local references.
+```
+
+----------------------------------------
+
+TITLE: Load JNI Shared Library in Java
+DESCRIPTION: Demonstrates how to load a native shared library (e.g., '.so' file) into a Java application using 'System.loadLibrary()'. The method automatically handles OS-specific prefixes and suffixes for the library name.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_0
+
+LANGUAGE: Java
+CODE:
+```
+static {
+    System.loadLibrary(""foo"");
+}
+```
+
+----------------------------------------
+
+TITLE: JNI Functions Callable During Pending Exceptions
+DESCRIPTION: This section lists the specific JNI functions that are permitted to be called while an exception is pending in the native code. Calling most other JNI functions in this state can lead to undefined behavior or crashes.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_26
+
+LANGUAGE: APIDOC
+CODE:
+```
+JNI_ExceptionHandling:
+  AllowedFunctionsDuringPendingException:
+    - DeleteGlobalRef()
+    - DeleteLocalRef()
+    - DeleteWeakGlobalRef()
+    - ExceptionCheck()
+    - ExceptionClear()
+    - ExceptionDescribe()
+    - ExceptionOccurred()
+    - MonitorExit()
+    - PopLocalFrame()
+    - PushLocalFrame()
+    - ReleaseXArrayElements()
+    - ReleasePrimitiveArrayCritical()
+    - ReleaseStringChars()
+    - ReleaseStringCritical()
+    - ReleaseStringUTFChars()
+```
+
+----------------------------------------
+
+TITLE: Generate JSON Compilation Database with ndk-build
+DESCRIPTION: Generate a `compile_commands.json` file for your project using ndk-build. This database is useful for various development tools like IDEs and static analyzers. You can generate it without building or as part of the build process.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r18-beta2.md#_snippet_2
+
+LANGUAGE: Shell
+CODE:
+```
+# Generate compile_commands.json without building the project
+ndk-build compile_commands.json
+
+# Build the project and then generate compile_commands.json
+ndk-build GEN_COMPILE_COMMANDS_DB=true
+```
+
+----------------------------------------
+
+TITLE: Access NDK Revision Information in CMake
+DESCRIPTION: This snippet documents the CMake variables available for accessing detailed NDK version information, including major, minor, build, and beta revisions. These variables allow build systems to programmatically determine the NDK version being used.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r17-beta1.md#_snippet_0
+
+LANGUAGE: APIDOC
+CODE:
+```
+CMake Variables for NDK Revision:
+- ANDROID_NDK_REVISION: Full string from source.properties
+- ANDROID_NDK_MAJOR: Major revision (e.g., 16 for r16b)
+- ANDROID_NDK_MINOR: Minor revision (e.g., 1 for 'b' in r16b)
+- ANDROID_NDK_BUILD: Build number (0 for local development)
+- ANDROID_NDK_BETA: Beta version (0 for stable release)
+```
+
+----------------------------------------
+
+TITLE: Workaround for ASan Exception Handling with libc++_shared
+DESCRIPTION: This bash script provides a workaround for Issue 988, where ASan exception handling can crash when using libc++_shared. It sets LD_PRELOAD to include libclang_rt.asan and libc++_shared.so if available, ensuring the correct library loading order. This is a platform bug affecting devices until at least Android R.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r22.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+#!/system/bin/sh
+HERE=""$(cd ""$(dirname ""$0"")"" && pwd)""
+export ASAN_OPTIONS=log_to_syslog=false,allow_user_segv_handler=1
+ASAN_LIB=$(ls $HERE/libclang_rt.asan-*-android.so)
+if [ -f ""$HERE/libc++_shared.so"" ]; then
+    # Workaround for https://github.com/android/ndk/issues/988.
+    export LD_PRELOAD=""$ASAN_LIB $HERE/libc++_shared.so""
+else
+    export LD_PRELOAD=""$ASAN_LIB""
+fi
+""$@""
+```
+
+----------------------------------------
+
+TITLE: JNI C JNIEnv Function Pointer Call
+DESCRIPTION: Illustrates the C syntax for invoking JNI functions, requiring explicit dereferencing of the `JNIEnv` pointer and passing it as the first argument to the function pointer. This syntax is more verbose compared to C++.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_14
+
+LANGUAGE: C
+CODE:
+```
+jstring s = (*env)->NewStringUTF(env, ""hello"");
+```
+
+----------------------------------------
+
+TITLE: Troubleshooting UnsatisfiedLinkError: Native Method Not Found
+DESCRIPTION: This snippet demonstrates UnsatisfiedLinkError when the runtime fails to find an implementation for a native method. It provides common causes like the library not being loaded, or a name/signature mismatch, and suggests using extern ""C"" for C++ functions or verifying method signatures for explicit registration.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_37
+
+LANGUAGE: Java
+CODE:
+```
+java.lang.UnsatisfiedLinkError: myfunc
+        at Foo.myfunc(Native Method)
+        at Foo.main(Foo.java:10)
+```
+
+LANGUAGE: Java
+CODE:
+```
+W/dalvikvm(  880): No implementation found for native LFoo;.myfunc ()V
+```
+
+LANGUAGE: APIDOC
+CODE:
+```
+Troubleshooting ""No implementation found for native method"":
+  - Library Loading: Check logcat for library loading messages.
+  - Method Name/Signature Mismatch:
+    - Lazy Lookup (C++): Ensure 'extern ""C""' and 'JNIEXPORT' visibility. Use 'nm(1)' to check for mangled symbols (_Z15Java_Foo_myfuncP7_JNIEnvP7_jclass) vs. correct (Java_Foo_myfunc), and symbol type ('T' for global text vs. 't' for local text).
+    - Explicit Registration: Verify method signature matches registration call. Remember: 'B' is byte, 'Z' is boolean. Class names: 'L' prefix, ';' suffix, '/' for package/class, '$' for inner classes (e.g., 'Ljava/util/Map$Entry;').
+  - Recommendation: Use 'javah' or 'javac -h' for automatic JNI header generation.
+```
+
+----------------------------------------
+
+TITLE: Declare Native Method in Java
+DESCRIPTION: Shows how to declare a method in Java (or Kotlin) using the 'native' keyword, indicating that its implementation is provided by C/C++ code via JNI.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_1
+
+LANGUAGE: Java
+CODE:
+```
+public native void foo();
+```
+
+----------------------------------------
+
+TITLE: JNI extern ""C"" and JNIEXPORT Usage
+DESCRIPTION: Explains the necessity of using `extern ""C""` in conjunction with `JNIEXPORT` for native method declarations in C++. This ensures that the C++ compiler generates functions with C linkage, preventing name mangling and allowing the Java Virtual Machine (JVM) to correctly locate and invoke the native functions.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_18
+
+LANGUAGE: APIDOC
+CODE:
+```
+extern ""C"" JNIEXPORT jstring JNICALL Java_com_example_MyClass_myNativeMethod(JNIEnv* env, jobject thiz);
+```
+
+----------------------------------------
+
+TITLE: Copying Byte Array Elements with GetByteArrayElements
+DESCRIPTION: This C++ snippet demonstrates copying byte array data using `GetByteArrayElements` followed by `memcpy`. It highlights the potential for multiple data copies and the necessity of calling `ReleaseByteArrayElements` with `JNI_ABORT` to prevent further copies.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_24
+
+LANGUAGE: C++
+CODE:
+```
+    jbyte* data = env->GetByteArrayElements(array, nullptr);
+    if (data != nullptr) {
+        memcpy(buffer, data, n);
+        env->ReleaseByteArrayElements(array, data, JNI_ABORT);
+    }
+```
+
+----------------------------------------
+
+TITLE: Bash Script for ASan Exception Handling Workaround in Android NDK
+DESCRIPTION: This `wrap.sh` script provides a workaround for Issue 988, addressing ASan exception handling crashes when using `libc++_shared` in Android NDK applications. It configures the `LD_PRELOAD` environment variable to ensure `libclang_rt.asan` and `libc++_shared.so` are loaded correctly, preventing crashes on Android R and older devices. This workaround is necessary for applications using ASan with `libc++_shared`.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r21.md#_snippet_3
+
+LANGUAGE: bash
+CODE:
+```
+#!/system/bin/sh
+HERE=""$(cd ""$(dirname ""$0"")"" && pwd)""
+export ASAN_OPTIONS=log_to_syslog=false,allow_user_segv_handler=1
+ASAN_LIB=$(ls $HERE/libclang_rt.asan-*-android.so)
+if [ -f ""$HERE/libc++_shared.so"" ]; then
+    # Workaround for https://github.com/android-ndk/ndk/issues/988.
+    export LD_PRELOAD=""$ASAN_LIB $HERE/libc++_shared.so""
+else
+    export LD_PRELOAD=""$ASAN_LIB""
+fi
+""$@""
+```
+
+----------------------------------------
+
+TITLE: Register Native Methods in C++ JNI_OnLoad
+DESCRIPTION: This C++ code implements the `JNI_OnLoad` function, which is called when the native library is loaded. It demonstrates how to obtain the JNI environment, find a Java class, and explicitly register native methods using `RegisterNatives` for improved performance and symbol checking.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_34
+
+LANGUAGE: c++
+CODE:
+```
+extern ""C"" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
+  JNIEnv* env;
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+    return JNI_ERR;
+  }
+
+  // Find your class.
+  // JNI_OnLoad is called from the correct class loader context for this to work.
+  jclass c = env->FindClass(""com/example/app/package/MyClass"");
+  if (c == nullptr) return JNI_ERR;
+
+  // Register your class' native methods.
+  static const JNINativeMethod methods[] = {
+    {""nativeFoo"", ""()V"", reinterpret_cast<void*>(nativeFoo)},
+    {""nativeBar"", ""(Ljava/lang/String;I)Z"", reinterpret_cast<void*>(nativeBar)},
+  };
+  int rc = env->RegisterNatives(c, methods,
+                                sizeof(methods)/sizeof(JNINativeMethod));
+  if (rc != JNI_OK) return rc;
+
+  return JNI_VERSION_1_6;
+}
+```
+
+----------------------------------------
+
+TITLE: Load Native Library in Java Static Initializer
+DESCRIPTION: This Java code snippet demonstrates the recommended way to load a native shared library using `System.loadLibrary` within a static initializer block. This ensures the library is loaded early and only once when the class is first accessed.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_33
+
+LANGUAGE: java
+CODE:
+```
+static {
+    System.loadLibrary(""foo"");
+}
+```
+
+----------------------------------------
+
+TITLE: Access NDK Revision Information in CMake
+DESCRIPTION: This snippet documents the CMake variables introduced to provide detailed NDK version information within CMake build scripts. These variables allow projects to programmatically determine the NDK revision, major version, minor version, build number, and beta status.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r17-beta2.md#_snippet_0
+
+LANGUAGE: APIDOC
+CODE:
+```
+ANDROID_NDK_REVISION: The full string in the source.properties file.
+ANDROID_NDK_MAJOR: The major revision of the NDK. For example: the 16 in r16b.
+ANDROID_NDK_MINOR: The minor revision of the NDK. For example: the b (represented as 1) in r16b.
+ANDROID_NDK_BUILD: The build number of the NDK. This is 0 in the case of a local development build.
+ANDROID_NDK_BETA: The beta version of the NDK. This is 0 for a stable release.
+```
+
+----------------------------------------
+
+TITLE: Configure GNU Assembler Integration with -fno-integrated-as
+DESCRIPTION: This flag disables the integrated assembler. Users are advised to remove this flag and migrate to LLVM's integrated assembler. Its continued use may indicate compatibility issues that should be reported.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r23.md#_snippet_0
+
+LANGUAGE: APIDOC
+CODE:
+```
+-fno-integrated-as
+```
+
+----------------------------------------
+
+TITLE: Build Multiple ABIs with ndk-build
+DESCRIPTION: This bash script illustrates a workflow for building an Android application for multiple ABIs sequentially using `ndk-build`. A recent change ensures that artifacts from previously built ABIs are no longer removed, allowing for cumulative builds.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r19-beta1.md#_snippet_2
+
+LANGUAGE: Bash
+CODE:
+```
+for abi in armeabi-v7a arm64-v8a x86 x86_64; do
+    ndk-build APP_ABI=$abi
+done
+```
+
+----------------------------------------
+
+TITLE: Troubleshooting UnsatisfiedLinkError: Library Not Found
+DESCRIPTION: This snippet illustrates the java.lang.UnsatisfiedLinkError when a native library cannot be found or opened by dlopen(3). It provides common reasons such as the library not existing, being inaccessible, or not being built correctly with the NDK.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_36
+
+LANGUAGE: Java
+CODE:
+```
+java.lang.UnsatisfiedLinkError: Library foo not found
+```
+
+LANGUAGE: APIDOC
+CODE:
+```
+Troubleshooting ""Library foo not found"":
+  - Check library existence and app accessibility: Use 'adb shell ls -l path'.
+  - Verify NDK build: Library might have dependencies not present on device if not built with NDK.
+```
+
+----------------------------------------
+
+TITLE: Enable Flexible Page Sizes in Android NDK Build (Application.mk)
+DESCRIPTION: This configuration snippet for `Application.mk` enables support for flexible page sizes, allowing the compiled application to be compatible with devices that utilize a 16KiB page size. This feature is activated by setting the `APP_SUPPORT_FLEXIBLE_PAGE_SIZES` variable to `true` within the `Application.mk` file.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r27.md#_snippet_1
+
+LANGUAGE: Makefile
+CODE:
+```
+APP_SUPPORT_FLEXIBLE_PAGE_SIZES := true
+```
+
+----------------------------------------
+
+TITLE: Creating a Global Reference for JNI Class Caching
+DESCRIPTION: This C++ snippet demonstrates how to convert a local JNI reference (obtained from `FindClass`) into a global reference using `NewGlobalRef`. This pattern is essential for caching `jclass` objects that need to persist beyond the current native method's execution, preventing them from being garbage collected prematurely.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_21
+
+LANGUAGE: C++
+CODE:
+```
+jclass localClass = env->FindClass(""MyClass"");
+jclass globalClass = reinterpret_cast<jclass>(env->NewGlobalRef(localClass));
+```
+
+----------------------------------------
+
+TITLE: Use ndk-which to Locate LLVM Tools
+DESCRIPTION: The ndk-which utility now provides improved fallback behavior, allowing users to query for GNU tool names (e.g., strip) and receive the path to the corresponding LLVM tool (e.g., llvm-strip). This simplifies tool discovery.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r24.md#_snippet_1
+
+LANGUAGE: Shell
+CODE:
+```
+ndk-which strip
+```
+
+----------------------------------------
+
+TITLE: Generate JSON Compilation Database with ndk-build
+DESCRIPTION: Commands to generate a JSON Compilation Database for your Android NDK project using ndk-build. This can be done either by generating the database without a full build or by building the project and generating the database simultaneously.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r18.md#_snippet_3
+
+LANGUAGE: Shell
+CODE:
+```
+ndk-build compile_commands.json
+ndk-build GEN_COMPILE_COMMANDS_DB=true
+```
+
+----------------------------------------
+
+TITLE: Enable and Configure Clang-Tidy in ndk-build
+DESCRIPTION: Integrate clang-tidy into your ndk-build project. Enable it application-wide or per-module, and pass specific checks or flags. You can also list available checks.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r18-beta2.md#_snippet_1
+
+LANGUAGE: Makefile
+CODE:
+```
+# Enable clang-tidy for the entire application
+APP_CLANG_TIDY := true
+
+# Enable clang-tidy for a specific module
+LOCAL_CLANG_TIDY := true
+
+# Pass specific flags for the application (e.g., enable specific checks)
+APP_CLANG_TIDY_FLAGS := -checks='-*,modernize-use-nullptr'
+
+# Pass specific flags for a module
+LOCAL_CLANG_TIDY_FLAGS := -checks='readability-identifier-naming'
+
+# Change warnings to errors
+APP_CLANG_TIDY_FLAGS += -warnings-as-errors='*'
+```
+
+LANGUAGE: Shell
+CODE:
+```
+# View the default list of clang-tidy checks
+clang-tidy -list-checks
+```
+
+----------------------------------------
+
+TITLE: Configure Clang-Tidy in Android NDK (ndk-build)
+DESCRIPTION: How to enable and pass flags to clang-tidy within the ndk-build system. This includes enabling clang-tidy application-wide or per-module, passing specific checks, and configuring warnings as errors through build variables.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r18.md#_snippet_1
+
+LANGUAGE: Makefile
+CODE:
+```
+# Enable clang-tidy application-wide
+APP_CLANG_TIDY := true
+
+# Enable clang-tidy per-module
+LOCAL_CLANG_TIDY := true
+
+# Pass specific clang-tidy flags application-wide (e.g., -checks)
+APP_CLANG_TIDY_FLAGS := -checks='*'
+
+# Pass specific clang-tidy flags per-module
+LOCAL_CLANG_TIDY_FLAGS := -checks='*'
+
+# Treat all clang-tidy warnings as errors (via flags)
+APP_CLANG_TIDY_FLAGS := -warnings-as-errors='*'
+```
+
+----------------------------------------
+
+TITLE: Efficiently Copying Byte Array Region with GetByteArrayRegion
+DESCRIPTION: This C++ snippet shows a more direct and efficient way to copy byte array data using `GetByteArrayRegion`. This method reduces overhead by requiring only one JNI call, avoids extra data copies, and minimizes programmer error by eliminating the need for a separate release call.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_25
+
+LANGUAGE: C++
+CODE:
+```
+    env->GetByteArrayRegion(array, 0, n, buffer);
+```
+
+----------------------------------------
+
+TITLE: Configure ndk-build to Allow Missing Dependencies
+DESCRIPTION: To revert to the old behavior where ndk-build modules would not fail on missing dependencies, set the `APP_ALLOW_MISSING_DEPS` variable to `true` in your `Application.mk` or `Android.mk` file, or as an environment variable.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r14-beta1.md#_snippet_0
+
+LANGUAGE: Makefile
+CODE:
+```
+APP_ALLOW_MISSING_DEPS=true
+```
+
+----------------------------------------
+
+TITLE: JavaVM Core Functions for Thread Management (C++)
+DESCRIPTION: This C++ code snippet illustrates the primary functions exposed by the `JavaVM` interface. It includes methods for attaching and detaching the current thread to the Java Virtual Machine, such as `AttachCurrentThread`, `DetachCurrentThread`, and `AttachCurrentThreadAsDaemon`. Additionally, it shows `GetEnv` for retrieving a `JNIEnv` and `DestroyJavaVM` for VM termination, though the latter is rarely useful for applications.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_10
+
+LANGUAGE: c++
+CODE:
+```
+    // Used to attach/detach the calling thread.
+    jint AttachCurrentThread(JavaVM*, JNIEnv**, void*);
+    jint DetachCurrentThread(JavaVM*);
+
+    // Like AttachCurrentThread(), but marks the thread as a Java ""daemon"" thread.
+    jint AttachCurrentThreadAsDaemon(JavaVM*, JNIEnv**, void*);
+
+    // Used to get a JNIEnv. Apps should usually call AttachCurrentThread instead.
+    jint GetEnv(JavaVM*, void**, jint);
+
+    // Used to destroy a JavaVM. Never useful for apps.
+    jint DestroyJavaVM(JavaVM*);
+```
+
+----------------------------------------
+
+TITLE: Manage -fno-integrated-as Flag for ARM32 Assembly
+DESCRIPTION: This snippet describes a change where ndk-build and CMake no longer pass the `-fno-integrated-as` flag by default for ARM32. Projects containing handwritten assembly may need to explicitly add this flag to their build configuration to ensure correct compilation.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r17-beta1.md#_snippet_2
+
+LANGUAGE: APIDOC
+CODE:
+```
+Compiler Flag Change:
+- Flag: -fno-integrated-as
+- Context: ARM32 assembly in ndk-build and CMake projects
+- Default: No longer passed by default
+- Action: May need to be explicitly added for projects with handwritten assembly.
+```
+
+----------------------------------------
+
+TITLE: Enable Flexible Page Sizes in Android NDK Build (CMake)
+DESCRIPTION: This CMake argument enables support for flexible page sizes, making the application compatible with devices that use a 16KiB page size. This argument can be passed directly to CMake during the build process or configured via the Android Gradle Plugin's `externalNativeBuild.cmake.arguments` property.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r27.md#_snippet_2
+
+LANGUAGE: CMake
+CODE:
+```
+-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON
+```
+
+----------------------------------------
+
+TITLE: Binutils Linker Option for Dynamic Linker Bug Workaround
+DESCRIPTION: The `--no-apply-dynamic` option is now a default in Binutils. This option was introduced to work around a dynamic linker bug present in earlier Android releases, preventing potential issues during runtime.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r12.md#_snippet_4
+
+LANGUAGE: Shell
+CODE:
+```
+--no-apply-dynamic
+```
+
+----------------------------------------
+
+TITLE: Configure Clang-Tidy in ndk-build and Shell
+DESCRIPTION: This snippet details how to enable and customize clang-tidy within the ndk-build system and how to list default checks. It covers application-wide or per-module enablement, passing specific flags like `-checks`, and changing warning behavior to errors.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r18-beta1.md#_snippet_1
+
+LANGUAGE: ndk-build
+CODE:
+```
+APP_CLANG_TIDY := true
+LOCAL_CLANG_TIDY := true
+APP_CLANG_TIDY_FLAGS
+LOCAL_CLANG_TIDY_FLAGS
+```
+
+LANGUAGE: Shell
+CODE:
+```
+clang-tidy -list-checks
+-warnings-as-errors=*
+```
+
+----------------------------------------
+
+TITLE: CheckJNI Extended Error Checking
+DESCRIPTION: CheckJNI is a debug mode in Android that enhances JNI error checking by switching JNIEnv function pointers to tables with extended validation. It helps identify common JNI programming errors that would otherwise lead to crashes.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_27
+
+LANGUAGE: APIDOC
+CODE:
+```
+CheckJNI:
+  Description: A debug mode that performs extended error checking for JNI calls.
+  ChecksPerformed:
+    - Arrays: Detecting attempts to allocate negative-sized arrays.
+    - Bad Pointers: Validating jarray/jclass/jobject/jstring arguments and non-NULL requirements.
+    - Class Names: Ensuring class names are in 'java/lang/String' format.
+    - Critical Calls: Preventing JNI calls between 'critical' get and release operations.
+    - Direct ByteBuffers: Validating arguments to NewDirectByteBuffer.
+    - Exceptions: Detecting JNI calls made while an exception is pending.
+    - JNIEnv*s: Verifying that JNIEnv* is used from the correct thread.
+```
+
+----------------------------------------
+
+TITLE: List Default Clang-Tidy Checks
+DESCRIPTION: Command to view the list of checks that are enabled by default in clang-tidy. This helps in understanding the default static analysis behavior of the tool.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r18.md#_snippet_2
+
+LANGUAGE: Shell
+CODE:
+```
+clang-tidy -list-checks
+```
+
+----------------------------------------
+
+TITLE: Configure Clang Target Architecture for Android NDK
+DESCRIPTION: This snippet demonstrates how to specify a target architecture for Clang using the `-target` flag, which serves as an alternative to using target-prefixed command wrappers. It also illustrates how to set this configuration as the `CC` environment variable for build systems like `configure` that may not properly handle arguments within the `CC` variable.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r27.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+clang -target aarch64-linux-android21
+```
+
+LANGUAGE: Shell
+CODE:
+```
+CC=""clang -target aarch64-linux-android21"" ./configure
+```
+
+----------------------------------------
+
+TITLE: Force ndk-gdb Execution
+DESCRIPTION: This flag forces the execution of `ndk-gdb`, which can be useful for bypassing certain checks or resolving incompatibilities, such as the Python 3 issue mentioned in the release notes.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r26.md#_snippet_3
+
+LANGUAGE: Shell
+CODE:
+```
+ndk-gdb -f
+```
+
+----------------------------------------
+
+TITLE: Enable LLD Linker for Android NDK Projects
+DESCRIPTION: To test the LLD linker, which AOSP and NDK are transitioning to, developers can pass a specific flag during the linking phase of their Android application build process. This allows for early testing of LLD's compatibility and performance.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r20-beta1.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+-fuse-ld=lld
+```
+
+----------------------------------------
+
+TITLE: Invoke NDK Clang Compiler Directly
+DESCRIPTION: Demonstrates how to directly invoke the Clang compiler from the NDK toolchain path. This method replaces the need for standalone toolchains and automatically finds necessary toolchain components. This change is primarily for maintainers of third-party build systems.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r19-beta2.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+$ $NDK/toolchains/llvm/prebuilt/<host-tag>/bin/armv7a-linux-androideabi26-clang++ src.cpp
+```
+
+----------------------------------------
+
+TITLE: Enable LLD Linker for Testing
+DESCRIPTION: To test the LLD linker in your application, pass this flag during the linking phase. This is relevant as AOSP and NDK are transitioning to LLD as the default linker.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r20.md#_snippet_0
+
+LANGUAGE: Command Line
+CODE:
+```
+-fuse-ld=lld
+```
+
+----------------------------------------
+
+TITLE: Enable LLD Linker for Android NDK
+DESCRIPTION: Demonstrates how to test the LLD linker in an Android NDK application by passing a specific flag during linking. LLD is being adopted by AOSP and will eventually be the default linker for NDK.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r20-beta3.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+-fuse-ld=lld
+```
+
+----------------------------------------
+
+TITLE: Allow Undefined Symbols in NDK Version Scripts
+DESCRIPTION: These options allow build systems to ignore errors caused by version scripts naming public symbols that are not present in the library. This can be used to revert to prior behavior if a library intentionally includes such symbols or if there's a mistake in the version script.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r26.md#_snippet_1
+
+LANGUAGE: CMake
+CODE:
+```
+-DANDROID_ALLOW_UNDEFINED_VERSION_SCRIPT_SYMBOLS=ON
+```
+
+LANGUAGE: Android.mk
+CODE:
+```
+LOCAL_ALLOW_UNDEFINED_VERSION_SCRIPT_SYMBOLS := true
+```
+
+----------------------------------------
+
+TITLE: Enable LLD Linker for Testing
+DESCRIPTION: This command-line flag allows developers to test the LLD linker in their Android applications. LLD is in the process of becoming the default linker for AOSP, and the NDK will follow suit. This helps in early adoption and testing of the new linker.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r18-beta1.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+-fuse-ld=lld
+```
+
+----------------------------------------
+
+TITLE: Ensure Clang Compatibility with Binutils
+DESCRIPTION: Third-party build systems must pass this flag to Clang to ensure compatibility with binutils. NDK-build, CMake, and standalone toolchains handle this automatically.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r20.md#_snippet_4
+
+LANGUAGE: Command Line
+CODE:
+```
+-fno-addrsig
+```
+
+----------------------------------------
+
+TITLE: Check NDK Version with ndk-major-at-least in Makefile
+DESCRIPTION: This Makefile snippet demonstrates how to check if the NDK version being used is r21 or newer. It utilizes the `ndk-major-at-least` function, which returns `true` if the condition is met. The code is designed to gracefully handle older NDKs where this function might be undefined, ensuring the `else` branch is taken in such cases.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r21.md#_snippet_2
+
+LANGUAGE: Makefile
+CODE:
+```
+# This check works even on pre-r21 NDKs. The function is undefined pre-r21,
+# and calling an undefined function in make returns the empty string, which
+# is not equal to ""true"", so the else branch will be taken.
+ifeq ($(call ndk-major-at-least,21),true)
+    # Using at least NDK r21.
+else
+    # Using something earlier than r21.
+endif
+```
+
+----------------------------------------
+
+TITLE: Enable CheckJNI on Rooted Android Devices
+DESCRIPTION: This sequence of ADB shell commands allows enabling CheckJNI on a rooted Android device by stopping the Dalvik/ART runtime, setting the 'dalvik.vm.checkjni' system property to true, and then restarting the runtime. This change applies system-wide until reboot or manual disable.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_28
+
+LANGUAGE: Bash
+CODE:
+```
+adb shell stop
+adb shell setprop dalvik.vm.checkjni true
+adb shell start
+```
+
+----------------------------------------
+
+TITLE: JNI `jvalue` Union Structure
+DESCRIPTION: Defines the `jvalue` union, a C/C++ structure used in JNI for passing arguments to Java methods. It encapsulates all primitive and reference types.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_6
+
+LANGUAGE: C++
+CODE:
+```
+typedef union jvalue {
+  // Primitive types.
+  jboolean z;
+  jbyte    b;
+  jchar    c;
+  jdouble  d;
+  jfloat   f;
+  jint     i;
+  jlong    j;
+  jshort   s;
+  // Reference types.
+  jobject  l;
+} jvalue;
+```
+
+----------------------------------------
+
+TITLE: Logcat Output for CheckJNI Enabled (Rooted/Emulator)
+DESCRIPTION: This logcat message indicates that CheckJNI has been successfully enabled for the Android runtime. This output is typically seen when CheckJNI is turned on by default (e.g., in an emulator) or via the 'dalvik.vm.checkjni' property on rooted devices.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_29
+
+LANGUAGE: Plain Text
+CODE:
+```
+D AndroidRuntime: CheckJNI is ON
+```
+
+----------------------------------------
+
+TITLE: Directly Invoke NDK Clang Compiler
+DESCRIPTION: This snippet shows how to directly invoke the NDK Clang compiler from its new unified installation path. This method replaces the need for standalone toolchains, as the compiler and its dependencies are now automatically found within the NDK's toolchains/llvm directory. It's relevant for maintainers of third-party build systems.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r19.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+$ $NDK/toolchains/llvm/prebuilt/<host-tag>/bin/armv7a-linux-androideabi26-clang++ src.cpp
+```
+
+----------------------------------------
+
+TITLE: Configure Module Stripping in ndk-build
+DESCRIPTION: Control how shared libraries and executables are stripped of debug information and symbols during the build process in ndk-build. This allows optimizing binary size or retaining debug info for specific purposes.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r18-beta2.md#_snippet_4
+
+LANGUAGE: Makefile
+CODE:
+```
+# Set application-wide strip mode (e.g., no stripping)
+APP_STRIP_MODE := none
+
+# Set module-specific strip mode (overrides APP_STRIP_MODE)
+LOCAL_STRIP_MODE := --strip-debug
+
+# Default strip mode (same as previous NDKs)
+# APP_STRIP_MODE := --strip-unneeded
+```
+
+----------------------------------------
+
+TITLE: Pass -fno-addrsig to Clang for Binutils Compatibility
+DESCRIPTION: Third-party build systems must pass this flag to Clang to ensure compatibility with binutils. ndk-build, CMake, and standalone toolchains include this flag automatically.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r19.md#_snippet_4
+
+LANGUAGE: Shell
+CODE:
+```
+-fno-addrsig
+```
+
+----------------------------------------
+
+TITLE: Default Linker Warning Flags for Shared Libraries
+DESCRIPTION: The linker flags `-Wl,--warn-shared-textrel` and `-Wl,--fatal-warnings` are now enabled by default. These flags warn about or treat as fatal errors shared text relocations, which are not allowed for 64-bit apps and prevent apps from loading on Marshmallow or later Android versions.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r12.md#_snippet_2
+
+LANGUAGE: Shell
+CODE:
+```
+-Wl,--warn-shared-textrel -Wl,--fatal-warnings
+```
+
+----------------------------------------
+
+TITLE: Configure NDK r29 Version in Gradle
+DESCRIPTION: This Gradle configuration snippet sets the `ndkVersion` property within the `android` block to specify the exact version of NDK r29 to be used in an Android project. This ensures the project builds with the intended NDK release.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Home.md#_snippet_2
+
+LANGUAGE: gradle
+CODE:
+```
+android {
+    ndkVersion ""29.0.13599879""
+}
+```
+
+----------------------------------------
+
+TITLE: Workaround for thread_local Segfaults with dlclose
+DESCRIPTION: When using `thread_local` variables with non-trivial destructors, calling `dlclose` on the containing library can lead to segfaults on Android M or newer devices, or older devices when using a static STL. The simple workaround is to avoid calling `dlclose` on such libraries.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r20-beta2.md#_snippet_1
+
+LANGUAGE: C/C++
+CODE:
+```
+Avoid calling `dlclose()` on libraries that contain `thread_local` variables with non-trivial destructors.
+```
+
+----------------------------------------
+
+TITLE: Configure Android NDK r24 Version in Gradle
+DESCRIPTION: This Gradle snippet sets the `ndkVersion` to 24.0.8215888 within the `android` block of a build file. This configuration specifies the r24 release of the Native Development Kit for use in an Android project.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Unsupported-Downloads.md#_snippet_2
+
+LANGUAGE: Gradle
+CODE:
+```
+android {
+    ndkVersion ""24.0.8215888""
+}
+```
+
+----------------------------------------
+
+TITLE: Binutils Linker Option for Large ARM32 Binaries
+DESCRIPTION: The `--long-plt` option has been introduced in Binutils to fix an internal linker error that could occur when linking very large ARM32 binaries, ensuring proper symbol resolution.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r12.md#_snippet_3
+
+LANGUAGE: Shell
+CODE:
+```
+--long-plt
+```
+
+----------------------------------------
+
+TITLE: Configure Android NDK r26d Version in Gradle
+DESCRIPTION: This Gradle snippet sets the `ndkVersion` to 26.3.11579264 within the `android` block of a build file. This configuration specifies the r26d release of the Native Development Kit for use in an Android project.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Unsupported-Downloads.md#_snippet_0
+
+LANGUAGE: Gradle
+CODE:
+```
+android {
+    ndkVersion ""26.3.11579264""
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Android NDK r23c Version in Gradle
+DESCRIPTION: This Gradle snippet sets the `ndkVersion` to 23.2.8568313 within the `android` block of a build file. This configuration specifies the r23c release of the Native Development Kit for use in an Android project.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Unsupported-Downloads.md#_snippet_3
+
+LANGUAGE: Gradle
+CODE:
+```
+android {
+    ndkVersion ""23.2.8568313""
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Android ARM Mode in CMake
+DESCRIPTION: These CMake variables control the ARM mode for Android ABIs. The new toolchain file now ignores `ANDROID_ARM_MODE` for ABIs other than `armeabi-v7a`, aligning with legacy behavior and preventing errors with CMake 3.22+ when `CMAKE_ANDROID_ARM_MODE` is set for other ABIs.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r23.md#_snippet_4
+
+LANGUAGE: APIDOC
+CODE:
+```
+ANDROID_ARM_MODE
+CMAKE_ANDROID_ARM_MODE
+```
+
+----------------------------------------
+
+TITLE: Configure Android NDK r25c Version in Gradle
+DESCRIPTION: This Gradle snippet sets the `ndkVersion` to 25.2.9519653 within the `android` block of a build file. This configuration specifies the r25c release of the Native Development Kit for use in an Android project.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Unsupported-Downloads.md#_snippet_1
+
+LANGUAGE: Gradle
+CODE:
+```
+android {
+    ndkVersion ""25.2.9519653""
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Android NDK Version r16b in Gradle
+DESCRIPTION: This snippet illustrates how to define Android NDK version r16b (16.1.4479499) in a Gradle build script. This setting is crucial for projects that require a specific NDK toolchain for compiling native components.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Unsupported-Downloads.md#_snippet_10
+
+LANGUAGE: gradle
+CODE:
+```
+android {
+    ndkVersion ""16.1.4479499""
+}
+```
+
+----------------------------------------
+
+TITLE: Test LLD Linker in Android NDK Applications
+DESCRIPTION: Instructions on how to test the LLD (LLVM Linker) in your Android NDK application. This involves passing a specific flag to the linker during the build process to enable LLD.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r18.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+-fuse-ld=lld
+```
+
+----------------------------------------
+
+TITLE: Configure NDK r28 Version in Gradle
+DESCRIPTION: This Gradle configuration snippet sets the `ndkVersion` property within the `android` block to specify the exact version of NDK r28 to be used in an Android project. This ensures the project builds with the intended NDK release.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Home.md#_snippet_1
+
+LANGUAGE: gradle
+CODE:
+```
+android {
+    ndkVersion ""28.1.13356709""
+}
+```
+
+----------------------------------------
+
+TITLE: Resolve NDK Toolchain Error with Android Gradle Plugin
+DESCRIPTION: An error indicating 'No toolchains found' can occur if the Android Gradle plugin version is 3.0 or older, making it incompatible with this NDK version. The resolution involves upgrading the project's Gradle plugin to version 3.1 or newer, along with Android Studio 3.1 or newer.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r20-beta1.md#_snippet_2
+
+LANGUAGE: Error Message
+CODE:
+```
+No toolchains found in the NDK toolchains folder for ABI with prefix: mips64el-linux-android
+```
+
+----------------------------------------
+
+TITLE: Enable CheckJNI for New Apps on Regular Devices
+DESCRIPTION: This ADB shell command enables CheckJNI for any new applications launched after the command is executed. It does not affect already running apps. The setting persists until the device is rebooted or the property is explicitly changed to another value.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/JNI.md#_snippet_30
+
+LANGUAGE: Bash
+CODE:
+```
+adb shell setprop debug.checkjni 1
+```
+
+----------------------------------------
+
+TITLE: Configure Android NDK Version r19c in Gradle
+DESCRIPTION: This Gradle snippet sets the `ndkVersion` property within the `android` block to specify Android NDK version 19.2.5345600 for a project. This configuration ensures that the correct NDK version is utilized during the build process, aligning with the r19c release.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Unsupported-Downloads.md#_snippet_7
+
+LANGUAGE: Gradle
+CODE:
+```
+android {
+    ndkVersion ""19.2.5345600""
+}
+```
+
+----------------------------------------
+
+TITLE: Specify LLD Linker for Android NDK Builds
+DESCRIPTION: To test the LLD linker, which will become the default in future NDK releases, developers should pass this flag during the linking phase of their build process.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r19-beta1.md#_snippet_0
+
+LANGUAGE: Bash
+CODE:
+```
+-fuse-ld=lld
+```
+
+----------------------------------------
+
+TITLE: Configure Android NDK Version r17c in Gradle
+DESCRIPTION: This snippet demonstrates how to set Android NDK version r17c (17.2.4988734) within a Gradle build script. Specifying the NDK version helps maintain build reproducibility and compatibility for projects relying on native code.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Unsupported-Downloads.md#_snippet_9
+
+LANGUAGE: gradle
+CODE:
+```
+android {
+    ndkVersion ""17.2.4988734""
+}
+```
+
+----------------------------------------
+
+TITLE: Enable Debug Info for Clang Builds
+DESCRIPTION: This flag is enabled by default for Clang debug builds in NDK r12b. It improves debugability when using LLDB by preventing the compiler from limiting debug information.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r12.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+-fno-limit-debug-info
+```
+
+----------------------------------------
+
+TITLE: Configure Android NDK Version r18b in Gradle
+DESCRIPTION: This snippet shows how to specify Android NDK version r18b (18.1.5063045) in a Gradle build script. This configuration ensures that your Android project uses the exact NDK version for compilation and linking, providing consistent build environments.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Unsupported-Downloads.md#_snippet_8
+
+LANGUAGE: gradle
+CODE:
+```
+android {
+    ndkVersion ""18.1.5063045""
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Android NDK Version r21e in Gradle
+DESCRIPTION: This Gradle snippet sets the `ndkVersion` property within the `android` block to specify Android NDK version 21.4.7075529 for a project. This configuration ensures that the correct NDK version is utilized during the build process, aligning with the r21e release.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Unsupported-Downloads.md#_snippet_5
+
+LANGUAGE: Gradle
+CODE:
+```
+android {
+    ndkVersion ""21.4.7075529""
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Android NDK Version r20b in Gradle
+DESCRIPTION: This Gradle snippet sets the `ndkVersion` property within the `android` block to specify Android NDK version 20.1.5948944 for a project. This configuration ensures that the correct NDK version is utilized during the build process, aligning with the r20b release.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Unsupported-Downloads.md#_snippet_6
+
+LANGUAGE: Gradle
+CODE:
+```
+android {
+    ndkVersion ""20.1.5948944""
+}
+```
+
+----------------------------------------
+
+TITLE: Enable LLD Linker in Android NDK Builds
+DESCRIPTION: To test the LLD linker in your Android NDK application, pass this flag during the linking phase. LLD is being adopted by AOSP and will eventually be the default linker for the NDK, improving build performance and debugging.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r20-beta2.md#_snippet_0
+
+LANGUAGE: Build Configuration
+CODE:
+```
+-fuse-ld=lld
+```
+
+----------------------------------------
+
+TITLE: Configure NDK r27c Version in Gradle
+DESCRIPTION: This Gradle configuration snippet sets the `ndkVersion` property within the `android` block to specify the exact version of NDK r27c to be used in an Android project. This ensures the project builds with the intended NDK release.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Home.md#_snippet_0
+
+LANGUAGE: gradle
+CODE:
+```
+android {
+    ndkVersion ""27.2.12479018""
+}
+```
+
+----------------------------------------
+
+TITLE: Test LLD Linker in Android NDK
+DESCRIPTION: Test the LLD linker in your Android NDK application by passing the `-fuse-ld=lld` flag during the linking phase. This helps in evaluating the new linker before it becomes the default.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r18-beta2.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+g++ -fuse-ld=lld your_source.cpp -o your_app
+```
+
+----------------------------------------
+
+TITLE: Configure Android NDK Version r22b in Gradle
+DESCRIPTION: This Gradle snippet sets the `ndkVersion` property within the `android` block to specify Android NDK version 22.1.7171670 for a project. This configuration ensures that the correct NDK version is utilized during the build process, aligning with the r22b release.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Unsupported-Downloads.md#_snippet_4
+
+LANGUAGE: Gradle
+CODE:
+```
+android {
+    ndkVersion ""22.1.7171670""
+}
+```
+
+----------------------------------------
+
+TITLE: Enable Build ID for Crash Reports
+DESCRIPTION: The `--build-id` flag is now enabled by default in NDK r12b. This feature embeds a unique build identifier into the binary, which is then shown in native crash reports to help identify the exact version of the code that was running.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r12.md#_snippet_1
+
+LANGUAGE: Shell
+CODE:
+```
+--build-id
+```
+
+----------------------------------------
+
+TITLE: Configure Strip Mode for Modules in ndk-build
+DESCRIPTION: How to specify the stripping mode for modules in ndk-build using `APP_STRIP_MODE` and `LOCAL_STRIP_MODE`. This allows users to control how binaries are stripped, including options to disable stripping or set custom strip options. `LOCAL_STRIP_MODE` always overrides `APP_STRIP_MODE`.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r18.md#_snippet_5
+
+LANGUAGE: Makefile
+CODE:
+```
+# Set application-wide strip mode
+APP_STRIP_MODE := --strip-debug
+
+# Set per-module strip mode
+LOCAL_STRIP_MODE := --strip-all
+
+# Disable stripping
+LOCAL_STRIP_MODE := none
+
+# Default behavior (same as previous NDKs)
+APP_STRIP_MODE := --strip-unneeded
+```
+
+----------------------------------------
+
+TITLE: Configure LLD Linker for Android NDK Builds
+DESCRIPTION: Instructs the linker to use LLD (LLVM Linker) instead of the default linker. This flag is passed during the linking phase of the build process to enable testing of LLD within your Android NDK application.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r21.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+-fuse-ld=lld
+```
+
+----------------------------------------
+
+TITLE: Specify ARMv7-a Architecture for Non-Integrated Assembler
+DESCRIPTION: When using Clang with a non-integrated assembler, it may incorrectly generate ARMv5 instructions for 32-bit ARM builds if -march=armv7-a is not explicitly passed. This flag ensures correct ARMv7-a instruction generation. Integrated assembler does not have this issue.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r20.md#_snippet_5
+
+LANGUAGE: Command Line
+CODE:
+```
+-march=armv7-a
+```
+
+----------------------------------------
+
+TITLE: Disable Clang Implicit Function Declaration Error
+DESCRIPTION: This flag reverts Clang's behavior for implicit function declarations from an error to a warning in C11 and newer standards. It is useful for projects that may have forgotten `#include` directives and need to maintain compatibility with older Clang versions.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r26.md#_snippet_0
+
+LANGUAGE: C/C++
+CODE:
+```
+-Wno-error=implicit-function-declaration
+```
+
+----------------------------------------
+
+TITLE: Fix Clang ARM64 Debug Info with -O0
+DESCRIPTION: Clang may output debug information with incorrect line numbers when compiling for ARM64 with -O0 (no optimizations). Third-party build systems can pass this flag to Clang to work around this issue.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r20.md#_snippet_6
+
+LANGUAGE: Command Line
+CODE:
+```
+-fno-experimental-isel
+```
+
+----------------------------------------
+
+TITLE: Add Cortex-A8 Fix Flag to NDK Build
+DESCRIPTION: To support older devices requiring the Cortex-A8 fix, add this flag to your build configuration. It should be appended to `APP_LDFLAGS` for ndk-build or `CMAKE_C_FLAGS` for CMake projects. Note that LLD does not support this workaround.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r19.md#_snippet_2
+
+LANGUAGE: Shell
+CODE:
+```
+-Wl,--fix-cortex-a8
+```
+
+----------------------------------------
+
+TITLE: Specify ARMv7-a Architecture for Clang Non-Integrated Assembler
+DESCRIPTION: When using Clang with the non-integrated assembler (`-fno-integrated-as`) for 32-bit ARM, explicitly use this flag. This prevents the assembler from generating ARMv5 instructions. The integrated assembler does not have this issue, and ndk-build/CMake already apply this workaround.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r19.md#_snippet_5
+
+LANGUAGE: Shell
+CODE:
+```
+-march=armv7-a
+```
+
+----------------------------------------
+
+TITLE: Disable NEON for ARM in Android NDK Projects
+DESCRIPTION: Instructions on how to explicitly disable NEON support for ARM architectures in Android NDK projects. This is applicable for both ndk-build and CMake build systems, especially if your minSdkVersion is 23 or higher and you need to support older devices without NEON.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r18.md#_snippet_4
+
+LANGUAGE: Makefile
+CODE:
+```
+LOCAL_ARM_NEON := false
+```
+
+LANGUAGE: CMake
+CODE:
+```
+-DANDROID_ARM_NEON=false
+```
+
+----------------------------------------
+
+TITLE: NDK Build System Linker Flags Precedence
+DESCRIPTION: In Android NDK build systems, the LOCAL_LDFLAGS variable now takes precedence over APP_LDFLAGS. This change affects how linker flags are applied during the build process.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r20.md#_snippet_2
+
+LANGUAGE: Android NDK
+CODE:
+```
+LOCAL_LDFLAGS precedence over APP_LDFLAGS
+```
+
+----------------------------------------
+
+TITLE: Add Cortex-A8 Fix Flag to NDK Builds
+DESCRIPTION: For applications requiring continued support for older Cortex-A8 CPUs, this linker flag can be added to `APP_LDFLAGS` in `ndk-build` or `CMAKE_C_FLAGS` in CMake projects. It's important to note that the LLD linker does not support this specific workaround.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r19-beta1.md#_snippet_3
+
+LANGUAGE: Build Flags
+CODE:
+```
+-Wl,--fix-cortex-a8
+```
+
+----------------------------------------
+
+TITLE: Disable Multithreaded Linking for LLD on Windows
+DESCRIPTION: When using LLD on Windows, multithreaded linking may cause hangs. Custom build systems and CMake users should pass this flag to the linker to disable multithreaded linking. ndk-build automatically handles this.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r19.md#_snippet_3
+
+LANGUAGE: Shell
+CODE:
+```
+-Wl,--no-threads
+```
+
+----------------------------------------
+
+TITLE: Disable Multithreaded LLD Linking on Windows
+DESCRIPTION: When using LLD on Windows, multithreaded linking may cause the linker to hang. CMake users and custom build systems should pass this flag to disable multithreaded linking. NDK-build automatically applies this workaround.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r20.md#_snippet_3
+
+LANGUAGE: Command Line
+CODE:
+```
+-Wl,--no-threads
+```
+
+----------------------------------------
+
+TITLE: Disable ARM NEON in Android NDK Builds
+DESCRIPTION: Explicitly disable ARM NEON support in your Android NDK project for compatibility with older devices that may not support it, especially when targeting Android 23 (Marshmallow) or newer. This can be configured in ndk-build or CMake.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r18-beta2.md#_snippet_3
+
+LANGUAGE: Makefile
+CODE:
+```
+# Disable NEON for a module in ndk-build
+LOCAL_ARM_NEON := false
+```
+
+LANGUAGE: CMake
+CODE:
+```
+# Disable NEON in CMake
+-DANDROID_ARM_NEON=false
+```
+
+----------------------------------------
+
+TITLE: Disable ARM NEON in CMake
+DESCRIPTION: This CMake flag disables ARM NEON support when building with CMake. It provides a way to ensure compatibility with older devices that do not support NEON, particularly when targeting minSdkVersion 23 or higher.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r18-beta1.md#_snippet_3
+
+LANGUAGE: CMake
+CODE:
+```
+-DANDROID_ARM_NEON=false
+```
+
+----------------------------------------
+
+TITLE: Disable ARM NEON in ndk-build
+DESCRIPTION: This configuration variable disables ARM NEON support for modules built with ndk-build. This is useful for supporting older devices that may have been upgraded to Marshmallow but lack NEON hardware, especially if minSdkVersion is 23 or higher.
+SOURCE: https://github.com/android/ndk/blob/master/__wiki__/Changelogs/Changelog-r18-beta1.md#_snippet_2
+
+LANGUAGE: ndk-build
+CODE:
+```
+LOCAL_ARM_NEON := false
+```","android",""

@@ -1,0 +1,82 @@
+"sprint boot","TITLE: Default Handlebars Configuration - YAML
+DESCRIPTION: This YAML snippet displays the default configuration properties for Handlebars in Spring Boot. It includes properties for enabling Handlebars, setting the prefix and suffix for template files, enabling caching, registering a message helper, and handling missing files.
+SOURCE: https://github.com/allegro/handlebars-spring-boot-starter/blob/master/README.md#_snippet_3
+
+LANGUAGE: yaml
+CODE:
+```
+handlebars.enabled: true
+handlebars.prefix: classpath:templates/
+handlebars.suffix: .hbs
+handlebars.cache: true
+handlebars.registerMessageHelper: true
+handlebars.failOnMissingFile: false
+handlebars.bindI18nToMessageSource: false
+handlebars.prettyPrint: false
+handlebars.infiniteLoops: false
+```
+
+----------------------------------------
+
+TITLE: Adding Handlebars Starter Dependency - Gradle
+DESCRIPTION: This Gradle snippet demonstrates how to add the `handlebars-spring-boot-starter` dependency to your project. It includes the necessary repository configuration and the dependency declaration. Replace `$version` with the actual version number.
+SOURCE: https://github.com/allegro/handlebars-spring-boot-starter/blob/master/README.md#_snippet_0
+
+LANGUAGE: gradle
+CODE:
+```
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'pl.allegro.tech.boot:handlebars-spring-boot-starter:$version'
+}
+```
+
+----------------------------------------
+
+TITLE: Adding Handlebars Helpers - Gradle
+DESCRIPTION: This Gradle snippet demonstrates how to add Handlebars helpers as dependencies. It includes `handlebars-helpers` and `handlebars-jackson`. JacksonHelper will be registered with the name `json`, while others will use their default names.
+SOURCE: https://github.com/allegro/handlebars-spring-boot-starter/blob/master/README.md#_snippet_1
+
+LANGUAGE: gradle
+CODE:
+```
+dependencies {
+    compile 'com.github.jknack:handlebars-helpers:4.4.0',
+            'com.github.jknack:handlebars-jackson:4.4.0'
+}
+```
+
+----------------------------------------
+
+TITLE: Registering a Custom Handlebars Helper - Java
+DESCRIPTION: This Java snippet shows how to register a custom Handlebars helper using the `@HandlebarsHelper` annotation. The `foo()` method returns the string 'bar', making it available as a helper in Handlebars templates. It requires the `HandlebarsHelper` annotation to be defined.
+SOURCE: https://github.com/allegro/handlebars-spring-boot-starter/blob/master/README.md#_snippet_2
+
+LANGUAGE: java
+CODE:
+```
+@HandlebarsHelper
+public class CustomHelper {
+    CharSequence foo() {
+        return 'bar'
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Default Handlebars Resolver Configuration - YAML
+DESCRIPTION: This YAML snippet displays the default configuration properties for Handlebars value resolvers in Spring Boot. It includes properties for enabling or disabling Java Bean, Map, Method and Field resolvers. More information about value resolvers can be found on [Using the ValueResolver](https://github.com/jknack/handlebars.java#using-the-valueresolver).
+SOURCE: https://github.com/allegro/handlebars-spring-boot-starter/blob/master/README.md#_snippet_4
+
+LANGUAGE: yaml
+CODE:
+```
+handlebars.resolver.javaBean: true
+handlebars.resolver.map: true
+handlebars.resolver.method: false
+handlebars.resolver.field: false
+```","sprint boot",""

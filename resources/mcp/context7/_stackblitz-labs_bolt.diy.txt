@@ -1,0 +1,950 @@
+"bolt-diy","TITLE: Configuring Environment Variables - Bash
+DESCRIPTION: Example content for the `.env.local` file, used to set API keys and optional configuration like log level and context size for the application.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/CONTRIBUTING.md#_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+GROQ_API_KEY=XXX
+HuggingFace_API_KEY=XXX
+OPENAI_API_KEY=XXX
+...
+VITE_LOG_LEVEL=debug
+DEFAULT_NUM_CTX=32768
+```
+
+----------------------------------------
+
+TITLE: Example API Key Configuration (.env.local)
+DESCRIPTION: This snippet shows the format for adding API keys to the `.env.local` file. Replace `XXX` with your actual API keys for each service you intend to use (e.g., Groq, OpenAI, Anthropic). These keys are loaded by the application to authenticate with the respective LLM providers.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_3
+
+LANGUAGE: Shell
+CODE:
+```
+GROQ_API_KEY=XXX
+OPENAI_API_KEY=XXX
+ANTHROPIC_API_KEY=XXX
+```
+
+----------------------------------------
+
+TITLE: Clone bolt.diy Repository (Bash)
+DESCRIPTION: Clones the bolt.diy project repository from GitHub to your local machine using the git command-line tool. This is the first step in setting up the development environment.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/CONTRIBUTING.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+git clone https://github.com/stackblitz-labs/bolt.diy.git
+```
+
+----------------------------------------
+
+TITLE: Installing Project Dependencies with pnpm
+DESCRIPTION: This command installs all required project dependencies listed in the package.json file using pnpm. It must be run from the project's root directory after cloning the repository.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+pnpm install
+```
+
+----------------------------------------
+
+TITLE: Install Dependencies with pnpm
+DESCRIPTION: Installs the project dependencies using the pnpm package manager. This command should be run after cloning the repository or pulling the latest changes.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+pnpm install
+```
+
+----------------------------------------
+
+TITLE: Installing Dependencies - PNPM Bash
+DESCRIPTION: Installs project dependencies using the PNPM package manager after cloning the repository.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/CONTRIBUTING.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+pnpm install
+```
+
+----------------------------------------
+
+TITLE: Cloning Bolt.DIY Repository (Stable Branch)
+DESCRIPTION: This Git command clones the Bolt.DIY repository from GitHub, specifically checking out the stable branch. This is recommended for developers who want a reliable version of the project.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_7
+
+LANGUAGE: bash
+CODE:
+```
+git clone -b stable https://github.com/stackblitz-labs/bolt.diy.git
+```
+
+----------------------------------------
+
+TITLE: Installing pnpm Package Manager Globally
+DESCRIPTION: This command uses npm to globally install pnpm, a fast, disk-space efficient package manager. pnpm is required to manage project dependencies for Bolt.DIY.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+npm install -g pnpm
+```
+
+----------------------------------------
+
+TITLE: Install pnpm Globally via npm
+DESCRIPTION: Installs the pnpm package manager globally on your system using npm. This is a prerequisite if pnpm is not already installed.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_5
+
+LANGUAGE: bash
+CODE:
+```
+sudo npm install -g pnpm
+```
+
+----------------------------------------
+
+TITLE: Install Project Dependencies (Bash)
+DESCRIPTION: Installs all necessary project dependencies using the pnpm package manager. This command should be run after cloning the repository.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/CONTRIBUTING.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+pnpm install
+```
+
+----------------------------------------
+
+TITLE: Fetch Latest Changes with Git
+DESCRIPTION: Pulls the latest code changes from the 'main' branch of the origin repository using Git. This updates your local codebase.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_10
+
+LANGUAGE: bash
+CODE:
+```
+git pull origin main
+```
+
+----------------------------------------
+
+TITLE: Clone Bolt.diy Repository (Stable Branch)
+DESCRIPTION: This command clones the bolt.diy GitHub repository to your local machine. The `-b stable` flag ensures that the stable branch of the project is checked out immediately after cloning, providing a known working version of the application.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_1
+
+LANGUAGE: Bash
+CODE:
+```
+git clone -b stable https://github.com/stackblitz-labs/bolt.diy
+```
+
+----------------------------------------
+
+TITLE: Starting Bolt.DIY Development Server with pnpm
+DESCRIPTION: This command initiates the development server for the Bolt.DIY application using a script defined in package.json. It typically starts the web UI, accessible via a local URL like http://localhost:5173.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_3
+
+LANGUAGE: bash
+CODE:
+```
+pnpm run dev
+```
+
+----------------------------------------
+
+TITLE: Start Development Server Script
+DESCRIPTION: Runs the script to start the development server, typically with hot-reloading enabled.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_13
+
+LANGUAGE: bash
+CODE:
+```
+pnpm run dev
+```
+
+----------------------------------------
+
+TITLE: Running Development Server - PNPM Bash
+DESCRIPTION: Starts the local development server for the bolt.diy application using PNPM.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/CONTRIBUTING.md#_snippet_3
+
+LANGUAGE: bash
+CODE:
+```
+pnpm run dev
+```
+
+----------------------------------------
+
+TITLE: Run Local Development Server (Bash)
+DESCRIPTION: Starts the local development server for the bolt.diy project using the pnpm run dev script. The application will typically be accessible in a web browser after running this command.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/CONTRIBUTING.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+pnpm run dev
+```
+
+----------------------------------------
+
+TITLE: Navigating to Bolt.DIY Project Directory
+DESCRIPTION: This command changes the current directory to bolt.diy, which is the root directory of the cloned repository. All subsequent project-specific commands should be run from this directory.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_8
+
+LANGUAGE: bash
+CODE:
+```
+cd bolt.diy
+```
+
+----------------------------------------
+
+TITLE: Cloning Repository - Git Bash
+DESCRIPTION: Clones the bolt.diy project repository from GitHub to your local machine.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/CONTRIBUTING.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+git clone https://github.com/stackblitz-labs/bolt.diy.git
+```
+
+----------------------------------------
+
+TITLE: Example Environment Variables (.env.local) (Text)
+DESCRIPTION: Provides an example of required API keys that should be added to the `.env.local` file for the application to function correctly. Replace 'XXX' with your actual keys.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/CONTRIBUTING.md#_snippet_2
+
+LANGUAGE: text
+CODE:
+```
+GROQ_API_KEY=XXX
+HuggingFace_API_KEY=XXX
+OPENAI_API_KEY=XXX
+...
+```
+
+----------------------------------------
+
+TITLE: Start Development Server with pnpm
+DESCRIPTION: Starts the Remix Vite development server for local development. This enables hot-reloading and requires Google Chrome Canary for local execution.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_6
+
+LANGUAGE: bash
+CODE:
+```
+pnpm run dev
+```
+
+----------------------------------------
+
+TITLE: Running Development Server with pnpm
+DESCRIPTION: This command starts the local development server for the project. It's typically used during active development to see changes in real-time.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_15
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm run dev
+```
+
+----------------------------------------
+
+TITLE: Pulling Latest Updates from Git Repository
+DESCRIPTION: This Git command fetches and integrates the latest changes from the remote repository into the current local branch. It's essential for keeping the local codebase up-to-date.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_11
+
+LANGUAGE: bash
+CODE:
+```
+git pull
+```
+
+----------------------------------------
+
+TITLE: Performing a Clean Project Installation
+DESCRIPTION: This sequence of commands performs a clean installation by removing existing node_modules and lock files, clearing the pnpm store cache, and then reinstalling all dependencies. This is useful for resolving dependency-related issues.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_13
+
+LANGUAGE: bash
+CODE:
+```
+rm -rf node_modules pnpm-lock.yaml
+pnpm store prune
+pnpm install
+```
+
+----------------------------------------
+
+TITLE: Saving Local Git Changes with Stash
+DESCRIPTION: This Git command temporarily saves uncommitted local changes, allowing developers to switch branches or pull updates without committing incomplete work. Changes can be restored later using git stash pop.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_10
+
+LANGUAGE: bash
+CODE:
+```
+git stash
+```
+
+----------------------------------------
+
+TITLE: Running Test Suite - PNPM Bash
+DESCRIPTION: Executes the project's test suite using PNPM to verify functionality.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/CONTRIBUTING.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+pnpm test
+```
+
+----------------------------------------
+
+TITLE: Run Project Test Suite (Bash)
+DESCRIPTION: Executes the project's automated test suite using the pnpm test script. This command verifies the functionality and stability of the codebase.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/CONTRIBUTING.md#_snippet_5
+
+LANGUAGE: bash
+CODE:
+```
+pnpm test
+```
+
+----------------------------------------
+
+TITLE: Running Test Suite with Vitest
+DESCRIPTION: This command executes the project's test suite using Vitest, ensuring that all components and functionalities are working as expected.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_19
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm test
+```
+
+----------------------------------------
+
+TITLE: Building the Project with pnpm
+DESCRIPTION: This command compiles and bundles the project's source code into a production-ready build. It's a prerequisite for deployment or local production testing.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_16
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm run build
+```
+
+----------------------------------------
+
+TITLE: Previewing Production Build Locally with pnpm
+DESCRIPTION: This command first builds the project and then runs the production build locally, allowing for a full test of the optimized application before deployment.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_18
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm run preview
+```
+
+----------------------------------------
+
+TITLE: Setting DEFAULT_NUM_CTX Environment Variable (Bash)
+DESCRIPTION: This snippet shows how to set the `DEFAULT_NUM_CTX` environment variable in a `.env.local` file. This variable is used to configure the default context size, which is often related to the required VRAM.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/CONTRIBUTING.md#_snippet_15
+
+LANGUAGE: bash
+CODE:
+```
+DEFAULT_NUM_CTX=24576 # Uses 32GB VRAM
+```
+
+----------------------------------------
+
+TITLE: Automatically Fixing Linting Issues with pnpm
+DESCRIPTION: This command automatically identifies and corrects common code style and quality issues based on predefined linting rules, improving code consistency.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_23
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm run lint:fix
+```
+
+----------------------------------------
+
+TITLE: Run Test Suite Script
+DESCRIPTION: Executes the project's test suite using Vitest.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_17
+
+LANGUAGE: bash
+CODE:
+```
+pnpm test
+```
+
+----------------------------------------
+
+TITLE: Update Dependencies After Git Pull
+DESCRIPTION: Re-installs or updates project dependencies using pnpm after pulling the latest changes from the repository. This ensures you have the correct versions for the updated code.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_11
+
+LANGUAGE: bash
+CODE:
+```
+pnpm install
+```
+
+----------------------------------------
+
+TITLE: Rebuild and Run Docker Container After Update
+DESCRIPTION: Rebuilds the Docker image and restarts the container using Docker Compose with the 'development' profile. The '--build' flag ensures the image is rebuilt with the latest code.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_12
+
+LANGUAGE: bash
+CODE:
+```
+docker compose --profile development up --build
+```
+
+----------------------------------------
+
+TITLE: Building & Running Docker Production Container (Compose) - Docker Compose Bash
+DESCRIPTION: Uses Docker Compose with the 'production' profile to build and start the application container for production purposes.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/CONTRIBUTING.md#_snippet_12
+
+LANGUAGE: bash
+CODE:
+```
+docker compose --profile production up
+```
+
+----------------------------------------
+
+TITLE: Running Docker Container with Docker Compose
+DESCRIPTION: This command uses Docker Compose to start the Bolt.DIY application container. It activates the development profile, which typically configures the container for local development and exposes necessary ports.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_6
+
+LANGUAGE: bash
+CODE:
+```
+docker compose --profile development up
+```
+
+----------------------------------------
+
+TITLE: Run Docker Dev Container (Compose Profile) (Bash)
+DESCRIPTION: Starts the development environment using Docker Compose with the 'development' profile. This is a convenient way to run the application and its dependencies in containers.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/CONTRIBUTING.md#_snippet_9
+
+LANGUAGE: bash
+CODE:
+```
+docker compose --profile development up
+```
+
+----------------------------------------
+
+TITLE: Run Docker Prod Container (Compose Profile) (Bash)
+DESCRIPTION: Starts the production environment using Docker Compose with the 'production' profile. This is a convenient way to run the application and its dependencies in containers for production.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/CONTRIBUTING.md#_snippet_13
+
+LANGUAGE: bash
+CODE:
+```
+docker compose --profile production up
+```
+
+----------------------------------------
+
+TITLE: Run Docker Container with Development Profile
+DESCRIPTION: Starts the application container using Docker Compose with the 'development' profile. This profile enables features like hot-reloading for development.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_9
+
+LANGUAGE: bash
+CODE:
+```
+docker compose --profile development up
+```
+
+----------------------------------------
+
+TITLE: Running TypeScript Type Checking with pnpm
+DESCRIPTION: This command performs static analysis on the TypeScript code to check for type errors, ensuring type safety and code quality.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_20
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm run typecheck
+```
+
+----------------------------------------
+
+TITLE: Deploying Project to Cloudflare Pages with pnpm
+DESCRIPTION: This command automates the deployment process, pushing the built project to Cloudflare Pages for public access.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_22
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm run deploy
+```
+
+----------------------------------------
+
+TITLE: Deploy to Cloudflare Pages (Bash)
+DESCRIPTION: Deploys the bolt.diy application to Cloudflare Pages using the pnpm run deploy script. Requires appropriate permissions and Wrangler CLI configuration.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/CONTRIBUTING.md#_snippet_6
+
+LANGUAGE: bash
+CODE:
+```
+pnpm run deploy
+```
+
+----------------------------------------
+
+TITLE: Deploy to Cloudflare Pages Script
+DESCRIPTION: Builds the project and deploys it to Cloudflare Pages.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_20
+
+LANGUAGE: bash
+CODE:
+```
+pnpm run deploy
+```
+
+----------------------------------------
+
+TITLE: Preview Production Build Locally Script
+DESCRIPTION: Builds the project and then starts it locally for testing the production build. Note that HTTP streaming may not work as expected.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_16
+
+LANGUAGE: bash
+CODE:
+```
+pnpm run preview
+```
+
+----------------------------------------
+
+TITLE: Deploying to Cloudflare Pages - PNPM Bash
+DESCRIPTION: Initiates the deployment process for the application to Cloudflare Pages using PNPM.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/CONTRIBUTING.md#_snippet_5
+
+LANGUAGE: bash
+CODE:
+```
+pnpm run deploy
+```
+
+----------------------------------------
+
+TITLE: Build Project Script
+DESCRIPTION: Runs the script to build the project for production deployment.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_14
+
+LANGUAGE: bash
+CODE:
+```
+pnpm run build
+```
+
+----------------------------------------
+
+TITLE: Building Docker Image via npm Script
+DESCRIPTION: This command executes an npm script named dockerbuild to build the Docker image for the Bolt.DIY application. It's a convenient wrapper for the direct Docker build command.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+npm run dockerbuild
+```
+
+----------------------------------------
+
+TITLE: Building Docker Production Image (Script) - NPM Bash
+DESCRIPTION: Uses an NPM helper script to build the Docker image specifically for the production environment.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/CONTRIBUTING.md#_snippet_10
+
+LANGUAGE: bash
+CODE:
+```
+npm run dockerbuild:prod
+```
+
+----------------------------------------
+
+TITLE: Build Docker Dev Image (npm script) (Bash)
+DESCRIPTION: Builds the Docker image for the development environment using a predefined npm script. This is one of the options for preparing the development container.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/CONTRIBUTING.md#_snippet_7
+
+LANGUAGE: bash
+CODE:
+```
+# Development build
+npm run dockerbuild
+```
+
+----------------------------------------
+
+TITLE: Building Docker Development Image (Script) - NPM Bash
+DESCRIPTION: Uses an NPM helper script to build the Docker image specifically for the development environment.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/CONTRIBUTING.md#_snippet_6
+
+LANGUAGE: bash
+CODE:
+```
+npm run dockerbuild
+```
+
+----------------------------------------
+
+TITLE: Run TypeScript Type Checking Script
+DESCRIPTION: Performs static analysis to check for TypeScript type errors.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_18
+
+LANGUAGE: bash
+CODE:
+```
+pnpm run typecheck
+```
+
+----------------------------------------
+
+TITLE: Building Docker Image Directly
+DESCRIPTION: This command builds the Docker image for the Bolt.DIY application from the current directory, specifically targeting the bolt-ai-development stage. It creates a container image ready for deployment.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_5
+
+LANGUAGE: bash
+CODE:
+```
+docker build . --target bolt-ai-development
+```
+
+----------------------------------------
+
+TITLE: Building Docker Development Image (Direct) - Docker Bash
+DESCRIPTION: Directly builds the Docker image for the development environment using the Docker CLI, targeting the 'bolt-ai-development' stage.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/CONTRIBUTING.md#_snippet_7
+
+LANGUAGE: bash
+CODE:
+```
+docker build . --target bolt-ai-development
+```
+
+----------------------------------------
+
+TITLE: Build Docker Image Directly
+DESCRIPTION: Builds the Docker image directly using the docker CLI, targeting the 'bolt-ai-development' stage. This is an alternative to using the npm script.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_8
+
+LANGUAGE: bash
+CODE:
+```
+docker build . --target bolt-ai-development
+```
+
+----------------------------------------
+
+TITLE: Building Docker Production Image (Direct) - Docker Bash
+DESCRIPTION: Directly builds the Docker image for the production environment using the Docker CLI, targeting the 'bolt-ai-production' stage.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/CONTRIBUTING.md#_snippet_11
+
+LANGUAGE: bash
+CODE:
+```
+docker build . --target bolt-ai-production
+```
+
+----------------------------------------
+
+TITLE: Optional Environment Variables (.env.local) (Text)
+DESCRIPTION: Shows optional environment variables that can be set in the `.env.local` file to configure logging level and context size for the application.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/CONTRIBUTING.md#_snippet_3
+
+LANGUAGE: text
+CODE:
+```
+VITE_LOG_LEVEL=debug
+DEFAULT_NUM_CTX=32768
+```
+
+----------------------------------------
+
+TITLE: Building & Running Docker Development Container (Compose) - Docker Compose Bash
+DESCRIPTION: Uses Docker Compose with the 'development' profile to build and start the application container for development purposes.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/CONTRIBUTING.md#_snippet_8
+
+LANGUAGE: bash
+CODE:
+```
+docker compose --profile development up
+```
+
+----------------------------------------
+
+TITLE: Running Docker Development Container - Docker Bash
+DESCRIPTION: Runs the previously built Docker development image, mapping port 5173 and loading environment variables from `.env.local`.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/CONTRIBUTING.md#_snippet_9
+
+LANGUAGE: bash
+CODE:
+```
+docker run -p 5173:5173 --env-file .env.local bolt-ai:development
+```
+
+----------------------------------------
+
+TITLE: Run Built Application Locally Script
+DESCRIPTION: Runs the built application locally using Wrangler Pages, setting up necessary bindings via `bindings.sh`.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_15
+
+LANGUAGE: bash
+CODE:
+```
+pnpm run start
+```
+
+----------------------------------------
+
+TITLE: Running Built Application Locally with Wrangler
+DESCRIPTION: After building the project, this command runs the compiled application locally using Wrangler Pages, simulating the Cloudflare Pages environment.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_17
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm run start
+```
+
+----------------------------------------
+
+TITLE: Build Docker Image via npm Script
+DESCRIPTION: Uses a predefined npm script to build the Docker image for the application. This is the recommended way to build the image.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_7
+
+LANGUAGE: bash
+CODE:
+```
+npm run dockerbuild
+```
+
+----------------------------------------
+
+TITLE: Generate TypeScript Types Script
+DESCRIPTION: Generates TypeScript types using Wrangler.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_19
+
+LANGUAGE: bash
+CODE:
+```
+pnpm run typegen
+```
+
+----------------------------------------
+
+TITLE: Generating TypeScript Types with Wrangler
+DESCRIPTION: This command uses Wrangler to generate TypeScript types, which can be crucial for integrating with Cloudflare services and ensuring correct API usage.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_21
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm run typegen
+```
+
+----------------------------------------
+
+TITLE: Build Docker Prod Image (npm script) (Bash)
+DESCRIPTION: Builds the Docker image for the production environment using a predefined npm script. This is one of the options for preparing the production container.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/CONTRIBUTING.md#_snippet_11
+
+LANGUAGE: bash
+CODE:
+```
+# Production build
+npm run dockerbuild:prod
+```
+
+----------------------------------------
+
+TITLE: Setting DEFAULT_NUM_CTX Environment Variable (Bash)
+DESCRIPTION: This snippet demonstrates how to set the `DEFAULT_NUM_CTX` environment variable in a `.env.local` file. The value `24576` is assigned, with a comment indicating it corresponds to 32GB of VRAM usage. This variable is used for context-specific configurations.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/CONTRIBUTING.md#_snippet_16
+
+LANGUAGE: bash
+CODE:
+```
+DEFAULT_NUM_CTX=24576 # Uses 32GB VRAM
+```
+
+----------------------------------------
+
+TITLE: Build Docker Prod Image (direct command) (Bash)
+DESCRIPTION: Builds the Docker image for the production environment directly using the docker build command, targeting the 'bolt-ai-production' stage.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/CONTRIBUTING.md#_snippet_12
+
+LANGUAGE: bash
+CODE:
+```
+docker build . --target bolt-ai-production
+```
+
+----------------------------------------
+
+TITLE: Run Docker Dev Container (direct command) (Bash)
+DESCRIPTION: Runs the development Docker container directly, mapping port 5173 and loading environment variables from `.env.local`.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/CONTRIBUTING.md#_snippet_10
+
+LANGUAGE: bash
+CODE:
+```
+docker run -p 5173:5173 --env-file .env.local bolt-ai:development
+```
+
+----------------------------------------
+
+TITLE: Run Docker Prod Container (direct command) (Bash)
+DESCRIPTION: Runs the production Docker container directly, mapping port 5173 and loading environment variables from `.env.local`.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/CONTRIBUTING.md#_snippet_14
+
+LANGUAGE: bash
+CODE:
+```
+docker run -p 5173:5173 --env-file .env.local bolt-ai:production
+```
+
+----------------------------------------
+
+TITLE: Build Docker Dev Image (direct command) (Bash)
+DESCRIPTION: Builds the Docker image for the development environment directly using the docker build command, targeting the 'bolt-ai-development' stage.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/CONTRIBUTING.md#_snippet_8
+
+LANGUAGE: bash
+CODE:
+```
+docker build . --target bolt-ai-development
+```
+
+----------------------------------------
+
+TITLE: Running Docker Production Container - Docker Bash
+DESCRIPTION: Runs the previously built Docker production image, mapping port 5173 and loading environment variables from `.env.local`.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/CONTRIBUTING.md#_snippet_13
+
+LANGUAGE: bash
+CODE:
+```
+docker run -p 5173:5173 --env-file .env.local bolt-ai:production
+```
+
+----------------------------------------
+
+TITLE: Verify Node.js Path (Mac/Linux)
+DESCRIPTION: This command prints the system's PATH environment variable to the console. It is used to verify if the Node.js installation directory is included in the PATH, allowing executables like `node` and `npm` to be run from any terminal location.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_0
+
+LANGUAGE: Bash
+CODE:
+```
+echo $PATH
+```
+
+----------------------------------------
+
+TITLE: Switching to Main Branch and Restarting Development
+DESCRIPTION: This sequence of commands switches the Git branch to main, reinstalls dependencies, and restarts the development server. The main branch may contain pre-release features and is less stable than stable.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_9
+
+LANGUAGE: bash
+CODE:
+```
+git checkout main
+pnpm install
+pnpm run dev
+```
+
+----------------------------------------
+
+TITLE: Resetting Local Git Changes to Origin Main
+DESCRIPTION: This Git command discards all local changes and resets the current branch to match the main branch on the remote origin. Use with caution as it permanently removes uncommitted work.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_14
+
+LANGUAGE: bash
+CODE:
+```
+git reset --hard origin/main
+```
+
+----------------------------------------
+
+TITLE: Verifying Node.js Installation on Mac/Linux
+DESCRIPTION: This command displays the system's PATH environment variable, allowing users to verify if the Node.js binary directory (e.g., /usr/local/bin) is included, indicating a successful installation.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+echo $PATH
+```
+
+----------------------------------------
+
+TITLE: Restoring Stashed Git Changes
+DESCRIPTION: This Git command applies the most recently stashed changes back to the working directory and removes them from the stash list. It's used to restore work saved with git stash.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/README.md#_snippet_12
+
+LANGUAGE: bash
+CODE:
+```
+git stash pop
+```
+
+----------------------------------------
+
+TITLE: Coolify Docker Compose Start Command (Bash)
+DESCRIPTION: Specifies the start command to be used when deploying the application via Coolify using Docker Compose. It activates the 'production' profile.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/CONTRIBUTING.md#_snippet_15
+
+LANGUAGE: bash
+CODE:
+```
+docker compose --profile production up
+```
+
+----------------------------------------
+
+TITLE: Coolify Deployment Start Command - Docker Compose Bash
+DESCRIPTION: Specifies the Docker Compose command used within Coolify to start the application container using the production profile for deployment.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/CONTRIBUTING.md#_snippet_14
+
+LANGUAGE: bash
+CODE:
+```
+docker compose --profile production up
+```
+
+----------------------------------------
+
+TITLE: Show Hidden Files (Mac)
+DESCRIPTION: This command modifies the macOS Finder preferences to display hidden files and folders, including those starting with a dot (like `.env.local`). This is necessary to locate and edit configuration files that are hidden by default.
+SOURCE: https://github.com/stackblitz-labs/bolt.diy/blob/main/docs/docs/index.md#_snippet_2
+
+LANGUAGE: Bash
+CODE:
+```
+defaults write com.apple.finder AppleShowAllFiles YES
+```","bolt-diy",""

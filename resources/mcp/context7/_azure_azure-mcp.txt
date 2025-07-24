@@ -1,0 +1,2985 @@
+"mcp azure","TITLE: Complete Command Implementation Example in C#
+DESCRIPTION: Full implementation example of a container list command showing proper structure, error handling, and argument processing.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_25
+
+LANGUAGE: csharp
+CODE:
+```
+public class ContainersListCommand : BaseStorageCommand<ContainersListArguments>
+{
+    public ContainersListCommand() : base()
+    {
+        RegisterArgumentChain(
+            CreateAccountArgument(GetStorageAccountOptions),
+            CreateContainerArgument(GetContainerOptions)
+        );
+    }
+
+    public override Command GetCommand()
+    {
+        var command = new Command(
+            ""list"",
+            ""List all containers in a storage account. Returns an array of container names."");
+
+        AddBaseOptionsToCommand(command);
+        command.AddOption(_accountOption);
+        return command;
+    }
+
+    public override async Task<CommandResponse> ExecuteAsync(CommandContext context, ParseResult parseResult)
+    {
+        var args = BindArguments(parseResult);
+
+        try
+        {
+            if (!await ProcessArgumentChain(context, args))
+            {
+                return context.Response;
+            }
+
+            var service = context.GetService<IStorageService>();
+            var containers = await service.ListContainers(
+                options.Account!,
+                options.Subscription!,
+                options.AuthMethod ?? AuthMethod.Credential,
+                options.TenantId,
+                options.RetryPolicy);
+
+            context.Response.Results = containers?.Count > 0 ? 
+                new { containers } : 
+                null;
+        }
+        catch (Exception ex)
+        {
+            HandleException(context.Response, ex);
+        }
+
+        return context.Response;
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Implementing Base Command Interface in Azure CLI
+DESCRIPTION: Definition of the core command interface IBaseCommand that all Azure CLI commands must implement. Specifies the contract for command execution and argument management.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_29
+
+LANGUAGE: csharp
+CODE:
+```
+public interface IBaseCommand
+{
+    Command GetCommand();
+    Task<CommandResponse> ExecuteAsync(CommandContext context, ParseResult commandOptions);
+    IEnumerable<ArgumentDefinition<string>>? GetArguments();
+    void ClearArguments();
+    void AddArgument(ArgumentDefinition<string> argument);
+}
+```
+
+----------------------------------------
+
+TITLE: Starting MCP Server in STDIO Mode
+DESCRIPTION: Builds the project and starts the server in STDIO mode using the ModelContextProtocol inspector.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Commands/Server/README.md#2025-04-22_snippet_0
+
+LANGUAGE: shell
+CODE:
+```
+dotnet build && npx @modelcontextprotocol/inspector ./bin/Debug/net9.0/azmcp.exe server start
+```
+
+----------------------------------------
+
+TITLE: Defining Service Interface Method in C#
+DESCRIPTION: Template for defining a method in the service interface, including XML documentation and parameter descriptions.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_2
+
+LANGUAGE: csharp
+CODE:
+```
+public interface I{Service}Service
+{
+    /// <summary>
+    /// {Operation description}
+    /// </summary>
+    /// <param name=""requiredParam1"">Required parameter description</param>
+    /// <param name=""subscription"">Subscription ID or name</param>
+    /// <param name=""tenantId"">Optional tenant ID for cross-tenant operations</param>
+    /// <param name=""retryPolicy"">Optional retry policy for the operation</param>
+    /// <returns>List of results</returns>
+    /// <exception cref=""AuthenticationFailedException"">When authentication fails</exception>
+    /// <exception cref=""RequestFailedException"">When the service request fails</exception>
+    Task<List<string>> {Operation}{Resource}(
+        string {requiredParam1},
+        string subscription,
+        AuthMethod? authMethod = null,
+        string? tenantId = null,
+        RetryPolicyArguments? retryPolicy = null);
+}
+```
+
+----------------------------------------
+
+TITLE: Creating Command Class in C#
+DESCRIPTION: Template for creating a command class, including option registration, argument binding, and command execution logic.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_4
+
+LANGUAGE: csharp
+CODE:
+```
+using System.CommandLine;
+using System.CommandLine.Parsing;
+using AzureMcp.Models.Command;
+using AzureMcp.Services.Interfaces;
+using ModelContextProtocol.Server;
+
+namespace AzureMcp.Commands.{Service}.{SubService}.{Resource};
+
+public sealed class {Resource}{Operation}Command : Base{Service}Command<{Resource}{Operation}Arguments>
+{
+    private readonly Option<string> _resourceOption = ArgumentDefinitions.{Service}.Resource.ToOption();
+
+    protected override string GetCommandName() => ""{operation}"";
+
+    protected override string GetCommandDescription() =>
+        $""""""
+        {Detailed description of what the command does}.
+        Returns {description of return format}.
+        
+        Required arguments:
+        - {ArgumentDefinitions.{Service}.Resource.Name}
+        """""";
+
+    protected override void RegisterOptions(Command command)
+    {
+        base.RegisterOptions(command);
+        command.AddOption(_resourceOption);
+    }
+
+    protected override void RegisterArguments()
+    {
+        base.RegisterArguments();
+        AddArgument(Create{Resource}Argument());
+    }
+
+    protected override {Resource}{Operation}Arguments BindArguments(ParseResult parseResult)
+    {
+        var args = base.BindArguments(parseResult);
+        args.Resource = parseResult.GetValueForOption(_resourceOption);
+        return args;
+    }
+
+    [McpServerTool(Destructive = false, ReadOnly = true)]
+    public override async Task<CommandResponse> ExecuteAsync(CommandContext context, ParseResult parseResult)
+    {
+        var args = BindArguments(parseResult);
+
+        try
+        {
+            if (!await ProcessArguments(context, args))
+            {
+                return context.Response;
+            }
+
+            var service = context.GetService<I{Service}Service>();
+            var results = await service.{Operation}{Resource}(
+                args.Resource!,
+                args.Subscription!,
+                args.Tenant,
+                args.RetryPolicy);
+
+            context.Response.Results = results?.Count > 0 ? 
+                new { results } : 
+                null;
+        }
+        catch (Exception ex)
+        {
+            HandleException(context.Response, ex);
+        }
+
+        return context.Response;
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Starting MCP Server in SSE Mode
+DESCRIPTION: Builds and starts the server in SSE (Server-Sent Events) transport mode on port 5008.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Commands/Server/README.md#2025-04-22_snippet_1
+
+LANGUAGE: shell
+CODE:
+```
+dotnet build && ./bin/Debug/net9.0/azmcp.exe server start --transport sse
+```
+
+----------------------------------------
+
+TITLE: Creating Arguments Class in C#
+DESCRIPTION: Template for creating an Arguments class for a specific command, inheriting from BaseArgumentsWithSubscription and defining custom parameters.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_1
+
+LANGUAGE: csharp
+CODE:
+```
+namespace AzureMcp.Arguments.{Service}.{SubService}.{Resource};
+
+public class {Resource}{Operation}Arguments : BaseArgumentsWithSubscription
+{
+    public string? {SpecificParam} { get; set; }
+}
+```
+
+----------------------------------------
+
+TITLE: Azure CLI Extension Operations in Bash
+DESCRIPTION: Commands to execute any Azure CLI command through the MCP extension, with examples for listing resource groups, retrieving storage account details, and listing virtual machines.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/docs/azmcp-commands.md#2025-04-22_snippet_7
+
+LANGUAGE: bash
+CODE:
+```
+# Execute any Azure CLI command
+azmcp extension az --command ""<command>""
+
+# Examples:
+# List resource groups
+azmcp extension az --command ""group list""
+
+# Get storage account details
+azmcp extension az --command ""storage account show --name <account-name> --resource-group <resource-group>""
+
+# List virtual machines
+azmcp extension az --command ""vm list --resource-group <resource-group>""
+```
+
+----------------------------------------
+
+TITLE: Registering Monitor Commands in Command Factory
+DESCRIPTION: Implementation of command group registration for Azure Monitor operations, showing hierarchical command structure and group organization.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_20
+
+LANGUAGE: csharp
+CODE:
+```
+private void RegisterMonitorCommands()
+{
+    // Create Monitor command group with clear description
+    var monitor = new CommandGroup(""monitor"",
+        ""Azure Monitor operations - Commands for querying and analyzing Azure Monitor logs and metrics."");
+    _rootGroup.AddSubGroup(monitor);
+
+    // Create descriptive subgroups
+    var logs = new CommandGroup(""log"",
+        ""Azure Monitor logs operations - Commands for querying Log Analytics workspaces using KQL."");
+    monitor.AddSubGroup(logs);
+
+    var workspaces = new CommandGroup(""workspace"",
+        ""Log Analytics workspace operations - Commands for managing Log Analytics workspaces."");
+    monitor.AddSubGroup(workspaces);
+
+    // Register commands under appropriate groups
+    logs.AddCommand(""query"", new Monitor.Log.LogQueryCommand());
+    workspaces.AddCommand(""list"", new Monitor.Workspace.WorkspaceListCommand());
+}
+```
+
+----------------------------------------
+
+TITLE: Listing Azure Subscriptions in Bash
+DESCRIPTION: Command to list available Azure subscriptions with an optional tenant ID parameter.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/docs/azmcp-commands.md#2025-04-22_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+# List available Azure subscriptions
+azmcp subscription list [--tenant-id <tenant-id>]
+```
+
+----------------------------------------
+
+TITLE: Root Command Group Registration in C#
+DESCRIPTION: Top-level command group registration pattern showing the organization of major command categories.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_21
+
+LANGUAGE: csharp
+CODE:
+```
+private void RegisterCommandGroup()
+{
+    // Register top-level command groups
+    RegisterCosmosCommands();
+    RegisterStorageCommands();
+    RegisterMonitorCommands();
+    RegisterToolsCommands();
+    RegisterSubscriptionCommands();
+    RegisterGroupCommands();
+    RegisterMcpServerCommands();
+}
+```
+
+----------------------------------------
+
+TITLE: App Configuration Operations in Bash
+DESCRIPTION: Commands for Azure App Configuration operations including listing accounts, key-value settings, and managing key-value pairs.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/docs/azmcp-commands.md#2025-04-22_snippet_5
+
+LANGUAGE: bash
+CODE:
+```
+# List App Configuration stores in a subscription
+azmcp appconfig account list --subscription <subscription>
+
+# List all key-value settings in an App Configuration store
+azmcp appconfig kv list --subscription <subscription> --account-name <account-name> [--key <key>] [--label <label>]
+
+# Show a specific key-value setting
+azmcp appconfig kv show --subscription <subscription> --account-name <account-name> --key <key> [--label <label>]
+
+# Set a key-value setting
+azmcp appconfig kv set --subscription <subscription> --account-name <account-name> --key <key> --value <value> [--label <label>]
+
+# Lock a key-value setting (make it read-only)
+azmcp appconfig kv lock --subscription <subscription> --account-name <account-name> --key <key> [--label <label>]
+
+# Unlock a key-value setting (make it editable)
+azmcp appconfig kv unlock --subscription <subscription> --account-name <account-name> --key <key> [--label <label>]
+
+# Delete a key-value setting
+azmcp appconfig kv delete --subscription <subscription> --account-name <account-name> --key <key> [--label <label>]
+```
+
+----------------------------------------
+
+TITLE: Implementing Service-Specific Base Command in C#
+DESCRIPTION: Demonstrates how to create a service-specific base command class with helper methods for common arguments, ensuring proper type constraints and inheritance.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_16
+
+LANGUAGE: csharp
+CODE:
+```
+using System.CommandLine;
+using AzureMcp.Models;
+using AzureMcp.Services.Interfaces;
+using AzureMcp.Arguments;
+
+public abstract class BaseAppConfigCommand<TArgs> : BaseCommand<TArgs>
+{
+    protected ArgumentChain<TArgs> CreateAccountArgument()
+    {
+        return ArgumentChain<TArgs>
+            .Create(ArgumentDefinitions.AppConfig.Account.Name, ArgumentDefinitions.AppConfig.Account.Description)
+            .WithValueAccessor(args => ((dynamic)args).Account ?? string.Empty)
+            .WithCommandExample(ArgumentDefinitions.GetCommandExample(GetCommandPath(), ArgumentDefinitions.AppConfig.Account))
+            .WithValueLoader(async (context, args) => await GetAccountOptions(context, args.Subscription ?? string.Empty))
+            .WithIsRequired(ArgumentDefinitions.AppConfig.Account.Required);
+    }
+
+    // Other helper methods...
+}
+
+public class KeyValueLockCommand : BaseAppConfigCommand<KeyValueLockArguments>
+{
+    public KeyValueLockCommand() : base()
+    {
+        RegisterArgumentChain(
+            CreateAccountArgument(),
+            CreateKeyArgument()
+        );
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Running Standalone Aspire Dashboard for OpenTelemetry in Docker
+DESCRIPTION: This Docker command runs a standalone Aspire dashboard container for visualizing OpenTelemetry data exported from the Azure MCP Server. It exposes ports for the dashboard interface and OTLP endpoint.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/TROUBLESHOOTING.md#2025-04-22_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+docker run --rm -it -d \
+    -p 18888:18888 \
+    -p 4317:18889 \
+    --name aspire-dashboard \
+    mcr.microsoft.com/dotnet/aspire-dashboard:9.0
+```
+
+----------------------------------------
+
+TITLE: Implementing Error Handling in C# for Azure MCP Commands
+DESCRIPTION: Shows how to implement error handling methods in Azure MCP commands, including custom error messages and status codes for different exception types.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_11
+
+LANGUAGE: csharp
+CODE:
+```
+protected override string GetErrorMessage(Exception ex) => ex switch
+{
+    AuthenticationFailedException authEx =>
+        $""Authentication failed. Please run 'az login' to sign in to Azure. Details: {authEx.Message}"",
+    RequestFailedException rfEx => rfEx.Message,
+    HttpRequestException httpEx =>
+        $""Service unavailable or network connectivity issues. Details: {httpEx.Message}"",
+    _ => base.GetErrorMessage(ex)
+};
+
+protected override int GetStatusCode(Exception ex) => ex switch
+{
+    AuthenticationFailedException => 401,
+    RequestFailedException rfEx => rfEx.Status,
+    HttpRequestException => 503,
+    _ => 500
+};
+```
+
+----------------------------------------
+
+TITLE: Implementing Service Method in C#
+DESCRIPTION: Template for implementing a service method, including credential retrieval, SDK client usage, and exception handling.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_3
+
+LANGUAGE: csharp
+CODE:
+```
+public class {Service}Service : Base{Service}Service, I{Service}Service
+{
+    public async Task<List<string>> {Operation}{Resource}(
+        string {requiredParam1},
+        string subscription,
+        string? tenantId = null)
+    {
+        var credential = await GetCredential(tenantId);
+
+        try
+        {
+            var client = new {ServiceClient}(
+                endpoint,
+                credential);
+
+            var response = await client.{SdkMethod}Async();
+
+            return response.Value.Select(item => item.Name).ToList();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($""Error in {nameof({Operation}{Resource})}: {ex.Message}"", ex);
+        }
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Azure MCP CLI Response Format in JSON
+DESCRIPTION: Standard JSON response format returned by all Azure MCP CLI commands, including status code, message, arguments, results, and operation duration.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/docs/azmcp-commands.md#2025-04-22_snippet_8
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""status"": ""200|403|500, etc"",
+  ""message"": """",
+  ""args"": [],
+  ""results"": [],
+  ""duration"": 123
+}
+```
+
+----------------------------------------
+
+TITLE: HTTP Status Code Exception Mapping in C#
+DESCRIPTION: Maps different exception types to appropriate HTTP status codes for consistent error response handling across the application.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_18
+
+LANGUAGE: csharp
+CODE:
+```
+protected override int GetStatusCode(Exception ex) => ex switch
+{
+    AuthenticationFailedException => 401,
+    RequestFailedException rfEx => rfEx.Status,
+    HttpRequestException => 503,
+    ResourceNotFoundException => 404,
+    ValidationException => 400,
+    _ => 500
+};
+```
+
+----------------------------------------
+
+TITLE: Storage Operations in Bash
+DESCRIPTION: Commands for Azure Storage operations including listing accounts, tables, blobs, containers, and retrieving container details.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/docs/azmcp-commands.md#2025-04-22_snippet_3
+
+LANGUAGE: bash
+CODE:
+```
+# List Storage accounts in a subscription
+azmcp storage account list --subscription <subscription>
+
+# List tables in a Storage account
+azmcp storage table list --subscription <subscription> --account-name <account-name>
+
+# List blobs in a Storage container
+azmcp storage blob list --subscription <subscription> --account-name <account-name> --container-name <container-name>
+
+# List containers in a Storage blob service
+azmcp storage blob container list --subscription <subscription> --account-name <account-name>
+
+# Get detailed properties of a storage container
+azmcp storage blob container details --subscription <subscription> --account-name <account-name> --container-name <container-name>
+```
+
+----------------------------------------
+
+TITLE: Testing Argument Chain Validation in Azure Commands
+DESCRIPTION: Unit test for validating argument dependencies and suggestion generation in Azure CLI commands. Tests the command's ability to provide suggested values for arguments based on service responses.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_27
+
+LANGUAGE: csharp
+CODE:
+```
+[Fact]
+public async Task ProcessArguments_WithMissingDependentValue_ReturnsSuggestions()
+{
+    // Arrange
+    var service = _serviceProvider.GetRequiredService<IStorageService>();
+    service.GetStorageAccounts(Arg.Any<string>())
+        .Returns([""account1"", ""account2""]);
+
+    // Act
+    var result = await _command.ExecuteAsync(_context, _parser);
+
+    // Assert
+    Assert.NotNull(result.Arguments);
+    var accountArg = result.Arguments.First(a => a.Name == ""account"");
+    Assert.NotNull(accountArg.SuggestedValues);
+    Assert.Contains(""account1"", accountArg.SuggestedValues.Select(v => v.Name));
+}
+```
+
+----------------------------------------
+
+TITLE: Creating Test Resources for Azure Key Vault in PowerShell
+DESCRIPTION: This snippet demonstrates how to connect to an Azure account and create test resources for Azure Key Vault using the New-TestResources.ps1 script. It includes setting up a service principal and specifying a subscription.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/README.md#2025-04-22_snippet_0
+
+LANGUAGE: powershell
+CODE:
+```
+Connect-AzAccount -Subscription 'YOUR SUBSCRIPTION ID'
+eng\common\TestResources\New-TestResources.ps1 keyvault
+```
+
+----------------------------------------
+
+TITLE: Testing Authentication Failures in Azure Commands
+DESCRIPTION: Unit test for handling authentication failures in Azure CLI commands. Verifies proper error messages and status codes are returned when authentication fails.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_28
+
+LANGUAGE: csharp
+CODE:
+```
+[Fact]
+public async Task ExecuteAsync_WithAuthFailure_ReturnsUnauthorized()
+{
+    // Arrange
+    var service = _serviceProvider.GetRequiredService<IStorageService>();
+    service.ListContainers(Arg.Any<string>(), Arg.Any<string>())
+        .Throws(new AuthenticationFailedException(""Not authenticated""));
+
+    // Act
+    var result = await _command.ExecuteAsync(_context, _parser);
+
+    // Assert
+    Assert.Equal(401, result.Status);
+    Assert.Contains(""Please run 'az login'"", result.Message);
+}
+```
+
+----------------------------------------
+
+TITLE: Implementing Type-Safe Argument Creation in C#
+DESCRIPTION: Demonstrates best practices for implementing type-safe argument creation in Azure MCP commands.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_10
+
+LANGUAGE: csharp
+CODE:
+```
+protected ArgumentBuilder<TArgs> CreateResourceArgument()
+{
+    return ArgumentBuilder<TArgs>
+        .Create(ArgumentDefinitions.Service.Resource.Name, ArgumentDefinitions.Service.Resource.Description)
+        .WithValueAccessor(args => args.Resource ?? string.Empty)
+        .WithSuggestedValuesLoader(async (context, args) =>
+        {
+            if (string.IsNullOrEmpty(args.Subscription)) return [];
+            var service = context.GetService<IServiceName>();
+            var resources = await service.GetResources(args.Subscription);
+            return resources?.Select(r => new ArgumentOption { Name = r, Id = r }).ToList() ?? [];
+        })
+        .WithIsRequired(ArgumentDefinitions.Service.Resource.Required);
+}
+```
+
+----------------------------------------
+
+TITLE: Monitor Operations in Bash
+DESCRIPTION: Commands for Azure Monitor operations including listing workspaces, tables, and querying logs using KQL queries.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/docs/azmcp-commands.md#2025-04-22_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+# List Log Analytics workspaces in a subscription
+azmcp monitor workspace list --subscription <subscription>
+
+# List tables in a Log Analytics workspace
+azmcp monitor table list --subscription <subscription> --workspace <workspace> --resource-group <resource-group>
+
+# Query logs from Azure Monitor using KQL
+azmcp monitor log query --subscription <subscription> \
+                        --workspace <workspace> \
+                        --table-name <table-name> \
+                        --query ""<kql-query>"" \
+                        [--hours <hours>] \
+                        [--limit <limit>]
+
+# Examples:
+# Query logs from a specific table
+azmcp monitor log query --subscription <subscription> \
+                        --workspace <workspace> \
+                        --table-name ""AppEvents_CL"" \
+                        --query ""| order by TimeGenerated desc""
+```
+
+----------------------------------------
+
+TITLE: Executing Merge Proxy Tags Script in PowerShell
+DESCRIPTION: This snippet demonstrates how to run the merge-proxy-tags.ps1 script to combine proxy tags. It requires PowerShell 6+ and assumes the script is located in the eng/common/testproxy/scripts/tag-merge/ directory of the repository.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/testproxy/scripts/tag-merge/README.md#2025-04-22_snippet_0
+
+LANGUAGE: powershell
+CODE:
+```
+cd ""path/to/language/repo/root""
+./eng/common/testproxy/scripts/tag-merge/merge-proxy-tags.ps1 sdk/storage/azure-storage-blob/assets.json integration/example/storage_feature_addition2 integration/example/storage_feature_addition1
+test-proxy push -a sdk/storage/azure-storage-blob/assets.json
+```
+
+----------------------------------------
+
+TITLE: Error Response Structure in JSON
+DESCRIPTION: Standardized JSON structure for error responses including status code, message, results, and argument details.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_19
+
+LANGUAGE: json
+CODE:
+```
+{
+    ""status"": 404,
+    ""message"": ""Storage container not found. Please check the container name and try again."",
+    ""results"": null,
+    ""arguments"": [
+        {
+            ""name"": ""container"",
+            ""description"": ""Name of the container"",
+            ""value"": ""missing-container"",
+            ""required"": true,
+            ""suggestedValues"": [""container1"", ""container2""]
+        }
+    ]
+}
+```
+
+----------------------------------------
+
+TITLE: Implementing Container List Command in C#
+DESCRIPTION: Implements the ContainersListCommand class for listing containers in Azure Storage. It handles command-line arguments, executes the list operation, and processes the results.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_14
+
+LANGUAGE: csharp
+CODE:
+```
+namespace AzureMcp.Commands.Storage;
+
+public class ContainersListCommand : BaseStorageCommand
+{
+    public ContainersListCommand() : base()
+    {
+        RegisterArgumentChain<ContainersListArguments>(
+            CreateAccountArgument<ContainersListArguments>(GetAccountOptions)
+        );
+    }
+
+    public override Command GetCommand()
+    {
+        var command = new Command(
+            ""list"",
+            ""List all containers in a storage account."");
+
+        AddBaseOptionsToCommand(command);
+        return command;
+    }
+
+    public override async Task<CommandResponse> ExecuteAsync(CommandContext context, object commandOptions)
+    {
+        var parseResult = (System.CommandLine.Parsing.ParseResult)commandOptions;
+        var options = ParseOptions<ContainersListArguments>(parseResult);
+
+        try
+        {
+            if (!await ProcessArgumentChain(context, args))
+            {
+                return context.Response;
+            }
+
+            var storageService = context.GetService<IStorageService>();
+            var containers = await storageService.ListContainers(
+                options.Account!,
+                options.Subscription!,
+                options.TenantId,
+                options.RetryPolicy);
+
+            context.Response.Results = containers?.Count > 0 ? 
+                new { containers } : 
+                null;
+        }
+        catch (Exception ex)
+        {
+            HandleException(context.Response, ex);
+        }
+
+        return context.Response;
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Cosmos DB Operations in Bash
+DESCRIPTION: Commands for Cosmos DB operations including listing accounts, databases, containers, and querying items.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/docs/azmcp-commands.md#2025-04-22_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+# List Cosmos DB accounts in a subscription
+azmcp cosmos account list --subscription <subscription>
+
+# List databases in a Cosmos DB account
+azmcp cosmos database list --subscription <subscription> --account-name <account-name>
+
+# List containers in a Cosmos DB database
+azmcp cosmos database container list --subscription <subscription> --account-name <account-name> --database-name <database-name>
+
+# Query items in a Cosmos DB container
+azmcp cosmos database container item query --subscription <subscription> \
+                       --account-name <account-name> \
+                       --database-name <database-name> \
+                       --container-name <container-name> \
+                       [--query ""SELECT * FROM c""]
+```
+
+----------------------------------------
+
+TITLE: Updating Test Resources Expiration in PowerShell
+DESCRIPTION: This snippet shows how to use the Update-TestResources.ps1 script to extend the expiration time of test resources for Azure Key Vault. This is useful when you need more time for testing before resources are automatically deleted.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/README.md#2025-04-22_snippet_5
+
+LANGUAGE: powershell
+CODE:
+```
+Update-TestResources.ps1 keyvault
+```
+
+----------------------------------------
+
+TITLE: Defining Command Structure in C#
+DESCRIPTION: Demonstrates the basic structure of an azmcp command, showing the service, resource, and operation components.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_0
+
+LANGUAGE: csharp
+CODE:
+```
+azmcp <service> <resource> <operation>
+```
+
+----------------------------------------
+
+TITLE: Implementing Storage-Specific Base Command in Azure CLI
+DESCRIPTION: Base implementation for Azure Storage-specific commands with account management functionality. Extends SubscriptionCommand with storage-specific features and argument handling.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_32
+
+LANGUAGE: csharp
+CODE:
+```
+public abstract class BaseStorageCommand<T> : SubscriptionCommand<T>
+    where T : BaseStorageArguments, new()
+{
+    protected readonly Option<string> _accountOption = ArgumentDefinitions.Storage.Account.ToOption();
+
+    protected override void RegisterOptions(Command command)
+    {
+        base.RegisterOptions(command);
+        command.AddOption(_accountOption);
+    }
+
+    protected override void RegisterArguments()
+    {
+        base.RegisterArguments();
+        AddArgument(CreateAccountArgument());
+    }
+
+    protected ArgumentBuilder<T> CreateAccountArgument()
+    {
+        return ArgumentBuilder<T>
+            .Create(ArgumentDefinitions.Storage.Account.Name,
+                   ArgumentDefinitions.Storage.Account.Description)
+            .WithValueAccessor(args => args.Account ?? string.Empty)
+            .WithSuggestedValuesLoader(GetStorageAccounts)
+            .WithIsRequired(ArgumentDefinitions.Storage.Account.Required);
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Creating X509 Certificates with V3 Extensions in PowerShell
+DESCRIPTION: Demonstrates generating a certificate with V3 extensions, including Subject Alternative Names, Key Usage flags, and TLS capabilities. This example shows how to create a CA certificate suitable for TLS with specific key usage permissions and format it as both a PEM certificate with PKCS#8 private key and a Base64-encoded certificate.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/scripts/X509Certificate2/README.md#2025-04-22_snippet_1
+
+LANGUAGE: powershell
+CODE:
+```
+Import-Module -Name eng/scripts/X509Certificate2.psm1 # assumes $PWD is repo root
+
+$cert2 = New-X509Certificate2 -SubjectName 'CN=Azure SDK' -SubjectAlternativeNames (New-X509Certificate2SubjectAlternativeNames -EmailAddress azuresdk@microsoft.com) -KeyUsageFlags KeyEncipherment, NonRepudiation, DigitalSignature -CA -TLS -ValidDays 3652
+
+$PemCertificateWithV3Extensions = ($cert2 | Format-X509Certificate2 -Type Certificate) + ""`n"" + ($cert2 | Format-X509Certificate2 -Type Pkcs8)
+$CertificateWithV3ExtensionsBase64 = $cert2 | Format-X509Certificate2 -Type CertificateBase64
+```
+
+----------------------------------------
+
+TITLE: Updating README.md Documentation for Azure MCP
+DESCRIPTION: Demonstrates how to document a new command in the README.md file, including the command structure and example usage.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_8
+
+LANGUAGE: bash
+CODE:
+```
+#### Resource Group Operations
+# List resource groups in a subscription
+azmcp groups list --subscription <subscription> [--tenant-id <tenant-id>]
+```
+
+LANGUAGE: bash
+CODE:
+```
+# Query logs from a specific table
+azmcp monitor logs query --subscription <subscription> \
+                        --workspace-id <workspace-id> \
+                        --table ""AppEvents_CL"" \
+                        --query ""| order by TimeGenerated desc""
+```
+
+----------------------------------------
+
+TITLE: Implementing Abstract Base Command Class in Azure CLI
+DESCRIPTION: Abstract base implementation of IBaseCommand providing common functionality for Azure CLI commands. Includes command initialization, argument management, and error handling.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_30
+
+LANGUAGE: csharp
+CODE:
+```
+public abstract class BaseCommand : IBaseCommand
+{
+    protected readonly HashSet<string> _registeredArgumentNames = [];
+    protected readonly List<ArgumentDefinition<string>> _arguments = [];
+    private readonly Command? _command;
+
+    protected BaseCommand()
+    {
+        _command = new Command(GetCommandName(), GetCommandDescription());
+        RegisterOptions(_command);
+        RegisterArguments();
+    }
+
+    protected abstract string GetCommandName();
+    protected abstract string GetCommandDescription();
+    protected virtual void RegisterOptions(Command command) { }
+    protected virtual void RegisterArguments() { }
+    protected virtual void HandleException(CommandResponse response, Exception ex)
+    {
+        response.Status = GetStatusCode(ex);
+        response.Message = GetErrorMessage(ex);
+        response.Results = null;
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Local Build Verification Script
+DESCRIPTION: PowerShell script command for building and verifying changes locally with specific build parameters.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_22
+
+LANGUAGE: bash
+CODE:
+```
+# Build and verify the changes locally
+./eng/scripts/Build-Local.ps1 -UsePaths -VerifyNpx
+```
+
+----------------------------------------
+
+TITLE: Removing Test Resources for Azure Key Vault in PowerShell
+DESCRIPTION: This snippet demonstrates how to use the Remove-TestResources.ps1 script to immediately delete test resources created for Azure Key Vault. The -Force parameter is used to skip confirmation prompts.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/README.md#2025-04-22_snippet_6
+
+LANGUAGE: powershell
+CODE:
+```
+Remove-TestResources.ps1 keyvault -Force
+```
+
+----------------------------------------
+
+TITLE: Defining AdditionalParameters Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the AdditionalParameters parameter, which are optional key-value pairs of parameters to pass to the ARM template(s) and pre-post scripts.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_14
+
+LANGUAGE: yaml
+CODE:
+```
+Type: Hashtable
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: Registering Command Group for Storage Operations in C#
+DESCRIPTION: Shows how to register a command group for storage operations, including a subgroup for container operations and the ContainerListCommand.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_15
+
+LANGUAGE: csharp
+CODE:
+```
+private void RegisterCommandGroup()
+{
+    var storage = new CommandGroup(""storage"", ""Storage operations"");
+    _rootGroup.AddSubGroup(storage);
+
+    var container = new CommandGroup(
+        ""container"",
+        ""Storage container operations"");
+    storage.AddSubGroup(container);
+
+    container.AddCommand(""list"", new Storage.ContainerListCommand());
+}
+```
+
+----------------------------------------
+
+TITLE: Creating Test Resources with Additional Parameters in PowerShell
+DESCRIPTION: This snippet shows how to use the New-TestResources.ps1 script with additional parameters to control resource configuration. In this example, it enables HSM for Azure Key Vault.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/README.md#2025-04-22_snippet_7
+
+LANGUAGE: powershell
+CODE:
+```
+New-TestResources.ps1 keyvault -AdditionalParameters @{enableHsm = $true}
+```
+
+----------------------------------------
+
+TITLE: Defining TestApplicationSecret Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the TestApplicationSecret parameter, which is an optional service principal secret used to authenticate the test runner against deployed resources. It is passed to the ARM template as 'testApplicationSecret'.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_2
+
+LANGUAGE: yaml
+CODE:
+```
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: Generating and Formatting Basic X509 Certificates in PowerShell
+DESCRIPTION: Creates a self-signed X509 certificate with standard attributes and demonstrates how to format it in different encodings (Certificate Base64, PKCS#1 PEM, PKCS#12 Base64). The certificate is valid for 10 years (3652 days) and includes standard subject information.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/scripts/X509Certificate2/README.md#2025-04-22_snippet_0
+
+LANGUAGE: powershell
+CODE:
+```
+Import-Module -Name ./eng/common/scripts/X509Certificate2 # assumes $PWD is repo root
+
+$cert1 = New-X509Certificate2 -SubjectName 'E=opensource@microsoft.com, CN=Azure SDK, OU=Azure SDK, O=Microsoft, L=Redmond, S=WA, C=US' -ValidDays 3652
+
+$CaPublicKeyBase64 = $cert1 | Format-X509Certificate2 -Type CertificateBase64
+$CaPrivateKeyPem = $cert1 | Format-X509Certificate2 -Type Pkcs1
+$CaKeyPairPkcs12Base64 = $cert1 | Format-X509Certificate2 -Type Pkcs12Base64
+```
+
+----------------------------------------
+
+TITLE: Azure Pipeline YAML for Test Resource Management
+DESCRIPTION: This YAML snippet demonstrates how to include test resource deployment and removal steps in an Azure Pipeline. It uses templates for deploying and removing test resources, which should be linked to the 'Secrets for Resource Provisioner' variable group.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/README.md#2025-04-22_snippet_8
+
+LANGUAGE: yaml
+CODE:
+```
+- template: /eng/common/TestResources/deploy-test-resources.yml
+  parameters:
+    ServiceDirectory: '${{ parameters.ServiceDirectory }}'
+
+# Run tests
+
+- template: /eng/common/TestResources/remove-test-resources.yml
+```
+
+----------------------------------------
+
+TITLE: Implementing Global Command Class for Azure CLI
+DESCRIPTION: Generic implementation of global Azure command functionality including tenant and authentication method handling. Extends BaseCommand with Azure-specific features.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_31
+
+LANGUAGE: csharp
+CODE:
+```
+public abstract class GlobalCommand<TArgs> : BaseCommand
+    where TArgs : GlobalArguments, new()
+{
+    protected readonly Option<string> _tenantOption = ArgumentDefinitions.Common.Tenant.ToOption();
+    protected readonly Option<AuthMethod> _authMethodOption = ArgumentDefinitions.Common.AuthMethod.ToOption();
+
+    protected override void RegisterOptions(Command command)
+    {
+        base.RegisterOptions(command);
+        command.AddOption(_tenantOption);
+        command.AddOption(_authMethodOption);
+        // Add retry options...
+    }
+
+    protected override void RegisterArguments()
+    {
+        base.RegisterArguments();
+        AddArgument(CreateAuthMethodArgument());
+        AddArgument(CreateTenantArgument());
+        foreach (var argument in CreateRetryArguments())
+        {
+            AddArgument(argument);
+        }
+    }
+
+    protected virtual async Task<List<ArgumentOption>> GetAuthMethodOptions(CommandContext context) =>
+        await Task.FromResult(AuthMethodArgument.GetAuthMethodOptions());
+}
+```
+
+----------------------------------------
+
+TITLE: Creating X509 Certificate in PowerShell Pre-Script
+DESCRIPTION: This snippet from a test-resources-pre.ps1 file shows how to create an X509 certificate and add its details to the $templateFileParameters variable. This is used to pass data to the test-resources.json file for ARM template deployment.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/README.md#2025-04-22_snippet_3
+
+LANGUAGE: powershell
+CODE:
+```
+Import-Module -Name ./eng/common/scripts/X509Certificate2
+$cert = New-X509Certificate2 -SubjectName 'E=opensource@microsoft.com, CN=Azure SDK, OU=Azure SDK, O=Microsoft, L=Frisco, S=TX, C=US' -ValidDays 3652
+# Create new entries in $templateFileParameters
+$templateFileParameters['ConfidentialLedgerPrincipalPEM'] = Format-X509Certificate2 -Certificate $cert
+$templateFileParameters['ConfidentialLedgerPrincipalPEMPK'] = Format-X509Certificate2 -Type Pkcs8 -Certificate $cert
+```
+
+----------------------------------------
+
+TITLE: Using Copilot to Generate Azure MCP Commands
+DESCRIPTION: Command to use with GitHub Copilot Chat in Agent mode to generate new commands for Azure MCP. This leverages reference documentation to create command implementations based on a specified service, resource, and operation.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/CONTRIBUTING.md#2025-04-22_snippet_1
+
+LANGUAGE: plaintext
+CODE:
+```
+Execute in Copilot Chat:
+""create [service] [resource] [operation] command using #new-command.md as a reference""
+```
+
+----------------------------------------
+
+TITLE: Removing Azure Test Resources by Resource Group Name
+DESCRIPTION: This snippet illustrates how to remove test resources by specifying a resource group name without using provisioner authentication. It includes options for CI environments and various Azure-specific parameters.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/Remove-TestResources.ps1.md#2025-04-22_snippet_3
+
+LANGUAGE: powershell
+CODE:
+```
+Remove-TestResources.ps1 [-ResourceGroupName <String>] [-SubscriptionId <String>]
+ [[-ServiceDirectory] <String>] [-Environment <String>] [-CI] [-ResourceType <String>] [-ServicePrincipalAuth]
+ [-Force] [-RemoveTestResourcesRemainingArguments <Object>] [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm]
+ [<CommonParameters>]
+```
+
+----------------------------------------
+
+TITLE: Removing Azure Test Resources by Resource Group Name with Provisioner
+DESCRIPTION: This snippet shows how to remove test resources by specifying a resource group name and using provisioner authentication. It includes parameters for CI environments and additional Azure-specific options.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/Remove-TestResources.ps1.md#2025-04-22_snippet_2
+
+LANGUAGE: powershell
+CODE:
+```
+Remove-TestResources.ps1 [-ResourceGroupName <String>] -TenantId <String> [-SubscriptionId <String>]
+ -ProvisionerApplicationId <String> [-ProvisionerApplicationSecret <String>] [[-ServiceDirectory] <String>]
+ [-Environment <String>] [-CI] [-ResourceType <String>] [-ServicePrincipalAuth] [-Force]
+ [-RemoveTestResourcesRemainingArguments <Object>] [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm]
+ [<CommonParameters>]
+```
+
+----------------------------------------
+
+TITLE: Defining Arguments for Container Listing in C#
+DESCRIPTION: Defines a ContainersListArguments class that inherits from BaseStorageArguments and adds a Container property. This class is used to pass arguments for listing containers in Azure Storage.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_12
+
+LANGUAGE: csharp
+CODE:
+```
+namespace AzureMcp.Arguments.Storage;
+
+public class ContainersListArguments : BaseStorageArguments
+{
+    public string? Container { get; set; }
+}
+```
+
+----------------------------------------
+
+TITLE: Detecting Platform and Executing CLI Commands in JavaScript
+DESCRIPTION: The index.js file in the @azure/mcp package is responsible for detecting the platform and CPU architecture, loading the appropriate platform-specific package, and passing CLI arguments to the platform package's index.js file. It serves as the entry point for npx calls and global installations.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/npm/README.md#2025-04-22_snippet_0
+
+LANGUAGE: JavaScript
+CODE:
+```
+// index.js
+// Code for detecting platform and CPU architecture
+// Loading platform-specific package
+// Passing CLI arguments to platform package's index.js
+```
+
+----------------------------------------
+
+TITLE: Setting Environment Variables for Azure Key Vault in PowerShell
+DESCRIPTION: This snippet shows the output of environment variables generated by the New-TestResources.ps1 script for Azure Key Vault. It includes variables for tenant ID, client ID, client secret, subscription ID, resource group, location, SKU, and Key Vault URL.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/README.md#2025-04-22_snippet_1
+
+LANGUAGE: powershell
+CODE:
+```
+${env:KEYVAULT_TENANT_ID} = '<<secret>>'
+${env:KEYVAULT_CLIENT_ID} = '<<secret>>'
+${env:KEYVAULT_CLIENT_SECRET} = '<<secret>>'
+${env:KEYVAULT_SUBSCRIPTION_ID} = 'YOUR SUBSCRIPTION ID'
+${env:KEYVAULT_RESOURCE_GROUP} = 'rg-myusername'
+${env:KEYVAULT_LOCATION} = 'westus'
+${env:KEYVAULT_SKU} = 'premium'
+${env:AZURE_KEYVAULT_URL} = '<<url>>'
+```
+
+----------------------------------------
+
+TITLE: Updating Specific Resource Group with Subscription ID in PowerShell
+DESCRIPTION: This example shows how to update a specific resource group named 'rg-userkeyvault' in a given subscription. It sets the deletion time to 48 hours from the current time.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/Update-TestResources.ps1.md#2025-04-22_snippet_3
+
+LANGUAGE: PowerShell
+CODE:
+```
+Update-TestResources.ps1 -ResourceGroupName rg-userkeyvault -Subscription fa9c6912-f641-4226-806c-5139584b89ca
+```
+
+----------------------------------------
+
+TITLE: Persisting Azure Key Vault Environment Variables in PowerShell
+DESCRIPTION: This snippet demonstrates how to persistently set environment variables for Azure Key Vault using the setx command in PowerShell. This allows the variables to be available in future terminal sessions and applications.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/README.md#2025-04-22_snippet_2
+
+LANGUAGE: powershell
+CODE:
+```
+setx KEYVAULT_TENANT_ID ${env:KEYVAULT_TENANT_ID}
+setx KEYVAULT_CLIENT_ID ${env:KEYVAULT_CLIENT_ID}
+setx KEYVAULT_CLIENT_SECRET ${env:KEYVAULT_CLIENT_SECRET}
+setx KEYVAULT_SUBSCRIPTION_ID ${env:KEYVAULT_SUBSCRIPTION_ID}
+setx KEYVAULT_RESOURCE_GROUP ${env:KEYVAULT_RESOURCE_GROUP}
+setx KEYVAULT_LOCATION ${env:KEYVAULT_LOCATION}
+setx KEYVAULT_SKU ${env:KEYVAULT_SKU}
+setx AZURE_KEYVAULT_URL ${env:AZURE_KEYVAULT_URL}
+```
+
+----------------------------------------
+
+TITLE: Implementing Service-Specific Exception Handling in C#
+DESCRIPTION: Custom error message handler that provides specific messages based on exception types from different Azure services like Cosmos DB, Storage, and Monitor.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_17
+
+LANGUAGE: csharp
+CODE:
+```
+protected override string GetErrorMessage(Exception ex) => ex switch
+{
+    CosmosException cosmosEx when cosmosEx.Status == 404 => 
+        $""Cosmos DB container not found. Please check the container name and try again."",
+    StorageException storageEx when storageEx.ErrorCode == ""ContainerNotFound"" =>
+        $""Storage container not found. Please check the container name and try again."",
+    MonitorException monitorEx when monitorEx.Code == ""ResourceNotFound"" =>
+        $""Log Analytics workspace not found. Please check the workspace ID and try again."",
+    _ => base.GetErrorMessage(ex)
+};
+```
+
+----------------------------------------
+
+TITLE: Updating KeyVault Test Resources with DeleteAfterHours in PowerShell
+DESCRIPTION: This example demonstrates updating a KeyVault resource group to be deleted after 24 hours. It uses the ServiceDirectory parameter to specify the 'keyvault' directory.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/Update-TestResources.ps1.md#2025-04-22_snippet_2
+
+LANGUAGE: PowerShell
+CODE:
+```
+Update-TestResources.ps1 keyvault -DeleteAfterHours 24
+```
+
+----------------------------------------
+
+TITLE: Defining OutFile Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the OutFile parameter, which saves test environment settings into a .env file next to test resources template. The contents of the file are protected via the .NET Data Protection API (DPAPI).
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_18
+
+LANGUAGE: yaml
+CODE:
+```
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: Defining Certificate Parameters in ARM Template JSON
+DESCRIPTION: This JSON snippet from a test-resources.json file demonstrates how to define parameters for certificate details that are passed from the pre-script. These parameters can be used in the ARM template for resource deployment.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/README.md#2025-04-22_snippet_4
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""$schema"": ""https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#"",
+  ""contentVersion"": ""1.0.0.0"",
+  ""parameters"": {
+    ""_comment"": ""Other required parameters would go here... (this is not part of the actual test-resources.json)"",
+    ""ConfidentialLedgerPrincipalPEM"": {
+      ""type"": ""string"",
+      ""metadata"": {
+        ""description"": ""The certificate to configure as a certBasedSecurityPrincipal.""
+      }
+    },
+    ""ConfidentialLedgerPrincipalPEMPK"": {
+      ""type"": ""string"",
+      ""metadata"": {
+        ""description"": ""The certificate to configure as a certBasedSecurityPrincipal.""
+      }
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Defining Confirm Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the Confirm parameter, which prompts for confirmation before running the cmdlet.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_23
+
+LANGUAGE: yaml
+CODE:
+```
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: cf
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: Enabling Debug Output for Azure MCP Package in PowerShell
+DESCRIPTION: This snippet demonstrates how to set the DEBUG environment variable to 'true' and run the Azure MCP package with the --version flag using NPX in PowerShell. This allows viewing debug text from the wrapper and platform packages.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/npm/TROUBLESHOOTING.md#2025-04-22_snippet_0
+
+LANGUAGE: powershell
+CODE:
+```
+> $env:DEBUG='true'   #`export DEBUG=true` in bash
+> npx --yes @azure/mcp@latest --version
+```
+
+----------------------------------------
+
+TITLE: Defining SuppressVsoCommands Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the SuppressVsoCommands parameter, which suppresses printing out secrets to logs with Azure Pipelines log commands that cause them to be redacted. This is useful for CI environments that don't support this feature.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_19
+
+LANGUAGE: yaml
+CODE:
+```
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: ($null -eq $env:SYSTEM_TEAMPROJECTID)
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: Resource Group Operations in Bash
+DESCRIPTION: Command to list resource groups in an Azure subscription.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/docs/azmcp-commands.md#2025-04-22_snippet_6
+
+LANGUAGE: bash
+CODE:
+```
+# List resource groups in a subscription
+azmcp group list --subscription <subscription>
+```
+
+----------------------------------------
+
+TITLE: Running Azure MCP Tests with PowerShell
+DESCRIPTION: Command to run tests with coverage for the Azure MCP project using PowerShell. This script should be executed to validate code changes before submitting a pull request.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/CONTRIBUTING.md#2025-04-22_snippet_0
+
+LANGUAGE: pwsh
+CODE:
+```
+# Run tests with coverage
+./eng/scripts/Test-Code.ps1
+```
+
+----------------------------------------
+
+TITLE: Executing Platform-Specific Binary in JavaScript
+DESCRIPTION: The index.js file in platform-specific packages reads its own package.json to discover the file name for its executable, then calls that executable with all the passed-in arguments. This allows for direct execution of the platform-specific binary when invoked through npx or global installation.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/npm/README.md#2025-04-22_snippet_1
+
+LANGUAGE: JavaScript
+CODE:
+```
+// index.js in platform-specific package
+// Code for reading package.json
+// Discovering executable file name
+// Calling executable with passed-in arguments
+```
+
+----------------------------------------
+
+TITLE: Running Migration Script - Basic Usage
+DESCRIPTION: Example of running the migration script from within a service directory in the language repository
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/testproxy/onboarding/README.md#2025-04-22_snippet_2
+
+LANGUAGE: powershell
+CODE:
+```
+# if downloading the file singly, cd to the directory containing generate-assets-json.ps1
+cd ""<target-language-repo>/sdk/<service>""
+<path-to-transition-script>/generate-assets-json.ps1
+```
+
+----------------------------------------
+
+TITLE: Starting MCP Inspector
+DESCRIPTION: Launches the ModelContextProtocol inspector standalone for SSE mode.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Commands/Server/README.md#2025-04-22_snippet_2
+
+LANGUAGE: shell
+CODE:
+```
+npx @modelcontextprotocol/inspector
+```
+
+----------------------------------------
+
+TITLE: Conflicting assets.json Example in Git Merge
+DESCRIPTION: An example of a conflicting assets.json file during a Git merge, showing the conflict markers and differing Tag values.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/testproxy/scripts/resolve-asset-conflict/README.md#2025-04-22_snippet_0
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""AssetsRepo"": ""Azure/azure-sdk-assets-integration"",
+  ""AssetsRepoPrefixPath"": ""python"",
+  ""TagPrefix"": ""python/storage/azure-storage-blob"",
+<<<<<<< HEAD
+  ""Tag"": ""integration/example/storage_feature_addition2""
+=======
+  ""Tag"": ""integration/example/storage_feature_addition1""
+>>>>>>> test-storage-tag-combination
+}
+```
+
+----------------------------------------
+
+TITLE: MCP Inspector Timeout Configuration URL
+DESCRIPTION: URL pattern for configuring the timeout value in the MCP inspector web interface.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Commands/Server/README.md#2025-04-22_snippet_3
+
+LANGUAGE: plaintext
+CODE:
+```
+http://localhost:5173/?timeout=2000000000#resources
+```
+
+----------------------------------------
+
+TITLE: Registering Service Dependency in C#
+DESCRIPTION: Demonstrates how to register a new service dependency in the Program.cs file of the Azure MCP project.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_5
+
+LANGUAGE: csharp
+CODE:
+```
+private static void ConfigureServices(IServiceCollection services)
+{
+    services.AddSingleton<IYourService, YourService>();
+}
+```
+
+----------------------------------------
+
+TITLE: Running Migration Script - Tool Integration
+DESCRIPTION: Example of running the migration script with initial push for local test-proxy tool integration
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/testproxy/onboarding/README.md#2025-04-22_snippet_3
+
+LANGUAGE: powershell
+CODE:
+```
+# calling transition script against tool, given local clones of azure-sdk-for-java and azure-sdk-tools
+cd c:/src/azure-sdk-for-java/sdk/attestation
+<path-to-transition-script>/generate-assets-json.ps1 -InitialPush
+```
+
+----------------------------------------
+
+TITLE: Configuring Azure MCP Server in VS Code
+DESCRIPTION: JSON configuration for installing the Azure MCP Server in Visual Studio Code. This snippet defines the server configuration in the mcp.json file.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/README.md#2025-04-22_snippet_0
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""servers"": {
+    ""Azure MCP Server"": {
+      ""command"": ""npx"",
+      ""args"": [
+        ""-y"",
+        ""@azure/mcp@latest"",
+        ""server"",
+        ""start""
+      ]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Downloading Transition Script - PowerShell
+DESCRIPTION: PowerShell command to download the generate-assets-json.ps1 script from Azure SDK tools repository
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/testproxy/onboarding/README.md#2025-04-22_snippet_0
+
+LANGUAGE: powershell
+CODE:
+```
+Invoke-WebRequest -OutFile ""generate-assets-json.ps1"" https://raw.githubusercontent.com/Azure/azure-sdk-tools/main/eng/common/testproxy/onboarding/generate-assets-json.ps1
+```
+
+----------------------------------------
+
+TITLE: Adding Required Using Statements in C#
+DESCRIPTION: Shows the necessary using statement to include for a new service in the Program.cs file.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_6
+
+LANGUAGE: csharp
+CODE:
+```
+using AzureMcp.Services.Azure.YourService;  // For YourService implementation
+```
+
+----------------------------------------
+
+TITLE: Updating MCP Server Service Registration in C#
+DESCRIPTION: Illustrates how to update the ConfigureServices method in ServiceStartCommand.cs to include a new service registration.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_7
+
+LANGUAGE: csharp
+CODE:
+```
+private static void ConfigureServices(IServiceCollection services, IServiceProvider rootServiceProvider)
+{
+    services.AddSingleton(rootServiceProvider.GetRequiredService<CommandFactory>());
+    services.AddSingleton(rootServiceProvider.GetRequiredService<ISubscriptionService>());
+    services.AddSingleton(rootServiceProvider.GetRequiredService<IStorageService>());
+    services.AddSingleton(rootServiceProvider.GetRequiredService<ICosmosService>());
+    services.AddSingleton(rootServiceProvider.GetRequiredService<IMonitorService>());
+    services.AddSingleton(rootServiceProvider.GetRequiredService<IResourceGroupService>());
+    services.AddSingleton(rootServiceProvider.GetRequiredService<IYourService>()); // Add your service here
+}
+```
+
+----------------------------------------
+
+TITLE: Continuing Git Cherry-Pick After Conflict Resolution
+DESCRIPTION: This snippet demonstrates how to continue the Git cherry-pick operation after resolving conflicts. It assumes that the conflicts have been resolved and the changes have been staged using git add.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/testproxy/scripts/tag-merge/README.md#2025-04-22_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+C:/repo/azure-sdk-for-python/.assets/eDscgL1p9G/python [???]|>git cherry-pick --continue
+[detached HEAD 236e234] add the same file names as what was present in tag integration/example/storage_feature_addition2. In this case, the files themselves are just different enough from integration/example/storage_feature_addition2 that we should intentionally cause a conflict
+ Date: Fri Dec 1 16:57:52 2023 -0800
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+```
+
+----------------------------------------
+
+TITLE: Declaring Storage Service Interface Method in C#
+DESCRIPTION: Defines an interface method ListContainers in IStorageService for listing containers in an Azure Storage account. It takes account name, subscription ID, optional tenant ID, and retry policy as parameters.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_13
+
+LANGUAGE: csharp
+CODE:
+```
+public interface IStorageService
+{
+    Task<List<string>> ListContainers(
+        string accountName,
+        string subscriptionId,
+        string? tenantId = null,
+        RetryPolicyArguments? retryPolicy = null);
+}
+```
+
+----------------------------------------
+
+TITLE: Updating Test Resources with ResourceGroup Parameters in PowerShell
+DESCRIPTION: This snippet shows the ResourceGroup parameter set for updating test resources. It allows specifying a ResourceGroupName, SubscriptionId, and DeleteAfterHours.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/Update-TestResources.ps1.md#2025-04-22_snippet_1
+
+LANGUAGE: PowerShell
+CODE:
+```
+Update-TestResources.ps1 [-ResourceGroupName <String>] [-SubscriptionId <String>] [-DeleteAfterHours <Int32>]
+ [<CommonParameters>]
+```
+
+----------------------------------------
+
+TITLE: Resolving Git Conflicts in Bash
+DESCRIPTION: This snippet shows the process of resolving Git conflicts that may occur during the merge process. It includes checking the status of conflicted files, resolving conflicts, and continuing the cherry-pick operation.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/testproxy/scripts/tag-merge/README.md#2025-04-22_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+C:/repo/azure-sdk-for-python/.assets/eDscgL1p9G/python |>git status
+HEAD detached from python/storage/azure-storage-blob_12c8154ae2
+You are currently cherry-picking commit 1fd0865.
+  (fix conflicts and run ""git cherry-pick --continue"")
+  (use ""git cherry-pick --skip"" to skip this patch)
+  (use ""git cherry-pick --abort"" to cancel the cherry-pick operation)
+
+You are in a sparse checkout with 100% of tracked files present.
+
+Unmerged paths:
+  (use ""git add <file>..."" to mark resolution)
+        both added:      sdk/storage/azure-storage-blob/tests/recordings/test_append_blob_async.pyTestStorageAppendBlobAsynctest_append_blob_from_text_new.json
+
+no changes added to commit (use ""git add"" and/or ""git commit -a"")
+```
+
+----------------------------------------
+
+TITLE: Updating Test Resources with Default Parameters in PowerShell
+DESCRIPTION: This snippet shows the default parameter set for updating test resources. It requires a ServiceDirectory and allows optional parameters for BaseName, SubscriptionId, and DeleteAfterHours.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/Update-TestResources.ps1.md#2025-04-22_snippet_0
+
+LANGUAGE: PowerShell
+CODE:
+```
+Update-TestResources.ps1 [-ServiceDirectory] <String> [-BaseName <String>] [-SubscriptionId <String>]
+ [-DeleteAfterHours <Int32>] [<CommonParameters>]
+```
+
+----------------------------------------
+
+TITLE: Executing Merge Proxy Tags Script in PowerShell
+DESCRIPTION: PowerShell commands to navigate to the repo root, perform a Git merge, and then run the resolve-asset-conflict.ps1 script to automatically resolve conflicting tag values in the assets.json file.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/testproxy/scripts/resolve-asset-conflict/README.md#2025-04-22_snippet_1
+
+LANGUAGE: powershell
+CODE:
+```
+# including context to get into a merge conflict
+cd ""path/to/language/repo/root""
+git checkout base-branch
+git merge target-branch
+# auto resolve / merge conflicting tag values
+./eng/common/testproxy/scripts/resolve-asset-conflict/resolve-asset-conflict.ps1 sdk/storage/azure-storage-blob/assets.json
+# user pushes
+test-proxy push -a sdk/storage/azure-storage-blob/assets.json
+```
+
+----------------------------------------
+
+TITLE: Configuring Matrix Batching in YAML
+DESCRIPTION: This YAML snippet shows how to disable matrix batching for a specific configuration in the pullrequest pipeline by setting PRBatching to false.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/scripts/job-matrix/pullrequest-faq.md#2025-04-22_snippet_2
+
+LANGUAGE: yml
+CODE:
+```
+MatrixConfigs:
+  - Name: version_overrides_tests
+    Path: sdk/core/version-overrides-matrix.json
+    Selection: all
+    PRBatching: false # the new key
+    GenerateVMJobs: true
+```
+
+----------------------------------------
+
+TITLE: Pseudocode for Package Batching in Pullrequest Pipeline
+DESCRIPTION: This pseudocode explains how packages are batched for testing in the pullrequest pipeline, including the logic for direct and indirect changes.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/scripts/job-matrix/pullrequest-faq.md#2025-04-22_snippet_1
+
+LANGUAGE: pseudocode
+CODE:
+```
+batchSize = configurable # of packages in each test batch, defaults to 10
+directPackages = the list of packages with directly changed code in the PR
+
+group the direct packages by matrix configuration
+  - each matrix contribution
+    - group by batch size
+      - assign the matrix to the full batch
+      - if multiple batches exist, add suffix
+```
+
+----------------------------------------
+
+TITLE: Creating Arguments in C# for Azure MCP Commands
+DESCRIPTION: Shows two methods for creating arguments in Azure MCP commands: using base command helper methods and creating custom arguments.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_9
+
+LANGUAGE: csharp
+CODE:
+```
+RegisterArgumentChain(
+    CreateAccountArgument(GetAccountOptions),
+    CreateContainerArgument(GetContainerOptions)
+);
+```
+
+LANGUAGE: csharp
+CODE:
+```
+ArgumentChain<TArgs>
+    .Create(""name"", ""description"")
+    .WithValueAccessor(args => args.Property)
+    .WithValueLoader(async (context, args) => await LoadValues())
+    .WithIsRequired(true);
+```
+
+----------------------------------------
+
+TITLE: Python Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Python files using hash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_28
+
+LANGUAGE: Python
+CODE:
+```
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: C Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for C files using multiline comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_2
+
+LANGUAGE: C
+CODE:
+```
+/*
+ * Copyright (c) Microsoft Corporation.
+ * Licensed under the MIT License
+ */
+```
+
+----------------------------------------
+
+TITLE: Batchfile Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Batchfile scripts using double-colon comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_0
+
+LANGUAGE: Batchfile
+CODE:
+```
+:: Copyright (c) Microsoft Corporation.
+:: Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Starting the MCP Server in Bash
+DESCRIPTION: Command to start the Azure MCP server with an optional transport parameter.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/docs/azmcp-commands.md#2025-04-22_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+# Start the MCP Server
+azmcp server start [--transport <transport>]
+```
+
+----------------------------------------
+
+TITLE: Ruby Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Ruby files using hash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_30
+
+LANGUAGE: Ruby
+CODE:
+```
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: SQL Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for SQL files using double-dash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_34
+
+LANGUAGE: SQL
+CODE:
+```
+-- Copyright (c) Microsoft Corporation.
+-- Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Haskell Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Haskell files using block comment syntax, including a module declaration.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_13
+
+LANGUAGE: Haskell
+CODE:
+```
+{-
+Copyright : (c) Microsoft Corporation.
+License : MIT
+-}
+module <module-name>
+```
+
+----------------------------------------
+
+TITLE: Unit Test Structure for Commands
+DESCRIPTION: Example of unit test implementation for container list command, showing setup, constructor testing, and execution testing.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_23
+
+LANGUAGE: csharp
+CODE:
+```
+public class ContainerListCommandTests
+{
+    private readonly IServiceProvider _serviceProvider;
+    private readonly ContainerListCommand _command;
+    private readonly CommandContext _context;
+    private readonly ParseResult _parser;
+
+    public ContainerListCommandTests()
+    {
+        var storageService = Substitute.For<IStorageService>();
+        var collection = new ServiceCollection()
+            .AddSingleton(storageService);
+
+        _serviceProvider = collection.BuildServiceProvider();
+        _command = new();
+        _context = new(_serviceProvider);
+        _parser = new(_command.GetCommand());
+    }
+
+    [Fact]
+    public void Constructor_InitializesCommandCorrectly()
+    {
+        // Assert
+        Assert.Equal(""list"", _command.GetCommand().Name);
+        Assert.NotEmpty(_command.GetCommand().Description);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WithValidInput_ReturnsSuccess()
+    {
+        // Arrange
+        var storageService = _serviceProvider.GetRequiredService<IStorageService>();
+        storageService.ListContainers(
+            Arg.Any<string>(),
+            Arg.Any<string>(),
+            Arg.Any<string>())
+            .Returns([]);
+
+        // Act
+        var result = await _command.ExecuteAsync(_context, _parser);
+
+        // Assert
+        Assert.Equal(200, result.Status);
+        Assert.NotNull(result.Results);
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Defining ArmTemplateParameters Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the ArmTemplateParameters parameter, which are optional key-value pairs of parameters to pass to the ARM template(s).
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_13
+
+LANGUAGE: yaml
+CODE:
+```
+Type: Hashtable
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: GLSL Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for GLSL files using double-slash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_10
+
+LANGUAGE: GLSL
+CODE:
+```
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Defining EnvironmentVariables Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the EnvironmentVariables parameter, which are optional key-value pairs of parameters to set as environment variables to the shell.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_15
+
+LANGUAGE: yaml
+CODE:
+```
+Type: Hashtable
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: @{}
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: Julia Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Julia files using hash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_17
+
+LANGUAGE: Julia
+CODE:
+```
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Defining ServicePrincipalAuth Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the ServicePrincipalAuth parameter, which uses the provisioner SP credentials to deploy and pass the test SP credentials to tests. If not set, it provisions an SP with user credentials and passes the new SP to tests.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_20
+
+LANGUAGE: yaml
+CODE:
+```
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: Groovy Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Groovy files using double-slash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_12
+
+LANGUAGE: Groovy
+CODE:
+```
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Testing Error Handling in Azure CLI Commands with xUnit
+DESCRIPTION: Demonstrates unit tests for command error paths including missing arguments and service errors. Uses xUnit test framework with async/await patterns for testing command execution failures.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_26
+
+LANGUAGE: csharp
+CODE:
+```
+[Fact]
+public async Task ExecuteAsync_WithMissingArguments_ReturnsBadRequest()
+{
+    // Arrange
+    _parser = _parser.WithOption(_accountOption, string.Empty);
+
+    // Act
+    var result = await _command.ExecuteAsync(_context, _parser);
+
+    // Assert
+    Assert.Equal(400, result.Status);
+    Assert.Contains(""Missing required arguments"", result.Message);
+}
+
+[Fact]
+public async Task ExecuteAsync_WithServiceError_HandlesErrorCorrectly()
+{
+    // Arrange
+    var service = _serviceProvider.GetRequiredService<IStorageService>();
+    service.ListContainers(Arg.Any<string>(), Arg.Any<string>())
+        .Throws(new RequestFailedException(404, ""Not found""));
+
+    // Act
+    var result = await _command.ExecuteAsync(_context, _parser);
+
+    // Assert
+    Assert.Equal(404, result.Status);
+    Assert.Contains(""Not found"", result.Message);
+}
+```
+
+----------------------------------------
+
+TITLE: Defining TenantId Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the TenantId parameter, which is the tenant ID of a service principal when a provisioner is specified. The same Tenant ID is used for both Test Application and Provisioner Application.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_4
+
+LANGUAGE: yaml
+CODE:
+```
+Type: String
+Parameter Sets: Provisioner
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: Objective-C Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Objective-C files using double-slash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_23
+
+LANGUAGE: Objective-C
+CODE:
+```
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Defining DeleteAfterHours Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the DeleteAfterHours parameter, which is a positive integer number of hours from the current time to set the 'DeleteAfter' tag on the created resource group. It is used for CI automation.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_9
+
+LANGUAGE: yaml
+CODE:
+```
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: 120
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: LLVM Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for LLVM files using double-slash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_19
+
+LANGUAGE: LLVM
+CODE:
+```
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Defining Location Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the Location parameter, which is an optional location where resources should be created. If left empty, the default is based on the cloud to which the template is being deployed.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_10
+
+LANGUAGE: yaml
+CODE:
+```
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: Provisioner Parameter Set for New-TestResources.ps1
+DESCRIPTION: Parameter set for deploying test resources using a provisioner service principal, including mandatory parameters for tenant and provisioner authentication.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_1
+
+LANGUAGE: powershell
+CODE:
+```
+New-TestResources.ps1 [-BaseName <String>] [-ResourceGroupName <String>] [-ServiceDirectory] <String>
+ [-TestResourcesDirectory <String>] [-TestApplicationId <String>] [-TestApplicationSecret <String>]
+ [-TestApplicationOid <String>] -TenantId <String> [-SubscriptionId <String>]
+ -ProvisionerApplicationId <String> [-ProvisionerApplicationOid <String>]
+ [-ProvisionerApplicationSecret <String>] [-DeleteAfterHours <Int32>] [-Location <String>]
+ [-Environment <String>] [-ResourceType <String>] [-ArmTemplateParameters <Hashtable>]
+ [-AdditionalParameters <Hashtable>] [-EnvironmentVariables <Hashtable>] [-CI] [-Force] [-OutFile]
+ [-SuppressVsoCommands] [-ServicePrincipalAuth] [-NewTestResourcesRemainingArguments <Object>]
+ [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
+```
+
+----------------------------------------
+
+TITLE: Defining Force Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the Force parameter, which forces creation of resources instead of being prompted.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_17
+
+LANGUAGE: yaml
+CODE:
+```
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: Defining WhatIf Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the WhatIf parameter, which shows what would happen if the cmdlet runs without actually running it.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_22
+
+LANGUAGE: yaml
+CODE:
+```
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: wi
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: Defining ProgressAction Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the ProgressAction parameter. The description for this parameter is not provided in the given content.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_24
+
+LANGUAGE: yaml
+CODE:
+```
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: Default Parameter Set for New-TestResources.ps1
+DESCRIPTION: Default parameter set for deploying test resources, including optional parameters for resource naming, service principal configuration, and resource management settings.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_0
+
+LANGUAGE: powershell
+CODE:
+```
+New-TestResources.ps1 [-BaseName <String>] [-ResourceGroupName <String>] [-ServiceDirectory] <String>
+ [-TestResourcesDirectory <String>] [-TestApplicationId <String>] [-TestApplicationSecret <String>]
+ [-TestApplicationOid <String>] [-SubscriptionId <String>] [-DeleteAfterHours <Int32>] [-Location <String>]
+ [-Environment <String>] [-ResourceType <String>] [-ArmTemplateParameters <Hashtable>]
+ [-AdditionalParameters <Hashtable>] [-EnvironmentVariables <Hashtable>] [-CI] [-Force] [-OutFile]
+ [-SuppressVsoCommands] [-ServicePrincipalAuth] [-NewTestResourcesRemainingArguments <Object>]
+ [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm] [<CommonParameters>]
+```
+
+----------------------------------------
+
+TITLE: Debugging NPX Execution of Azure MCP Package
+DESCRIPTION: This snippet shows how to run the Azure MCP package using NPX with the Node.js inspector enabled. It uses the --node-options flag to pass the --inspect-brk option, which pauses execution until a debugger is attached.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/npm/TROUBLESHOOTING.md#2025-04-22_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+npx --node-options=""--inspect-brk"" @azure/mcp@latest
+```
+
+----------------------------------------
+
+TITLE: Debug Output Example for Azure MCP Package
+DESCRIPTION: This snippet shows the expected debug output when running the Azure MCP package with DEBUG=true. It displays information about the platform package being loaded, command arguments, executable paths, and the package version.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/npm/TROUBLESHOOTING.md#2025-04-22_snippet_1
+
+LANGUAGE: plaintext
+CODE:
+```
+Attempting to require platform package: @azure/mcp-linux-x64
+All args:
+0: /usr/bin/node
+1: /home/user/.npm/_npx/541454632b79112e/node_modules/.bin/azmcp
+2: --version
+All args:
+0: --version
+Found executable in package.json: azmcp
+Executable path: /home/user/.npm/_npx/541454632b79112e/node_modules/@azure/mcp-linux-x64/azmcp
+Starting /home/user/.npm/_npx/541454632b79112e/node_modules/@azure/mcp-linux-x64/azmcp
+0.0.6+90c3def5f15860420244db365c04eb302494da5b
+Process exited with code: 0
+```
+
+----------------------------------------
+
+TITLE: Configuring Azure MCP Server for SSE in VS Code
+DESCRIPTION: JSON configuration for using the Azure MCP Server with Server-Sent Events (SSE) in Visual Studio Code. This snippet defines the SSE server configuration in the mcp.json file.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/README.md#2025-04-22_snippet_1
+
+LANGUAGE: json
+CODE:
+```
+{
+   ""servers"": {
+     ""Azure MCP Server"": {
+       ""type"": ""sse"",
+       ""url"": ""http://localhost:5008/sse""
+     }
+   }
+}
+```
+
+----------------------------------------
+
+TITLE: Removing Azure Test Resources with Default Parameters
+DESCRIPTION: This snippet shows the default parameter set for the Remove-TestResources.ps1 script. It allows specifying a base name, subscription ID, service directory, and other optional parameters to remove test resources.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/Remove-TestResources.ps1.md#2025-04-22_snippet_0
+
+LANGUAGE: powershell
+CODE:
+```
+Remove-TestResources.ps1 [-BaseName <String>] [-SubscriptionId <String>] [[-ServiceDirectory] <String>]
+ [-Environment <String>] [-ResourceType <String>] [-ServicePrincipalAuth] [-Force]
+ [-RemoveTestResourcesRemainingArguments <Object>] [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm]
+ [<CommonParameters>]
+```
+
+----------------------------------------
+
+TITLE: Removing Azure Test Resources with Provisioner Authentication
+DESCRIPTION: This snippet demonstrates the parameter set for removing test resources using a provisioner application for authentication. It requires a base name, tenant ID, and provisioner application ID, along with other optional parameters.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/Remove-TestResources.ps1.md#2025-04-22_snippet_1
+
+LANGUAGE: powershell
+CODE:
+```
+Remove-TestResources.ps1 -BaseName <String> -TenantId <String> [-SubscriptionId <String>]
+ -ProvisionerApplicationId <String> [-ProvisionerApplicationSecret <String>] [[-ServiceDirectory] <String>]
+ [-Environment <String>] [-ResourceType <String>] [-ServicePrincipalAuth] [-Force]
+ [-RemoveTestResourcesRemainingArguments <Object>] [-ProgressAction <ActionPreference>] [-WhatIf] [-Confirm]
+ [<CommonParameters>]
+```
+
+----------------------------------------
+
+TITLE: TypeScript Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for TypeScript files using double-slash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_36
+
+LANGUAGE: TypeScript
+CODE:
+```
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: C# Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for C# files using double-slash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_4
+
+LANGUAGE: C#
+CODE:
+```
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Error Response with Missing Arguments in JSON
+DESCRIPTION: Example JSON error response when required arguments are missing, showing status code, descriptive message, and suggested values for the missing arguments.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/docs/azmcp-commands.md#2025-04-22_snippet_9
+
+LANGUAGE: json
+CODE:
+```
+{
+  ""status"": 400,
+  ""message"": ""Missing required args"",
+  ""args"": [
+    {
+      ""name"": ""subscription"",
+      ""description"": ""Azure Subscription ID"",
+      ""command"": ""azmcp cosmos database list --subscription <subscription>"",
+      ""value"": ""<sub-id>"",
+      ""values"": []
+    },
+    {
+      ""name"": ""account-name"",
+      ""description"": ""Cosmos DB Account Name"",
+      ""command"": ""azmcp cosmos database list --account-name <account-name>"",
+      ""value"": """",
+      ""values"": [
+        {
+          ""name"": ""cosmosaccount1"",
+          ""id"": ""cosmosaccount1""
+        }
+      ]
+    }
+  ],
+  ""duration"": 156
+}
+```
+
+----------------------------------------
+
+TITLE: JavaScript Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for JavaScript files using double-slash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_16
+
+LANGUAGE: JavaScript
+CODE:
+```
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Dart Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Dart files using double-slash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_7
+
+LANGUAGE: Dart
+CODE:
+```
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Java Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Java files using double-slash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_15
+
+LANGUAGE: Java
+CODE:
+```
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: C++ Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for C++ files using double-slash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_3
+
+LANGUAGE: C++
+CODE:
+```
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Defining ProvisionerApplicationId Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the ProvisionerApplicationId parameter, which is an optional Application ID of the Azure Active Directory service principal to use for provisioning test resources. It requires specific permissions to the Microsoft Graph API.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_6
+
+LANGUAGE: yaml
+CODE:
+```
+Type: String
+Parameter Sets: Provisioner
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: PHP Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for PHP files using double-slash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_26
+
+LANGUAGE: PHP
+CODE:
+```
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Rust Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Rust files using double-slash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_31
+
+LANGUAGE: Rust
+CODE:
+```
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: F# Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for F# files using double-slash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_9
+
+LANGUAGE: F#
+CODE:
+```
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Defining TestApplicationOid Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the TestApplicationOid parameter, which is the Service Principal Object ID of the AAD Test Application. It is used to assign permissions to the AAD application for accessing tested features on live test resources.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_3
+
+LANGUAGE: yaml
+CODE:
+```
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: HTML Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for HTML files using HTML comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_14
+
+LANGUAGE: HTML
+CODE:
+```
+<!-- Copyright (c) Microsoft Corporation.
+ Licensed under the MIT License. -->
+```
+
+----------------------------------------
+
+TITLE: TeX Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for TeX files using percent sign comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_35
+
+LANGUAGE: TeX
+CODE:
+```
+% Copyright (c) Microsoft Corporation.
+% Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Defining SubscriptionId Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the SubscriptionId parameter, which is an optional subscription ID to use for new resources when logging in as a provisioner. If not specified, one will be automatically selected by Connect-AzAccount cmdlet.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_5
+
+LANGUAGE: yaml
+CODE:
+```
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: Defining CI Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the CI parameter, which indicates the script is run as part of a Continuous Integration / Continuous Deployment (CI/CD) build. Currently, only Azure Pipelines is supported.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_16
+
+LANGUAGE: yaml
+CODE:
+```
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: ($null -ne $env:SYSTEM_TEAMPROJECTID)
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: Defining ProvisionerApplicationSecret Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the ProvisionerApplicationSecret parameter, which is a service principal secret used to provision test resources when a provisioner is specified. This value is not passed to the ARM template.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_8
+
+LANGUAGE: yaml
+CODE:
+```
+Type: String
+Parameter Sets: Provisioner
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: OCaml Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for OCaml files using parenthesized asterisk comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_24
+
+LANGUAGE: OCaml
+CODE:
+```
+(* Copyright (c) Microsoft Corporation. *)
+(* Licensed under the MIT License. *)
+```
+
+----------------------------------------
+
+TITLE: Lua Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Lua files using double-dash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_20
+
+LANGUAGE: Lua
+CODE:
+```
+-- Copyright (c) Microsoft Corporation.
+-- Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Defining ProvisionerApplicationOid Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the ProvisionerApplicationOid parameter. The description for this parameter is not provided in the given content.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_7
+
+LANGUAGE: yaml
+CODE:
+```
+Type: String
+Parameter Sets: Provisioner
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: Code Style Examples in C#
+DESCRIPTION: Demonstration of good and bad coding practices, focusing on self-documenting code without comments.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/src/Docs/new-command.md#2025-04-22_snippet_24
+
+LANGUAGE: csharp
+CODE:
+```
+// BAD - uses comments
+// Get the storage account client
+var client = new StorageAccountClient(endpoint, credential);
+
+// GOOD - self-documenting code
+var storageClient = new StorageAccountClient(endpoint, credential);
+
+// BAD - commented steps
+// First validate the input
+if (string.IsNullOrEmpty(accountName)) return false;
+// Then check permissions
+if (!await HasPermissions()) return false;
+
+// GOOD - extracted to meaningful method
+if (!await ValidateAccountAccess(accountName)) return false;
+```
+
+----------------------------------------
+
+TITLE: Listing Common Parameters for Azure MCP Cmdlets in PowerShell
+DESCRIPTION: This snippet lists the common parameters supported by Azure MCP cmdlets. These parameters provide functionality for debugging, error handling, information output, and variable management across all cmdlets in the Azure MCP module.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_25
+
+LANGUAGE: PowerShell
+CODE:
+```
+-Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, -WarningVariable
+```
+
+----------------------------------------
+
+TITLE: Defining Environment Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the Environment parameter, which is an optional name of the cloud environment. The default is the Azure Public Cloud ('AzureCloud').
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_11
+
+LANGUAGE: yaml
+CODE:
+```
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: AzureCloud
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: Defining ResourceType Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the ResourceType parameter. The description for this parameter is not provided in the given content.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_12
+
+LANGUAGE: yaml
+CODE:
+```
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: Test
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: Downloading Transition Script - Bash
+DESCRIPTION: Bash command to download the generate-assets-json.ps1 script from Azure SDK tools repository
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/testproxy/onboarding/README.md#2025-04-22_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+wget https://raw.githubusercontent.com/Azure/azure-sdk-tools/main/eng/common/testproxy/onboarding/generate-assets-json.ps1 -o generate-assets-json.ps1
+```
+
+----------------------------------------
+
+TITLE: Running Migration Script - Docker Integration
+DESCRIPTION: Example of running the migration script using Docker container with git token for authentication
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/testproxy/onboarding/README.md#2025-04-22_snippet_4
+
+LANGUAGE: powershell
+CODE:
+```
+# calling transition script against docker, given local clones of azure-sdk-for-java and azure-sdk-tools
+$env:GIT_TOKEN=""my git token""
+cd c:/src/azure-sdk-for-java/sdk/attestation
+<path-to-transition-script>/generate-assets-json.ps1 -TestProxyExe ""docker"" -InitialPush
+```
+
+----------------------------------------
+
+TITLE: Pushing Combined Tag Using Test-Proxy
+DESCRIPTION: This snippet shows how to push the combined tag using the test-proxy command after successfully merging the proxy tags. It assumes that the merge process has completed without errors.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/testproxy/scripts/tag-merge/README.md#2025-04-22_snippet_3
+
+LANGUAGE: bash
+CODE:
+```
+test-proxy push sdk/storage/azure-storage-blob/assets.json
+```
+
+----------------------------------------
+
+TITLE: Azure MCP Development Version String
+DESCRIPTION: This snippet represents the development version number for Azure MCP. The version string follows semantic versioning with dev prefix, date stamp (YYYYMMDD format), and build number.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/testproxy/target_version.txt#2025-04-22_snippet_0
+
+LANGUAGE: plaintext
+CODE:
+```
+1.0.0-dev.20250221.1
+```
+
+----------------------------------------
+
+TITLE: Defining NewTestResourcesRemainingArguments Parameter in PowerShell for Azure Resource Management
+DESCRIPTION: Defines the NewTestResourcesRemainingArguments parameter, which captures any arguments not declared in the script. This enables backwards compatibility with old script versions in hotfix branches.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/New-TestResources.ps1.md#2025-04-22_snippet_21
+
+LANGUAGE: yaml
+CODE:
+```
+Type: Object
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+----------------------------------------
+
+TITLE: Generating PowerShell Script Documentation with PlatyPS
+DESCRIPTION: This PowerShell snippet shows how to install the PlatyPS module and use it to generate markdown documentation for the New-TestResources.ps1 script. This is useful for maintaining up-to-date documentation for PowerShell scripts.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/TestResources/README.md#2025-04-22_snippet_9
+
+LANGUAGE: powershell
+CODE:
+```
+Install-Module platyPS -Scope CurrentUser -Force
+New-MarkdownHelp -Command .\New-TestResources.ps1 -OutputFolder . -Force
+```
+
+----------------------------------------
+
+TITLE: Illustrating Azure SDK Repository Structure
+DESCRIPTION: This snippet shows the typical structure of an Azure SDK repository, including the location of service packages and the ci.yml file.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/common/scripts/job-matrix/pullrequest-faq.md#2025-04-22_snippet_0
+
+LANGUAGE: jsonc
+CODE:
+```
+sdk/
+  storage
+    Azure.Storage.Blobs
+    Azure.Storage.Queues
+    ...
+  <service>
+    <service-package-1>
+    ..
+    <service-package-N>
+    // the ci.yml is what AZDO build defs are based upon
+    ci.yml
+```
+
+----------------------------------------
+
+TITLE: PowerShell Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for PowerShell files using hash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_27
+
+LANGUAGE: PowerShell
+CODE:
+```
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Shell Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Shell scripts using hash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_33
+
+LANGUAGE: Shell
+CODE:
+```
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Bicep Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Bicep files using double-slash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_1
+
+LANGUAGE: Bicep
+CODE:
+```
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Go Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Go files using double-slash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_11
+
+LANGUAGE: Go
+CODE:
+```
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Kotlin Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Kotlin files using multiline comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_18
+
+LANGUAGE: Kotlin
+CODE:
+```
+/*
+ * Copyright (c) Microsoft Corporation.
+ * Licensed under the MIT License
+ */
+```
+
+----------------------------------------
+
+TITLE: CoffeeScript Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for CoffeeScript files using hash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_6
+
+LANGUAGE: CoffeeScript
+CODE:
+```
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: CMake Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for CMake files using hash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_5
+
+LANGUAGE: CMake
+CODE:
+```
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Scala Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Scala files using double-slash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_32
+
+LANGUAGE: Scala
+CODE:
+```
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: R Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for R files using hash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_29
+
+LANGUAGE: R
+CODE:
+```
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Perl Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Perl files using hash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_25
+
+LANGUAGE: Perl
+CODE:
+```
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Matlab Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Matlab files using percent sign comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_22
+
+LANGUAGE: Matlab
+CODE:
+```
+% Copyright (c) Microsoft Corporation.
+% Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Makefile Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Makefiles using hash comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_21
+
+LANGUAGE: Makefile
+CODE:
+```
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+```
+
+----------------------------------------
+
+TITLE: Emacs Lisp Copyright Header
+DESCRIPTION: Standard copyright and MIT license header for Emacs Lisp files using double-semicolon comment syntax.
+SOURCE: https://github.com/azure/azure-mcp/blob/main/eng/scripts/CopyrightHeaders.md#2025-04-22_snippet_8
+
+LANGUAGE: Emacs Lisp
+CODE:
+```
+;; Copyright (c) Microsoft Corporation.
+;; Licensed under the MIT License.
+```","mcp azure",""

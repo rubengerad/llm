@@ -1,0 +1,483 @@
+"azure","TITLE: Azure Login with OIDC Workflow (Azure CLI)
+DESCRIPTION: This workflow demonstrates how to log in to Azure using OpenID Connect (OIDC) and then execute an Azure CLI script. It sets the necessary permissions for OIDC and utilizes the `azure/login` action. It uses secrets stored in GitHub to provide client, tenant and subscription id.
+SOURCE: https://github.com/azure/login/blob/master/README.md#_snippet_1
+
+LANGUAGE: yaml
+CODE:
+```
+# File: .github/workflows/workflow.yml
+
+name: Run Azure Login with OIDC
+on: [push]
+
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Azure CLI script
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az account show
+```
+
+----------------------------------------
+
+TITLE: Azure Login with OIDC Workflow (CLI & PowerShell)
+DESCRIPTION: This workflow demonstrates how to log in to Azure using OIDC and execute both Azure CLI and Azure PowerShell scripts. It sets the necessary permissions for OIDC and utilizes the `azure/login` action, enabling an Azure PowerShell session. It uses secrets stored in GitHub to provide client, tenant and subscription id.
+SOURCE: https://github.com/azure/login/blob/master/README.md#_snippet_2
+
+LANGUAGE: yaml
+CODE:
+```
+# File: .github/workflows/workflow.yml
+
+name: Run Azure Login with OIDC
+on: [push]
+
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+
+      - name: Azure CLI script
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az account show
+
+      - name: Azure PowerShell script
+        uses: azure/powershell@v2
+        with:
+          azPSVersion: ""latest""
+          inlineScript: |
+            Get-AzContext
+```
+
+----------------------------------------
+
+TITLE: Azure Login with Individual Secret Parameters
+DESCRIPTION: This workflow demonstrates how to pass the client ID, client secret, subscription ID, and tenant ID as individual secrets rather than as a JSON object. This approach can address security concerns related to storing the entire credential object. It uses the azure/login@v2 with the `creds` parameters using string interpolation
+SOURCE: https://github.com/azure/login/blob/master/README.md#_snippet_6
+
+LANGUAGE: yaml
+CODE:
+```
+  - uses: azure/login@v2
+    with:
+      creds: '{""clientId"":""${{ secrets.AZURE_CLIENT_ID }}"",""clientSecret"":""${{ secrets.AZURE_CLIENT_SECRET }}"",""subscriptionId"":""${{ secrets.AZURE_SUBSCRIPTION_ID }}"",""tenantId"":""${{ secrets.AZURE_TENANT_ID }}""}'
+```
+
+----------------------------------------
+
+TITLE: Azure Login with Service Principal Secret (CLI)
+DESCRIPTION: This workflow demonstrates how to log in to Azure using a service principal secret stored in the `AZURE_CREDENTIALS` GitHub secret and execute an Azure CLI script. It uses the `azure/login` action with the `creds` parameter and then executes an Azure CLI script to display the current account.
+SOURCE: https://github.com/azure/login/blob/master/README.md#_snippet_4
+
+LANGUAGE: yaml
+CODE:
+```
+on: [push]
+
+name: Run Azure Login With a Service Principal Secret
+
+jobs:
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Azure CLI script
+      uses: azure/cli@v2
+      with:
+        azcliversion: latest
+        inlineScript: |
+          az account show
+```
+
+----------------------------------------
+
+TITLE: Azure Login with Service Principal Secret (CLI & PS)
+DESCRIPTION: This workflow demonstrates how to log in to Azure using a service principal secret and then execute both Azure CLI and Azure PowerShell scripts. It utilizes the `azure/login` action with the `creds` parameter and enables an Azure PowerShell session.  The `AZURE_CREDENTIALS` secret stores service principal details.
+SOURCE: https://github.com/azure/login/blob/master/README.md#_snippet_5
+
+LANGUAGE: yaml
+CODE:
+```
+on: [push]
+
+name: Run Azure Login With a Service Principal Secret
+
+jobs:
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        enable-AzPSSession: true
+
+    - name: Azure CLI script
+      uses: azure/cli@v2
+      with:
+        azcliversion: latest
+        inlineScript: |
+          az account show
+
+    - name: Azure PowerShell script
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: ""latest""
+        inlineScript: |
+          Get-AzWebApp
+```
+
+----------------------------------------
+
+TITLE: Login with User-Assigned Managed Identity (YAML)
+DESCRIPTION: This workflow demonstrates how to authenticate to Azure using a user-assigned managed identity in a GitHub Actions workflow. It uses the azure/login@v2 action with the IDENTITY auth-type and specifies the client ID, tenant ID, and subscription ID of the managed identity.  It also includes steps for running Azure CLI and Azure PowerShell scripts.
+SOURCE: https://github.com/azure/login/blob/master/README.md#_snippet_8
+
+LANGUAGE: yaml
+CODE:
+```
+# File: .github/workflows/workflow.yml
+
+name: Run Azure Login with User-assigned Managed Identity
+on: [push]
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          auth-type: IDENTITY
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+
+      # Azure CLI Action only supports linux self-hosted runners for now.
+      # If you want to execute the Azure CLI script on a windows self-hosted runner, you can execute it directly in `run`.
+      - name: Azure CLI script
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az account show
+
+      - name: Azure PowerShell script
+        uses: azure/powershell@v2
+        with:
+          azPSVersion: ""latest""
+          inlineScript: |
+            Get-AzContext
+```
+
+----------------------------------------
+
+TITLE: Credential JSON format for Azure Login
+DESCRIPTION: This JSON snippet defines the expected format for the 'creds' input parameter when authenticating with a Service Principal. It includes the clientSecret, subscriptionId, tenantId, and clientId. This parameter should be securely stored as a GitHub Action secret.
+SOURCE: https://github.com/azure/login/blob/master/README.md#_snippet_0
+
+LANGUAGE: json
+CODE:
+```
+{
+    ""clientSecret"":  ""******"",
+    ""subscriptionId"":  ""******"",
+    ""tenantId"":  ""******"",
+    ""clientId"":  ""******""
+}
+```
+
+----------------------------------------
+
+TITLE: Service Principal Secret Credentials Format (JSON)
+DESCRIPTION: This JSON snippet defines the format for storing Azure service principal credentials as a GitHub secret.  It includes the client secret, subscription ID, tenant ID, and client ID. This credential is used for authenticating to Azure within a GitHub Actions workflow using a service principal.
+SOURCE: https://github.com/azure/login/blob/master/README.md#_snippet_3
+
+LANGUAGE: json
+CODE:
+```
+{
+    ""clientSecret"":  ""******"",
+    ""subscriptionId"":  ""******"",
+    ""tenantId"":  ""******"",
+    ""clientId"":  ""******""
+}
+```
+
+----------------------------------------
+
+TITLE: Azure Login with System-assigned Managed Identity
+DESCRIPTION: This workflow demonstrates how to log in to Azure using a system-assigned managed identity. This approach requires a self-hosted runner running on an Azure virtual machine with a system assigned managed identity. It uses the `azure/login` action with `auth-type: IDENTITY` and executes both Azure CLI and Azure PowerShell scripts. It requires AZURE_SUBSCRIPTION_ID and AZURE_TENANT_ID secrets.
+SOURCE: https://github.com/azure/login/blob/master/README.md#_snippet_7
+
+LANGUAGE: yaml
+CODE:
+```
+# File: .github/workflows/workflow.yml
+
+name: Run Azure Login with System-assigned Managed Identity
+on: [push]
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          auth-type: IDENTITY
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+
+      # Azure CLI Action only supports linux self-hosted runners for now.
+      # If you want to execute the Azure CLI script on a windows self-hosted runner, you can execute it directly in `run`.
+      - name: Azure CLI script
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az account show
+
+      - name: Azure PowerShell script
+        uses: azure/powershell@v2
+        with:
+          azPSVersion: ""latest""
+          inlineScript: |
+            Get-AzContext
+            Get-AzResourceGroup
+```
+
+----------------------------------------
+
+TITLE: Login without Subscription (YAML)
+DESCRIPTION: This workflow shows how to log in to Azure without a subscription using the azure/login@v2 action. It sets the allow-no-subscriptions parameter to true, enabling access to tenant-level commands.  It also demonstrates running Azure CLI and Azure PowerShell scripts.
+SOURCE: https://github.com/azure/login/blob/master/README.md#_snippet_11
+
+LANGUAGE: yaml
+CODE:
+```
+# File: .github/workflows/workflow.yml
+
+on: [push]
+
+name: Run Azure Login without subscription
+
+jobs:
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        allow-no-subscriptions: true
+        enable-AzPSSession: true
+
+    - name: Azure CLI script
+      uses: azure/cli@v2
+      with:
+        azcliversion: latest
+        inlineScript: |
+          az account show
+
+    - name: Run Azure PowerShell
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: ""latest""
+        inlineScript: |
+          Get-AzContext
+```
+
+----------------------------------------
+
+TITLE: Login to Azure US Government Cloud (YAML)
+DESCRIPTION: This workflow illustrates how to log in to Azure US Government cloud using the azure/login@v2 action. It uses the creds input to specify Azure credentials stored as a GitHub secret and sets the environment to 'AzureUSGovernment'.
+SOURCE: https://github.com/azure/login/blob/master/README.md#_snippet_9
+
+LANGUAGE: yaml
+CODE:
+```
+# File: .github/workflows/workflow.yml
+
+on: [push]
+
+name: Login to Azure US Government cloud
+
+jobs:
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        environment: 'AzureUSGovernment'
+        enable-AzPSSession: true
+```
+
+----------------------------------------
+
+TITLE: Control Azure Login Cleanup Steps (YAML)
+DESCRIPTION: This workflow demonstrates how to control the cleanup steps in the Azure Login action by setting the AZURE_LOGIN_PRE_CLEANUP and AZURE_LOGIN_POST_CLEANUP environment variables.  This allows enabling or disabling cleanup before and after the login step for multiple logins in a workflow. Different client IDs, tenant IDs, and subscription IDs are used for each Azure login step.
+SOURCE: https://github.com/azure/login/blob/master/README.md#_snippet_12
+
+LANGUAGE: yaml
+CODE:
+```
+# File: .github/workflows/workflow.yml
+
+on: [push]
+
+name: Cleanup examples for Multiple Azure Login
+
+jobs:
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+
+    # enable cleanup for the 1st Azure Login
+    - name: Azure Login
+      uses: azure/login@v2
+      env:
+        AZURE_LOGIN_PRE_CLEANUP: true
+        AZURE_LOGIN_POST_CLEANUP: true
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        enable-AzPSSession: true    
+
+    # run some actions
+
+    # disable cleanup for all other Azure Login
+    - name: Azure Login 2
+      uses: azure/login@v2
+      env:
+        AZURE_LOGIN_PRE_CLEANUP: false
+        AZURE_LOGIN_POST_CLEANUP: false
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID_2 }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID_2 }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID_2 }}
+        enable-AzPSSession: true   
+
+    # run other actions
+
+    # disable cleanup for all other Azure Login
+    - name: Azure Login 3
+      uses: azure/login@v2
+      env:
+        AZURE_LOGIN_PRE_CLEANUP: false
+        AZURE_LOGIN_POST_CLEANUP: false
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID_3 }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID_3 }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID_3 }}
+        enable-AzPSSession: true   
+
+    # run other actions
+```
+
+----------------------------------------
+
+TITLE: Disable cleanup for GitHub Hosted Runners (YAML)
+DESCRIPTION: This workflow shows how to conditionally disable cleanup steps based on the runner environment.  It uses the startsWith function to check if the runner name starts with 'GitHub Actions' and sets the AZURE_LOGIN_PRE_CLEANUP and AZURE_LOGIN_POST_CLEANUP environment variables accordingly.
+SOURCE: https://github.com/azure/login/blob/master/README.md#_snippet_13
+
+LANGUAGE: yaml
+CODE:
+```
+# File: .github/workflows/workflow.yml
+
+on: [push]
+
+name: Disable cleanup for GitHub Hosted Runners
+
+jobs:
+
+  deploy:
+    runs-on: [ubuntu-latest, self-hosted]
+    steps:
+
+    - name: Azure Login
+      uses: azure/login@v2
+      env:
+        AZURE_LOGIN_PRE_CLEANUP: ${{ startsWith(runner.name, 'GitHub Actions') }}
+        AZURE_LOGIN_POST_CLEANUP: ${{ startsWith(runner.name, 'GitHub Actions') }}
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        enable-AzPSSession: true    
+
+    # run some actions
+
+```
+
+----------------------------------------
+
+TITLE: Login to Azure Stack Hub (YAML)
+DESCRIPTION: This workflow demonstrates how to log in to Azure Stack Hub using the azure/login@v2 action.  It specifies the Azure credentials using the creds input (stored as a GitHub secret) and sets the environment to 'AzureStack'.
+SOURCE: https://github.com/azure/login/blob/master/README.md#_snippet_10
+
+LANGUAGE: yaml
+CODE:
+```
+# File: .github/workflows/workflow.yml
+
+on: [push]
+
+name: Login to Azure Stack Hub cloud
+
+jobs:
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        environment: 'AzureStack'
+        enable-AzPSSession: true
+```","azure",""

@@ -1,0 +1,45 @@
+"gcp","TITLE: Find GCP IAM Roles by Specific Permission
+DESCRIPTION: This script identifies and lists all GCP IAM roles that contain a specified permission. The permission should be provided as the first argument, following the format `api.resource.verb`. Ensure `jq` is installed and in your PATH.
+SOURCE: https://github.com/darkbitio/gcp-iam-role-permissions/blob/main/README.md#_snippet_2
+
+LANGUAGE: Shell
+CODE:
+```
+./list-roles-with-permission.sh container.clusters.get
+```
+
+----------------------------------------
+
+TITLE: List All Unique GCP IAM Permissions
+DESCRIPTION: This script lists all unique permissions found across all fetched GCP IAM roles. It requires the `jq` tool to be installed and available in your system's PATH for proper execution.
+SOURCE: https://github.com/darkbitio/gcp-iam-role-permissions/blob/main/README.md#_snippet_0
+
+LANGUAGE: Shell
+CODE:
+```
+list-all-permissions.sh
+```
+
+----------------------------------------
+
+TITLE: List Permissions of a Specific GCP IAM Role
+DESCRIPTION: This script lists all permissions associated with a specified GCP IAM role. The role name should be provided as the first argument (e.g., `container.admin`), without the `roles/` prefix. This script requires `jq` to be installed and in your PATH.
+SOURCE: https://github.com/darkbitio/gcp-iam-role-permissions/blob/main/README.md#_snippet_3
+
+LANGUAGE: Shell
+CODE:
+```
+./list-roles-with-permission.sh container.admin
+```
+
+----------------------------------------
+
+TITLE: List GCP IAM Roles by Availability Status
+DESCRIPTION: This script categorizes and lists GCP IAM roles based on their availability status, such as alpha, beta, or generally available (GA). It depends on the `jq` tool being installed and accessible in your system's PATH.
+SOURCE: https://github.com/darkbitio/gcp-iam-role-permissions/blob/main/README.md#_snippet_1
+
+LANGUAGE: Shell
+CODE:
+```
+list-alpha/beta/ga-roles.sh
+```","gcp",""

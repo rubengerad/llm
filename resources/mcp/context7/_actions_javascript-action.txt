@@ -1,0 +1,214 @@
+"javascript","TITLE: Install Node.js Dependencies for JavaScript Action
+DESCRIPTION: Installs all required Node.js packages and dependencies for the JavaScript action using npm. This step is essential for setting up the development environment and ensuring all necessary modules are available before building or running the action.
+SOURCE: https://github.com/actions/javascript-action/blob/main/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+npm install
+```
+
+----------------------------------------
+
+TITLE: Build and Prepare JavaScript Action with npm
+DESCRIPTION: Command to run all build and test scripts defined in `package.json`, which typically includes running `ncc` to bundle the JavaScript action and its dependencies into a single file, ensuring it's ready for deployment and includes license information.
+SOURCE: https://github.com/actions/javascript-action/blob/main/README.md#_snippet_5
+
+LANGUAGE: bash
+CODE:
+```
+npm run all
+```
+
+----------------------------------------
+
+TITLE: Define Asynchronous GitHub Action Entrypoint in JavaScript
+DESCRIPTION: Illustrates the basic structure of a GitHub Action's `main.js` file, showing how the `run` function is defined as `async` to handle asynchronous operations and how errors are caught using `core.setFailed` from the GitHub Actions toolkit.
+SOURCE: https://github.com/actions/javascript-action/blob/main/README.md#_snippet_3
+
+LANGUAGE: javascript
+CODE:
+```
+const core = require('@actions/core')
+//...
+
+async function run() {
+  try {
+    //...
+  } catch (error) {
+    core.setFailed(error.message)
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Run Tests for JavaScript Action
+DESCRIPTION: Executes the test suite for the JavaScript action to verify its functionality and ensure all components are working as expected. The provided output demonstrates successful test runs for various scenarios.
+SOURCE: https://github.com/actions/javascript-action/blob/main/README.md#_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+$ npm test
+
+PASS  ./index.test.js
+  ✓ throws invalid number (3ms)
+  ✓ wait 500 ms (504ms)
+  ✓ test runs (95ms)
+
+...
+```
+
+----------------------------------------
+
+TITLE: Package JavaScript Action for Distribution
+DESCRIPTION: Bundles and packages the JavaScript code for the action, preparing it for distribution and use in GitHub Actions workflows. This command typically compiles, minifies, and optimizes the source code into a single distributable file.
+SOURCE: https://github.com/actions/javascript-action/blob/main/README.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+npm run bundle
+```
+
+----------------------------------------
+
+TITLE: Reference Versioned GitHub Action in External Workflow YAML
+DESCRIPTION: Example YAML snippet showing how to include a published GitHub Action from another repository in a workflow, referencing it by its `v1` tag and passing required inputs, then accessing its outputs for further steps.
+SOURCE: https://github.com/actions/javascript-action/blob/main/README.md#_snippet_10
+
+LANGUAGE: yaml
+CODE:
+```
+steps:
+  - name: Checkout
+    id: checkout
+    uses: actions/checkout@v4
+
+  - name: Run my Action
+    id: run-action
+    uses: actions/javascript-action@v1 # Commit with the `v1` tag
+    with:
+      milliseconds: 1000
+
+  - name: Print Output
+    id: output
+    run: echo ""${{ steps.run-action.outputs.time }}""
+```
+
+----------------------------------------
+
+TITLE: Reference Local GitHub Action in Workflow YAML
+DESCRIPTION: Example YAML snippet for a GitHub Actions workflow (`ci.yml`) demonstrating how to reference an action located within the same repository using `./` and pass inputs, then print its output for validation.
+SOURCE: https://github.com/actions/javascript-action/blob/main/README.md#_snippet_9
+
+LANGUAGE: yaml
+CODE:
+```
+steps:
+  - name: Checkout
+    id: checkout
+    uses: actions/checkout@v3
+
+  - name: Test Local Action
+    id: test-action
+    uses: ./
+    with:
+      milliseconds: 1000
+
+  - name: Print Output
+    id: output
+    run: echo ""${{ steps.test-action.outputs.time }}""
+```
+
+----------------------------------------
+
+TITLE: Test GitHub Action Locally using `npx @github/local-action`
+DESCRIPTION: Demonstrates how to use the `@github/local-action` utility via `npx` to simulate a GitHub Actions environment and run a JavaScript action locally, specifying the action's YAML path, entrypoint, and an optional `.env` file for environment variables like inputs.
+SOURCE: https://github.com/actions/javascript-action/blob/main/README.md#_snippet_6
+
+LANGUAGE: bash
+CODE:
+```
+# npx @github/local action <action-yaml-path> <entrypoint> <dotenv-file>
+npx @github/local-action . src/main.js .env
+```
+
+----------------------------------------
+
+TITLE: Commit Changes to Git Repository
+DESCRIPTION: Standard Git commands to stage all modified files and commit them with a descriptive message, preparing the changes for pushing to the remote repository.
+SOURCE: https://github.com/actions/javascript-action/blob/main/README.md#_snippet_7
+
+LANGUAGE: bash
+CODE:
+```
+git add .
+git commit -m ""My first action is ready!""
+```
+
+----------------------------------------
+
+TITLE: Push Git Branch to Remote Repository
+DESCRIPTION: Command to push the newly created branch and its committed changes to the remote Git repository, setting the upstream tracking branch for future pushes.
+SOURCE: https://github.com/actions/javascript-action/blob/main/README.md#_snippet_8
+
+LANGUAGE: bash
+CODE:
+```
+git push -u origin releases/v1
+```
+
+----------------------------------------
+
+TITLE: Create New Git Branch for Action Release
+DESCRIPTION: Command to create a new Git branch, typically used for versioning or releasing a new iteration of the action, such as `releases/v1`, to manage stable versions.
+SOURCE: https://github.com/actions/javascript-action/blob/main/README.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+git checkout -b releases/v1
+```
+
+----------------------------------------
+
+TITLE: Update Cached Dependency Licenses with Licensed CLI
+DESCRIPTION: This command uses the Licensed CLI to update the local cache of dependency licenses. It should be run whenever new dependencies are installed or existing ones are updated to ensure the license database is current.
+SOURCE: https://github.com/actions/javascript-action/blob/main/README.md#_snippet_12
+
+LANGUAGE: bash
+CODE:
+```
+licensed cache
+```
+
+----------------------------------------
+
+TITLE: Check Status of Cached Dependency Licenses with Licensed CLI
+DESCRIPTION: This command allows users to check the current status of cached dependency licenses using the Licensed CLI. It provides an overview of the license compliance and any issues detected.
+SOURCE: https://github.com/actions/javascript-action/blob/main/README.md#_snippet_13
+
+LANGUAGE: bash
+CODE:
+```
+licensed status
+```
+
+----------------------------------------
+
+TITLE: Enable Licensed GitHub Actions Workflow Triggers
+DESCRIPTION: This YAML snippet shows the configuration to uncomment in 'licensed.yml' to enable the GitHub Actions workflow. It configures the workflow to run on 'pull_request' and 'push' events targeting the 'main' branch.
+SOURCE: https://github.com/actions/javascript-action/blob/main/README.md#_snippet_11
+
+LANGUAGE: yaml
+CODE:
+```
+# pull_request:
+#   branches:
+#     - main
+# push:
+#   branches:
+#     - main
+```","javascript",""
